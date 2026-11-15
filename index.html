@@ -662,6 +662,60 @@
     letter-spacing: .03em;
     padding: 8px 4px 6px;
   }
+
+  /* Apple-style list + swipe */
+  .list-group {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .list-row {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg-card);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .list-row:last-child { border-bottom: none; }
+  .list-row-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    position: relative;
+    z-index: 1;
+    transition: transform .2s var(--ease);
+    touch-action: pan-y;
+  }
+  .list-row-actions {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    display: flex;
+    z-index: 0;
+  }
+  .list-row-actions button {
+    border: none;
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 0 20px;
+    cursor: pointer;
+    font-family: inherit;
+    min-width: 88px;
+  }
+  .list-row-actions .act-delete { background: #ff3b30; }
+  .list-row.open .list-row-inner { transform: translateX(-88px); }
+  .list-row-meta {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .list-chevron {
+    color: var(--text-muted);
+    opacity: .5;
+    font-size: 18px;
+    margin-left: 4px;
+  }
 </style>
 </head>
 <body>
@@ -1551,6 +1605,37 @@ function showBuilder(draft) {
 }
 
 /* People */
+async function deleteUser(u) {
+  const id = u.id;
+  const attempts = [
+    () => api('DELETE', `/users/${id}`),
+    () => api('POST', `/users/${id}/delete`),
+    () => api('POST', `/users/${id}/deactivate`),
+    () => api('PATCH', `/users/${id}`, { status: 'DISABLED', isActive: false, active: false }),
+    () => api('PUT', `/users/${id}`, { status: 'DISABLED', isActive: false }),
+  ];
+  let lastErr;
+  for (const attempt of attempts) {
+    try {
+      await attempt();
+      toast('Сотрудник удалён');
+      return true;
+    } catch (err) {
+      lastErr = err;
+      // real permission/validation error — stop
+      if (err.status === 403 || err.status === 401) break;
+      if (err.status === 400 && !/cannot|not allowed|method/i.test(err.message || '')) break;
+    }
+  }
+  const msg = lastErr?.message || '';
+  if (/cannot delete|method not allowed|404|not found/i.test(msg)) {
+    toast('Удаление пользователей пока не реализовано на сервере', true);
+  } else {
+    toast(msg || 'Не удалось удалить сотрудника', true);
+  }
+  return false;
+}
+
 async function renderPeople() {
   const users = can('users.read') ? await loadUsers() : [];
   const out = h('div');
@@ -1602,46 +1687,97 @@ async function renderPeople() {
   if (can('users.read')) {
     nodes.push(h('div', { class: 'section-label' }, 'Список'));
     if (users.length) {
+      const group = h('div', { class: 'list-group' });
+      const canDelete = can('users.create') || can('users.delete') || can('users.manage') || can('users.update');
+
+      const closeAllSwipes = (except) => {
+        group.querySelectorAll('.list-row.open').forEach(row => {
+          if (row !== except) row.classList.remove('open');
+        });
+      };
+
       users.forEach(u => {
         const isMe = u.id === state.me?.id;
-        nodes.push(h('div', { class: 'card' },
-          h('div', { class: 'row' },
-            h('div', { style: 'display:flex;align-items:center;gap:12px;min-width:0;flex:1' },
-              h('div', {
-                class: 'avatar',
-                style: 'width:40px;height:40px;font-size:14px;flex-shrink:0',
-              }, initials(u)),
-              h('div', { style: 'min-width:0' },
-                h('strong', { style: 'font-size:15px' }, personName(u)),
-                h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis' }, u.email || '')
-              )
-            ),
-            h('span', { class: 'badge neutral' }, u.roleCode || u.role || '—')
+        const roleLabel = u.roleCode || u.role || u.roleName || '';
+        const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
+
+        const row = h('div', { class: 'list-row' });
+        const inner = h('div', { class: 'list-row-inner' },
+          h('div', {
+            class: 'avatar',
+            style: 'width:40px;height:40px;font-size:14px;flex-shrink:0',
+          }, initials(u)),
+          h('div', { style: 'min-width:0;flex:1' },
+            h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'),
+            h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, u.email || '')
           ),
-          !isMe && (can('users.create') || can('users.delete') || can('users.manage')) && h('div', { class: 'gap' },
+          showRole && h('span', { class: 'badge neutral list-row-meta' }, roleLabel)
+        );
+
+        // Swipe to delete (Apple-style)
+        if (!isMe && canDelete) {
+          const actions = h('div', { class: 'list-row-actions' },
             h('button', {
-              class: 'btn btn-danger btn-sm',
-              onclick: async () => {
-                if (!confirm(`Удалить сотрудника «${personName(u)}»?`)) return;
-                try {
-                  await api('DELETE', `/users/${u.id}`);
-                  toast('Сотрудник удалён');
-                  go('people');
-                } catch (err) {
-                  // try alternate endpoints
-                  try {
-                    await api('POST', `/users/${u.id}/delete`);
-                    toast('Сотрудник удалён');
-                    go('people');
-                  } catch (err2) {
-                    toast(err.message || 'Удаление пока не поддержано на сервере', true);
-                  }
+              class: 'act-delete',
+              type: 'button',
+              onclick: async (e) => {
+                e.stopPropagation();
+                if (!confirm(`Удалить «${personName(u)}»?`)) {
+                  row.classList.remove('open');
+                  return;
                 }
+                const ok = await deleteUser(u);
+                if (ok) go('people');
+                else row.classList.remove('open');
               },
             }, 'Удалить')
-          )
-        ));
+          );
+          row.append(actions, inner);
+
+          let startX = 0, currentX = 0, dragging = false;
+          inner.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            currentX = startX;
+            dragging = true;
+            closeAllSwipes(row);
+          }, { passive: true });
+          inner.addEventListener('touchmove', (e) => {
+            if (!dragging) return;
+            currentX = e.touches[0].clientX;
+            const dx = currentX - startX;
+            if (dx < 0) {
+              const offset = Math.max(dx, -88);
+              inner.style.transition = 'none';
+              inner.style.transform = `translateX(${offset}px)`;
+            }
+          }, { passive: true });
+          inner.addEventListener('touchend', () => {
+            if (!dragging) return;
+            dragging = false;
+            inner.style.transition = '';
+            const dx = currentX - startX;
+            if (dx < -40) {
+              row.classList.add('open');
+              inner.style.transform = '';
+            } else {
+              row.classList.remove('open');
+              inner.style.transform = '';
+            }
+          });
+          // click closes
+          inner.addEventListener('click', () => {
+            if (row.classList.contains('open')) row.classList.remove('open');
+          });
+        } else {
+          row.append(inner);
+        }
+
+        group.append(row);
       });
+      nodes.push(group);
+      nodes.push(h('div', { class: 'small', style: 'margin-top:10px;padding:0 4px' },
+        'Свайп влево по сотруднику — удалить'
+      ));
     } else {
       nodes.push(emptyState('Список пуст'));
     }
@@ -1752,7 +1888,6 @@ async function renderProfile() {
 
           e.target.disabled = true;
           try {
-            // try common update endpoints
             let updated = null;
             const attempts = [
               () => api('PATCH', '/auth/me', body),
@@ -1760,6 +1895,7 @@ async function renderProfile() {
               () => api('PATCH', `/users/${me.id}`, body),
               () => api('PUT', `/users/${me.id}`, body),
               () => api('POST', '/auth/profile', body),
+              () => api('POST', '/users/me', body),
             ];
             let lastErr;
             for (const attempt of attempts) {
@@ -1768,13 +1904,23 @@ async function renderProfile() {
                 break;
               } catch (err) {
                 lastErr = err;
-                if (err.status && err.status !== 404 && err.status !== 405) {
-                  // validation or auth error — stop
-                  if (err.status === 400 || err.status === 401 || err.status === 403) throw err;
+                if (err.status === 400) {
+                  // validation — show real message
+                  throw err;
                 }
+                if (err.status === 401 || err.status === 403) throw err;
               }
             }
-            if (!updated && lastErr) throw lastErr;
+            if (!updated) {
+              const msg = lastErr?.message || '';
+              if (/cannot|not allowed|404|405|not found|method/i.test(msg) || !lastErr) {
+                toast('Изменение профиля пока не реализовано на сервере', true);
+              } else {
+                toast(msg, true);
+              }
+              e.target.disabled = false;
+              return;
+            }
 
             toast('Профиль обновлён');
             try {
@@ -1783,13 +1929,12 @@ async function renderProfile() {
               updateSideUser();
               go('me');
             } catch {
-              // keep local optimistic update
               Object.assign(state.me, body);
               updateSideUser();
               go('me');
             }
           } catch (err) {
-            toast(err.message || 'Обновление профиля пока не поддержано на сервере', true);
+            toast(err.message || 'Не удалось сохранить профиль', true);
             e.target.disabled = false;
           }
         },
@@ -1959,18 +2104,22 @@ async function renderSearch() {
       }
       if (users.length) {
         nodes.push(h('div', { class: 'section-label' }, 'Сотрудники'));
-        users.forEach(({ data: u }) => nodes.push(h('div', { class: 'card' },
-          h('div', { class: 'row' },
-            h('div', { style: 'display:flex;align-items:center;gap:12px' },
-              h('div', { class: 'avatar', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
-              h('div', {},
-                h('strong', { style: 'font-size:15px' }, personName(u)),
-                h('div', { class: 'muted' }, u.email || '')
-              )
-            ),
-            h('span', { class: 'badge neutral' }, u.roleCode || u.role || '—')
-          )
-        )));
+        users.forEach(({ data: u }) => {
+          const roleLabel = u.roleCode || u.role || u.roleName || '';
+          const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
+          nodes.push(h('div', { class: 'card' },
+            h('div', { class: 'row' },
+              h('div', { style: 'display:flex;align-items:center;gap:12px;min-width:0;flex:1' },
+                h('div', { class: 'avatar', style: 'width:40px;height:40px;font-size:14px;flex-shrink:0' }, initials(u)),
+                h('div', { style: 'min-width:0' },
+                  h('strong', { style: 'font-size:15px' }, personName(u)),
+                  h('div', { class: 'muted' }, u.email || '')
+                )
+              ),
+              showRole && h('span', { class: 'badge neutral' }, roleLabel)
+            )
+          ));
+        });
       }
     }
     setView(nodes);
