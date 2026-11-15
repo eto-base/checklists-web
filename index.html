@@ -83,7 +83,7 @@ function h(tag, props, ...kids) {
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
     else if (v !== false && v !== null && v !== undefined) e.setAttribute(k, v === true ? '' : v);
   }
-  for (const c of kids.flat()) {
+  for (const c of kids.flat(Infinity)) {
     if (c === null || c === undefined || c === false) continue;
     e.append(c.nodeType ? c : document.createTextNode(String(c)));
   }
@@ -95,7 +95,7 @@ const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', tim
 const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
 const statusName = (s) => STATUS[s] || s || '';
 const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.email || '') : '';
-const setView = (...nodes) => $('view').replaceChildren(...nodes.flat());
+const setView = (...nodes) => $('view').replaceChildren(...nodes.flat(Infinity).filter((n) => n && n.nodeType));
 
 function toast(msg, bad) {
   const t = $('toast');
