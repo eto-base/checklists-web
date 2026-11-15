@@ -53,6 +53,7 @@
 </head>
 <body>
     <div id="app">
+        <!-- Экран входа -->
         <div id="login-screen">
             <h1>Вход в чеклисты</h1>
             <label for="email">Email</label>
@@ -63,6 +64,7 @@
             <div id="login-error" class="error hidden"></div>
         </div>
 
+        <!-- Экран «Мои чеклисты» -->
         <div id="main-screen" class="hidden">
             <h1>Мои чеклисты</h1>
             <p>Вы вошли как <strong id="user-email"></strong>.</p>
@@ -72,115 +74,114 @@
         </div>
     </div>
 
-    <script type="module">
-        const tg = window.Telegram?.WebApp;
-        if (tg) { tg.ready(); tg.expand(); }
+    <script>
+        // Ждем полной загрузки DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            const tg = window.Telegram?.WebApp;
+            if (tg) { tg.ready(); tg.expand(); }
 
-        const $ = (id) => document.getElementById(id);
-        const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev'; // Убедитесь, что это ваш актуальный адрес ngrok
+            const $ = (id) => document.getElementById(id);
+            // ВАЖНО: Убедитесь, что адрес совпадает с вашим текущим ngrok
+            const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev'; 
 
-        let csrfToken = null;
+            let csrfToken = null;
 
-        function showError(msg) {
-            const el = $('login-error');
-            el.textContent = msg;
-            el.classList.remove('hidden');
-        }
-        function hideError() { $('login-error').classList.add('hidden'); }
+            function showError(msg) {
+                const el = $('login-error');
+                el.textContent = msg;
+                el.classList.remove('hidden');
+            }
+            function hideError() { $('login-error').classList.add('hidden'); }
 
-        function showMain(user) {
-            $('login-screen').classList.add('hidden');
-            $('main-screen').classList.remove('hidden');
-            $('user-email').textContent = user.email;
-            $('user-json').textContent = JSON.stringify(user, null, 2);
-        }
-        function showLogin() {
-            $('main-screen').classList.add('hidden');
-            $('login-screen').classList.remove('hidden');
-            csrfToken = null;
-        }
+            function showMain(user) {
+                $('login-screen').classList.add('hidden');
+                $('main-screen').classList.remove('hidden');
+                $('user-email').textContent = user.email;
+                $('user-json').textContent = JSON.stringify(user, null, 2);
+            }
+            function showLogin() {
+                $('main-screen').classList.add('hidden');
+                $('login-screen').classList.remove('hidden');
+                csrfToken = null;
+            }
 
-        async function api(method, path, body) {
-            const headers = {};
-            const savedToken = localStorage.getItem('auth_token');
-            if (savedToken) headers['Authorization'] = 'Bearer ' + savedToken;
+            async function api(method, path, body) {
+                const headers = {};
+                const savedToken = localStorage.getItem('auth_token');
+                if (savedToken) headers['Authorization'] = 'Bearer ' + savedToken;
 
-            if (csrfToken) headers['x-csrf-token'] = csrfToken;
-            if (body !== undefined) headers['content-type'] = 'application/json';
+                if (csrfToken) headers['x-csrf-token'] = csrfToken;
+                if (body !== undefined) headers['content-type'] = 'application/json';
+                
+                const res = await fetch(API_BASE + path, {
+                    method,
+                    headers,
+                    credentials: 'include',
+                    body: body === undefined ? undefined : JSON.stringify(body),
+                });
+                
+                const text = await res.text();
+                let data = null;
+                try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+                if (!res.ok) {
+                    const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
+                    throw new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
+                }
+                return data;
+            }
+
+            const loginBtn = $('login-btn');
             
-            const res = await fetch(API_BASE + path, {
-                method,
-                headers,
-                credentials: 'include',
-                body: body === undefined ? undefined : JSON.stringify(body),
+            loginBtn.addEventListener('click', async () => {
+                hideError();
+                const email = $('email').value.trim();
+                const password = $('password').value;
+                if (!email || !password) { showError('Заполните email и пароль'); return; }
+                
+                loginBtn.disabled = true;
+                loginBtn.textContent = 'Загрузка...';
+                
+                try {
+                    const data = await api('POST', '/auth/login', { email, password });
+                    
+                    if (data.twoFactorRequired) {
+                        showError('Включена 2FA.');
+                        return;
+                    }
+                    csrfToken = data.csrfToken || null;
+                    
+                    if (data.token) {
+                        localStorage.setItem('auth_token', data.token);
+                    }
+
+                    const me = await api('GET', '/auth/me');
+                    csrfToken = me.csrfToken || csrfToken;
+                    showMain(me.user || me);
+                    
+                } catch (e) {
+                    showError(e.message || String(e)); 
+                } finally {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Войти';
+                }
             });
-            
-            const text = await res.text();
-            let data = null;
-            try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-            if (!res.ok) {
-                const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
-                throw new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
-            }
-            return data;
-        }
 
-        $('login-btn').onclick = async () => {
-            hideError();
-            const email = $('email').value.trim();
-            const password = $('password').value;
-            if (!email || !password) { showError('Заполните email и пароль'); return; }
-            
-            $('login-btn').disabled = true;
-            $('login-btn').textContent = 'Загрузка...';
-            
-            try {
-                console.log('1. Отправка запроса на вход...');
-                const data = await api('POST', '/auth/login', { email, password });
-                console.log('2. Ответ от сервера:', data);
-                
-                if (data.twoFactorRequired) {
-                    showError('Включена 2FA.');
-                    return;
-                }
-                csrfToken = data.csrfToken || null;
-                
-                if (data.token) {
-                    localStorage.setItem('auth_token', data.token);
-                    console.log('3. Токен сохранен');
-                }
-
-                console.log('4. Запрос профиля...');
-                const me = await api('GET', '/auth/me');
-                console.log('5. Профиль получен:', me);
-                
-                csrfToken = me.csrfToken || csrfToken;
-                showMain(me.user || me);
-                
-            } catch (e) {
-                console.error('ОШИБКА:', e);
-                showError(e.message || String(e)); 
-            } finally {
-                $('login-btn').disabled = false;
-                $('login-btn').textContent = 'Войти';
-            }
-        };
-
-        $('logout-btn').onclick = async () => {
-            try { await api('POST', '/auth/logout'); } catch {}
-            localStorage.removeItem('auth_token');
-            showLogin();
-        };
-
-        (async () => {
-            try {
-                const me = await api('GET', '/auth/me');
-                csrfToken = me.csrfToken || null;
-                showMain(me.user || me);
-            } catch {
+            $('logout-btn').addEventListener('click', async () => {
+                try { await api('POST', '/auth/logout'); } catch {}
+                localStorage.removeItem('auth_token');
                 showLogin();
-            }
-        })();
+            });
+
+            (async () => {
+                try {
+                    const me = await api('GET', '/auth/me');
+                    csrfToken = me.csrfToken || null;
+                    showMain(me.user || me);
+                } catch {
+                    showLogin();
+                }
+            })();
+        });
     </script>
 </body>
 </html>
