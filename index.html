@@ -134,32 +134,45 @@ const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev';
             return data;
         }
 
-        // Вход
+                // Вход
         $('login-btn').onclick = async () => {
             hideError();
             const email = $('email').value.trim();
             const password = $('password').value;
             if (!email || !password) { showError('Заполните email и пароль'); return; }
+            
             $('login-btn').disabled = true;
+            $('login-btn').textContent = 'Загрузка...';
+            
             try {
+                console.log('1. Отправка запроса на вход...');
                 const data = await api('POST', '/auth/login', { email, password });
+                console.log('2. Ответ от сервера:', data);
+                
                 if (data.twoFactorRequired) {
-                    showError('Включена 2FA. Пока не поддержано — отключите или дождитесь следующего этапа.');
+                    showError('Включена 2FA.');
                     return;
                 }
                 csrfToken = data.csrfToken || null;
-                // ДОБАВЛЯЕМ ЭТУ СТРОКУ: сохраняем токен, если он есть в ответе
+                
                 if (data.token) {
                     localStorage.setItem('auth_token', data.token);
+                    console.log('3. Токен сохранен');
                 }
-                // Дозапрашиваем профиль, чтобы увидеть права
+
+                console.log('4. Запрос профиля...');
                 const me = await api('GET', '/auth/me');
+                console.log('5. Профиль получен:', me);
+                
                 csrfToken = me.csrfToken || csrfToken;
                 showMain(me.user || me);
+                
             } catch (e) {
-                showError(e.message);
+                console.error('ОШИБКА:', e);
+                showError(e.message || String(e)); // Показываем ошибку на экране
             } finally {
                 $('login-btn').disabled = false;
+                $('login-btn').textContent = 'Войти';
             }
         };
 
