@@ -7,727 +7,278 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    /* Soft Modern + Telegram hybrid — improved contrast */
+    --accent: #2AABEE;
+    --accent-2: #5b9fff;
+    --accent-soft: rgba(42,171,238,.14);
+    --accent-glow: rgba(42,171,238,.35);
     --bg: #eef1f5;
     --bg-card: #ffffff;
-    --bg-elevated: #ffffff;
     --bg-input: #ffffff;
     --text: #0b141a;
     --text-secondary: #4a5568;
     --text-muted: #718096;
     --border: #d8dee6;
     --border-strong: #c5ced8;
-    --primary: #2AABEE;
-    --primary-hover: #1e9ad8;
-    --primary-soft: #e3f4fc;
-    --primary-soft-2: #c8ebfa;
-    --danger: #e53935;
+    --danger: #ff3b30;
     --danger-soft: #fdecea;
-    --success: #2ea043;
+    --success: #34c759;
     --success-soft: #e6f7e9;
-    --warning: #d97706;
+    --warning: #ff9f0a;
     --warning-soft: #fff7e6;
-    --info: #4a5568;
     --shadow: 0 1px 2px rgba(0,0,0,.05);
-    --shadow-md: 0 2px 8px rgba(0,0,0,.07);
-    --shadow-lg: 0 8px 24px rgba(0,0,0,.09);
-    --radius: 14px;
-    --radius-sm: 10px;
-    --radius-xs: 8px;
+    --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,.12);
+    --radius: 16px;
+    --radius-sm: 12px;
     --nav-height: 56px;
     --header-height: 52px;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    --ease: cubic-bezier(.25, .1, .25, 1);
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    --ease: cubic-bezier(.25,.1,.25,1);
+    --glass: rgba(255,255,255,.72);
+    --glass-border: rgba(255,255,255,.55);
+    --menu-item: rgba(255,255,255,.55);
+    --menu-item-active: rgba(42,171,238,.22);
+    --overlay-bg: rgba(15,20,30,.35);
   }
-
   [data-theme="dark"] {
-    --bg: #0c0c0e;
-    --bg-card: #1a1a1e;
-    --bg-elevated: #25252b;
-    --bg-input: #25252b;
-    --text: #f0f2f5;
-    --text-secondary: #a8b0bc;
-    --text-muted: #7a8494;
-    --border: #2e2e36;
-    --border-strong: #3d3d48;
-    --primary: #3bb4f0;
-    --primary-hover: #5cc4f5;
-    --primary-soft: #0f2a38;
-    --primary-soft-2: #153a4d;
-    --danger: #ff5a5f;
+    --bg: #0a0c10;
+    --bg-card: #14181f;
+    --bg-input: #1c222c;
+    --text: #f2f5f8;
+    --text-secondary: #a8b3c2;
+    --text-muted: #7a8698;
+    --border: #2a3140;
+    --border-strong: #3a4354;
+    --danger: #ff453a;
     --danger-soft: #3a1518;
-    --success: #3dd68c;
+    --success: #30d158;
     --success-soft: #0f2a1a;
-    --warning: #f5c518;
+    --warning: #ffd60a;
     --warning-soft: #2e2808;
-    --info: #a8b0bc;
-    --shadow: 0 1px 2px rgba(0,0,0,.3);
-    --shadow-md: 0 2px 8px rgba(0,0,0,.35);
-    --shadow-lg: 0 8px 24px rgba(0,0,0,.45);
+    --shadow: 0 1px 2px rgba(0,0,0,.35);
+    --shadow-md: 0 4px 16px rgba(0,0,0,.4);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,.5);
+    --glass: rgba(22,28,38,.78);
+    --glass-border: rgba(255,255,255,.08);
+    --menu-item: rgba(255,255,255,.06);
+    --menu-item-active: rgba(42,171,238,.28);
+    --overlay-bg: rgba(0,0,0,.55);
   }
+  [data-accent="blue"] { --accent:#2AABEE; --accent-2:#5b9fff; --accent-soft:rgba(42,171,238,.14); --accent-glow:rgba(42,171,238,.35); }
+  [data-accent="violet"] { --accent:#8b5cf6; --accent-2:#a78bfa; --accent-soft:rgba(139,92,246,.16); --accent-glow:rgba(139,92,246,.35); }
+  [data-accent="teal"] { --accent:#14b8a6; --accent-2:#2dd4bf; --accent-soft:rgba(20,184,166,.16); --accent-glow:rgba(20,184,166,.35); }
+  [data-accent="orange"] { --accent:#f97316; --accent-2:#fb923c; --accent-soft:rgba(249,115,22,.16); --accent-glow:rgba(249,115,22,.35); }
+  [data-accent="pink"] { --accent:#ec4899; --accent-2:#f472b6; --accent-soft:rgba(236,72,153,.16); --accent-glow:rgba(236,72,153,.35); }
+  [data-accent="green"] { --accent:#22c55e; --accent-2:#4ade80; --accent-soft:rgba(34,197,94,.16); --accent-glow:rgba(34,197,94,.35); }
+  [data-contrast="high"] { --text-secondary: var(--text); }
+  [data-theme="light"][data-contrast="high"] { --text:#000; --text-secondary:#1a1a1a; --text-muted:#333; --border-strong:#999; }
+  [data-theme="dark"][data-contrast="high"] { --text:#fff; --text-secondary:#eee; --text-muted:#ccc; --border-strong:#666; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.4;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.4; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   #app { min-height: 100%; }
 
-  /* ---------- Login / Auth screens ---------- */
   #login-screen, #tfa-screen, #forgot-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px 16px;
-    background: var(--bg);
+    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px;
+    background: radial-gradient(ellipse at 20% 0%, var(--accent-soft), transparent 50%), radial-gradient(ellipse at 80% 100%, var(--accent-soft), transparent 45%), var(--bg);
   }
   .login-card {
-    width: 100%;
-    max-width: 380px;
-    background: var(--bg-card);
-    border-radius: 20px;
-    padding: 32px 24px 28px;
-    box-shadow: var(--shadow-lg);
+    width: 100%; max-width: 380px; background: var(--glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border); border-radius: 24px; padding: 32px 24px 28px; box-shadow: var(--shadow-lg);
   }
   .login-logo {
-    width: 56px; height: 56px;
-    border-radius: 16px;
-    background: linear-gradient(145deg, #2AABEE, #229ED9);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 20px;
-    color: #fff;
-    font-size: 26px;
-    font-weight: 700;
-    box-shadow: 0 4px 14px rgba(42,171,238,.35);
+    width: 56px; height: 56px; border-radius: 16px; background: linear-gradient(145deg, var(--accent), var(--accent-2));
+    display: flex; align-items: center; justify-content: center; margin-bottom: 18px; color: #fff; font-size: 26px; font-weight: 700;
+    box-shadow: 0 6px 20px var(--accent-glow);
   }
-  .login-card h1 {
-    font-size: 24px;
-    font-weight: 700;
-    letter-spacing: -.02em;
-    margin-bottom: 6px;
-  }
-  .login-card .subtitle {
-    color: var(--text-secondary);
-    font-size: 15px;
-    margin-bottom: 28px;
-  }
+  .login-card h1 { font-size: 24px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 6px; }
+  .login-card .subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; }
 
-  /* ---------- App shell ---------- */
-  #app-screen {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
-
-  /* Top bar — Telegram-like */
+  #app-screen { display: flex; flex-direction: column; min-height: 100vh; }
   .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    height: var(--header-height);
-    background: var(--bg-card);
-    border-bottom: 0.5px solid var(--border);
-    display: flex;
-    align-items: center;
-    padding: 0 6px 0 4px;
-    gap: 2px;
+    position: sticky; top: 0; z-index: 40; height: var(--header-height); background: var(--bg-card);
+    border-bottom: 0.5px solid var(--border); display: flex; align-items: center; padding: 0 6px 0 4px; gap: 2px;
   }
   .topbar-btn {
-    width: 42px; height: 42px;
-    border: none;
-    background: transparent;
-    border-radius: 12px;
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background .15s var(--ease);
+    width: 42px; height: 42px; border: none; background: transparent; border-radius: 12px; color: var(--accent);
+    display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
   }
-  .topbar-btn:active { background: var(--primary-soft); }
+  .topbar-btn:active { background: var(--accent-soft); }
   .topbar-btn svg { width: 24px; height: 24px; }
   .topbar-btn.muted { color: var(--text-secondary); }
-  .topbar-title {
-    flex: 1;
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: -.01em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding-left: 4px;
-  }
-  .topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 0;
-  }
+  .topbar-title { flex: 1; font-size: 17px; font-weight: 600; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 4px; }
+  .topbar-actions { display: flex; align-items: center; }
   .ws-select {
-    max-width: 120px;
-    padding: 6px 8px;
-    font-size: 13px;
-    font-weight: 500;
-    border-radius: 8px;
-    border: none;
-    background: var(--bg-input);
-    color: var(--text);
-    font-family: inherit;
-    margin-right: 4px;
+    max-width: 120px; padding: 6px 8px; font-size: 13px; font-weight: 500; border-radius: 8px;
+    border: 1.5px solid var(--border-strong); background: var(--bg-input); color: var(--text); font-family: inherit; margin-right: 4px;
   }
 
-  /* ---------- Side menu ---------- */
   .overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.35);
-    z-index: 50;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .22s var(--ease);
-    backdrop-filter: blur(2px);
+    position: fixed; inset: 0; background: var(--overlay-bg); z-index: 50; opacity: 0; pointer-events: none;
+    transition: opacity .25s var(--ease); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   }
   .overlay.open { opacity: 1; pointer-events: auto; }
 
   .sidemenu {
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    width: min(300px, 82vw);
-    background: var(--bg-card);
-    z-index: 60;
-    transform: translateX(-105%);
-    transition: transform .28s var(--ease);
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow-lg);
+    position: fixed; top: 0; left: 0; bottom: 0; width: min(320px, 88vw); z-index: 60;
+    transform: translateX(-105%); transition: transform .3s var(--ease); display: flex; flex-direction: column;
+    background: radial-gradient(ellipse at 10% 0%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 90% 100%, var(--accent-soft), transparent 50%), var(--glass);
+    backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); border-right: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lg); padding: 12px 12px 16px;
   }
   .sidemenu.open { transform: translateX(0); }
-
-  .sidemenu-header {
-    padding: 28px 20px 20px;
-    background: linear-gradient(160deg, var(--primary-soft) 0%, var(--bg-card) 100%);
+  .side-profile {
+    display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 18px;
+    background: var(--menu-item); border: 1px solid var(--glass-border); cursor: pointer; margin-bottom: 8px;
   }
-  .sidemenu-user { display: flex; align-items: center; gap: 14px; }
-  .avatar {
-    width: 48px; height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(145deg, #2AABEE, #1a8bc4);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 17px;
-    flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(42,171,238,.3);
+  .side-profile:active { background: var(--menu-item-active); }
+  .side-profile .avatar {
+    width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(145deg, var(--accent), var(--accent-2));
+    color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;
+    flex-shrink: 0; box-shadow: 0 2px 10px var(--accent-glow); position: relative; overflow: hidden;
   }
-  .sidemenu-name { font-weight: 600; font-size: 16px; letter-spacing: -.01em; }
-  .sidemenu-email { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
-
-  .sidemenu-nav {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px 10px 12px;
+  .side-profile .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .side-profile .online { position: absolute; right: 1px; bottom: 1px; width: 11px; height: 11px; background: var(--success); border: 2px solid var(--bg-card); border-radius: 50%; }
+  .side-profile-text { flex: 1; min-width: 0; }
+  .side-profile-name { font-weight: 650; font-size: 16px; letter-spacing: -.01em; }
+  .side-profile-sub { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
+  .side-profile-mail { font-size: 12px; color: var(--text-muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .side-close {
+    position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 50%; border: none;
+    background: var(--menu-item); color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer;
   }
-  .sidemenu-section {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-muted);
-    padding: 14px 12px 6px;
-    letter-spacing: .01em;
-  }
+  .sidemenu-nav { flex: 1; overflow-y: auto; padding: 6px 0; }
+  .sidemenu-section { font-size: 12px; font-weight: 600; color: var(--text-muted); padding: 14px 10px 8px; letter-spacing: .02em; }
   .sidemenu-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 11px 12px;
-    border-radius: 12px;
-    color: var(--text);
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    border: none;
-    background: none;
-    width: 100%;
-    text-align: left;
-    font-family: inherit;
-    transition: background .12s;
+    display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 4px; border-radius: 14px; border: none;
+    background: var(--menu-item); color: var(--text); font-size: 15px; font-weight: 500; width: 100%; text-align: left;
+    cursor: pointer; font-family: inherit;
   }
-  .sidemenu-item:active { background: var(--bg); }
-  .sidemenu-item.active {
-    background: var(--primary-soft);
-    color: var(--primary);
-  }
-  .sidemenu-item svg {
-    width: 22px; height: 22px;
-    flex-shrink: 0;
-    opacity: .9;
-  }
-  .sidemenu-item .soon {
-    margin-left: auto;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted);
-    background: var(--bg);
-    padding: 2px 7px;
-    border-radius: 6px;
-  }
-  .sidemenu-footer {
-    padding: 8px 10px 16px;
-    border-top: 0.5px solid var(--border);
-  }
+  .sidemenu-item.active { background: linear-gradient(90deg, var(--accent-soft), var(--menu-item-active)); color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+  .sidemenu-item svg { width: 20px; height: 20px; flex-shrink: 0; opacity: .9; }
+  .sidemenu-item .chev { margin-left: auto; opacity: .35; font-size: 16px; }
+  .sidemenu-item .soon { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 2px 8px; border-radius: 8px; }
+  .sidemenu-footer { padding-top: 8px; }
+  .sidemenu-item.logout { color: var(--danger); background: var(--danger-soft); }
 
-  /* ---------- Content ---------- */
-  #view {
-    flex: 1;
-    padding: 12px 12px calc(var(--nav-height) + var(--safe-bottom) + 16px);
-    max-width: 560px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  /* ---------- Bottom nav — Telegram style ---------- */
+  #view { flex: 1; padding: 12px 12px calc(var(--nav-height) + var(--safe-bottom) + 16px); max-width: 560px; margin: 0 auto; width: 100%; }
   .bottom-nav {
-    position: fixed;
-    left: 0; right: 0; bottom: 0;
-    height: calc(var(--nav-height) + var(--safe-bottom));
-    padding-bottom: var(--safe-bottom);
-    background: var(--bg-card);
-    border-top: 0.5px solid var(--border);
-    display: flex;
-    z-index: 30;
+    position: fixed; left: 0; right: 0; bottom: 0; height: calc(var(--nav-height) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom); background: var(--bg-card); border-top: 0.5px solid var(--border); display: flex; z-index: 30;
   }
   .bottom-nav button {
-    flex: 1;
-    border: none;
-    background: transparent;
-    color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 500;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    cursor: pointer;
-    font-family: inherit;
-    padding: 6px 2px 4px;
-    transition: color .15s;
-    position: relative;
+    flex: 1; border: none; background: transparent; color: var(--text-muted); font-size: 10px; font-weight: 500;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; font-family: inherit; padding: 6px 2px 4px;
   }
-  .bottom-nav button.active { color: var(--primary); }
-  .bottom-nav button svg { width: 26px; height: 26px; }
-  .bottom-nav button span { line-height: 1.15; letter-spacing: -.01em; }
+  .bottom-nav button.active { color: var(--accent); }
+  .bottom-nav button svg { width: 24px; height: 24px; }
 
-  /* ---------- Typography ---------- */
-  h1 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -.02em;
-    margin-bottom: 2px;
-  }
-  h2 {
-    font-size: 15px;
-    font-weight: 600;
-    margin: 20px 0 10px;
-    color: var(--text-secondary);
-  }
-  .page-desc {
-    color: var(--text-secondary);
-    font-size: 14px;
-    margin-bottom: 16px;
-  }
-
-  /* ---------- Forms ---------- */
-  label {
-    display: block;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin: 16px 0 6px;
-  }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 2px; }
+  h2 { font-size: 15px; font-weight: 600; margin: 20px 0 10px; color: var(--text-secondary); }
+  .page-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin: 14px 0 6px; }
   input, select, textarea, button { font-family: inherit; font-size: 16px; }
-
-  input[type="text"], input[type="email"], input[type="password"],
-  input[type="number"], input[type="datetime-local"], input[type="search"],
-  input[type="file"], select, textarea {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border-strong);
-    background: var(--bg-input);
-    color: var(--text);
-    transition: border-color .15s, box-shadow .15s, background .15s;
+  input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="datetime-local"], input[type="search"], input[type="file"], select, textarea {
+    width: 100%; padding: 12px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border-strong); background: var(--bg-input); color: var(--text);
   }
-  input::placeholder, textarea::placeholder {
-    color: var(--text-muted);
-    opacity: 1;
-  }
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
-    background: var(--bg-card);
-  }
-  input:disabled, select:disabled, textarea:disabled {
-    opacity: .55;
-    cursor: not-allowed;
-    background: var(--bg);
-  }
+  input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  input:disabled, select:disabled, textarea:disabled { opacity: .55; cursor: not-allowed; background: var(--bg); }
   textarea { resize: vertical; min-height: 84px; }
 
-  /* Buttons */
   .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 13px 18px;
-    border-radius: var(--radius-sm);
-    border: none;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: transform .12s, opacity .15s, background .15s;
-    width: 100%;
-    margin-top: 14px;
-    letter-spacing: -.01em;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 18px; border-radius: var(--radius-sm);
+    border: none; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; margin-top: 14px; letter-spacing: -.01em;
   }
   .btn:active:not(:disabled) { transform: scale(.98); }
   .btn:disabled { opacity: .45; cursor: default; }
-  .btn-primary {
-    background: var(--primary);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(42,171,238,.25);
-  }
-  .btn-primary:active:not(:disabled) { background: var(--primary-hover); }
-  .btn-secondary {
-    background: var(--bg-card);
-    color: var(--text);
-    border: 1.5px solid var(--border-strong);
-  }
-  .btn-danger {
-    background: var(--danger);
-    color: #fff;
-  }
-  .btn-ghost {
-    background: transparent;
-    color: var(--primary);
-    width: auto;
-    padding: 8px 12px;
-    font-size: 15px;
-    font-weight: 500;
-    margin-top: 0;
-    box-shadow: none;
-  }
-  .btn-sm {
-    width: auto;
-    padding: 8px 14px;
-    font-size: 14px;
-    margin-top: 0;
-    border-radius: 8px;
-  }
+  .btn-primary { background: linear-gradient(145deg, var(--accent), var(--accent-2)); color: #fff; box-shadow: 0 4px 14px var(--accent-glow); }
+  .btn-secondary { background: var(--bg-card); color: var(--text); border: 1.5px solid var(--border-strong); }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-ghost { background: transparent; color: var(--accent); width: auto; padding: 8px 12px; font-size: 15px; font-weight: 500; margin-top: 0; box-shadow: none; }
+  .btn-sm { width: auto; padding: 8px 14px; font-size: 14px; margin-top: 0; border-radius: 10px; }
 
-  /* ---------- Cards — soft & list-like ---------- */
-  .card {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    padding: 14px 16px;
-    margin-bottom: 8px;
-    box-shadow: var(--shadow);
-    transition: transform .12s, box-shadow .15s;
-  }
+  .card { background: var(--bg-card); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; box-shadow: var(--shadow); }
   .card.click { cursor: pointer; }
-  .card.click:active {
-    transform: scale(.985);
-    box-shadow: none;
-  }
-
-  .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-  }
-  .gap {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 12px;
-  }
+  .card.click:active { transform: scale(.985); }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .gap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
   .stack { display: flex; flex-direction: column; gap: 8px; }
-
   .muted { color: var(--text-secondary); font-size: 14px; }
   .small { font-size: 12px; color: var(--text-muted); }
-
-  /* Soft badges */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    background: var(--primary-soft);
-    color: var(--primary);
-    white-space: nowrap;
-  }
+  .badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; background: var(--accent-soft); color: var(--accent); white-space: nowrap; }
   .badge.bad { background: var(--danger-soft); color: var(--danger); }
   .badge.ok { background: var(--success-soft); color: var(--success); }
-  .badge.warn { background: var(--warning-soft); color: var(--warning); }
-  .badge.neutral { background: var(--bg-input); color: var(--text-secondary); }
-
-  /* Alerts */
-  .alert {
-    padding: 12px 14px;
-    border-radius: var(--radius-sm);
-    font-size: 14px;
-    margin-bottom: 12px;
-    line-height: 1.4;
-  }
+  .badge.neutral { background: var(--bg); color: var(--text-secondary); border: 1px solid var(--border); }
+  .alert { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 14px; margin-bottom: 12px; line-height: 1.4; }
   .alert-info { background: var(--warning-soft); color: #8a5a00; }
   [data-theme="dark"] .alert-info { color: #f5d76e; }
   .alert-error { background: var(--danger-soft); color: var(--danger); }
   .alert-success { background: var(--success-soft); color: var(--success); word-break: break-all; }
-
-  /* Empty states */
-  .empty {
-    text-align: center;
-    padding: 48px 24px;
-    color: var(--text-muted);
-  }
-  .empty-icon {
-    width: 72px; height: 72px;
-    margin: 0 auto 16px;
-    border-radius: 20px;
-    background: var(--bg-input);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-muted);
-  }
-  .empty-icon svg { width: 32px; height: 32px; opacity: .7; }
-  .empty-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-  }
+  .empty { text-align: center; padding: 48px 24px; color: var(--text-muted); }
+  .empty-icon { width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 20px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; color: var(--accent); }
+  .empty-icon svg { width: 32px; height: 32px; }
+  .empty-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
   .empty-desc { font-size: 14px; max-width: 240px; margin: 0 auto; }
-
-  /* Checklist controls */
   .choices { display: flex; gap: 10px; }
-  .choice {
-    flex: 1;
-    padding: 13px;
-    border-radius: var(--radius-sm);
-    border: 1.5px solid var(--border-strong);
-    background: var(--bg-card);
-    color: var(--text);
-    font-weight: 600;
-    font-size: 15px;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all .15s;
-  }
-  .choice:active:not(:disabled) { transform: scale(.97); }
-  .choice.on.yes {
-    background: var(--success);
-    color: #fff;
-    border-color: var(--success);
-    box-shadow: 0 2px 8px rgba(49,181,69,.3);
-  }
-  .choice.on.no {
-    background: var(--danger);
-    color: #fff;
-    border-color: var(--danger);
-    box-shadow: 0 2px 8px rgba(229,57,53,.3);
-  }
+  .choice { flex: 1; padding: 13px; border-radius: var(--radius-sm); border: 1.5px solid var(--border-strong); background: var(--bg-card); color: var(--text); font-weight: 600; font-size: 15px; cursor: pointer; font-family: inherit; }
+  .choice.on.yes { background: var(--success); color: #fff; border-color: var(--success); }
+  .choice.on.no { background: var(--danger); color: #fff; border-color: var(--danger); }
   .choice:disabled { opacity: .5; cursor: default; }
-
-  .flag {
-    color: var(--danger);
-    font-size: 13px;
-    font-weight: 600;
-    margin-top: 8px;
-  }
-  .photo {
-    max-width: 100%;
-    border-radius: 12px;
-    margin-top: 10px;
-  }
-  .itemrow {
-    border-top: 0.5px solid var(--border);
-    padding-top: 16px;
-    margin-top: 16px;
-  }
-
-  /* Filter chips — soft pills */
-  .chips {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 14px;
-    padding: 0 2px;
-  }
-  .chip {
-    padding: 7px 14px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border-strong);
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: var(--shadow);
-    transition: all .15s;
-  }
-  .chip.active {
-    background: var(--primary);
-    color: #fff;
-    border-color: var(--primary);
-    box-shadow: 0 2px 8px rgba(42,171,238,.3);
-  }
-
-  /* Toast */
+  .flag { color: var(--danger); font-size: 13px; font-weight: 600; margin-top: 8px; }
+  .photo { max-width: 100%; border-radius: 12px; margin-top: 10px; }
+  .itemrow { border-top: 0.5px solid var(--border); padding-top: 16px; margin-top: 16px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip { padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border-strong); background: var(--bg-card); color: var(--text-secondary); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
   .toast {
-    position: fixed;
-    left: 16px; right: 16px;
-    bottom: calc(var(--nav-height) + var(--safe-bottom) + 14px);
-    background: #2c2c2e;
-    color: #fff;
-    padding: 14px 18px;
-    border-radius: 12px;
-    z-index: 100;
-    font-size: 15px;
-    font-weight: 500;
-    box-shadow: var(--shadow-lg);
-    transform: translateY(24px);
-    opacity: 0;
-    transition: transform .28s var(--ease), opacity .28s;
-    pointer-events: none;
-    text-align: center;
+    position: fixed; left: 16px; right: 16px; bottom: calc(var(--nav-height) + var(--safe-bottom) + 14px);
+    background: #2c2c2e; color: #fff; padding: 14px 18px; border-radius: 12px; z-index: 100; font-size: 15px; font-weight: 500;
+    box-shadow: var(--shadow-lg); transform: translateY(24px); opacity: 0; transition: transform .28s, opacity .28s; pointer-events: none; text-align: center;
   }
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.bad { background: var(--danger); }
-
-  /* Stub pages */
-  .stub-icon {
-    width: 68px; height: 68px;
-    margin: 0 auto 18px;
-    background: var(--primary-soft);
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--primary);
-  }
+  .stub-icon { width: 68px; height: 68px; margin: 0 auto 18px; background: var(--accent-soft); border-radius: 18px; display: flex; align-items: center; justify-content: center; color: var(--accent); }
   .stub-icon svg { width: 30px; height: 30px; }
-
   .hidden { display: none !important; }
   .back-btn { margin-bottom: 8px; }
-  .divider {
-    height: 0.5px;
-    background: var(--border);
-    margin: 20px 0;
-  }
-
-  /* Skeleton */
-  .skeleton {
-    background: linear-gradient(90deg, var(--border) 25%, var(--bg-input) 50%, var(--border) 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-    border-radius: 10px;
-    height: 16px;
-  }
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-  }
-
-  /* List section header */
-  .section-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: .03em;
-    padding: 8px 4px 6px;
-  }
-
-  /* Apple-style list + swipe */
-  .list-group {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-  }
-  .list-row {
-    position: relative;
-    overflow: hidden;
-    background: var(--bg-card);
-    border-bottom: 0.5px solid var(--border);
-  }
+  .divider { height: 0.5px; background: var(--border); margin: 20px 0; }
+  .section-label { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .03em; padding: 8px 4px 6px; }
+  .skeleton { background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 10px; height: 16px; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  .list-group { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+  .list-row { position: relative; overflow: hidden; border-bottom: 0.5px solid var(--border); }
   .list-row:last-child { border-bottom: none; }
-  .list-row-inner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--bg-card);
-    position: relative;
-    z-index: 1;
-    transition: transform .2s var(--ease);
-    touch-action: pan-y;
-  }
-  .list-row-actions {
-    position: absolute;
-    right: 0; top: 0; bottom: 0;
-    display: flex;
-    z-index: 0;
-  }
-  .list-row-actions button {
-    border: none;
-    color: #fff;
-    font-weight: 600;
-    font-size: 14px;
-    padding: 0 20px;
-    cursor: pointer;
-    font-family: inherit;
-    min-width: 88px;
-  }
+  .list-row-inner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg-card); position: relative; z-index: 1; transition: transform .2s var(--ease); touch-action: pan-y; }
+  .list-row-actions { position: absolute; right: 0; top: 0; bottom: 0; display: flex; z-index: 0; }
+  .list-row-actions button { border: none; color: #fff; font-weight: 600; font-size: 14px; padding: 0 20px; cursor: pointer; font-family: inherit; min-width: 88px; }
   .list-row-actions .act-delete { background: #ff3b30; }
   .list-row.open .list-row-inner { transform: translateX(-88px); }
-  .list-row-meta {
-    margin-left: auto;
-    flex-shrink: 0;
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .swatch { width: 36px; height: 36px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; box-shadow: var(--shadow-md); }
+  .swatch.on { border-color: var(--text); }
+  .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 10px; }
+  .emoji-grid button { aspect-ratio: 1; border: 1.5px solid var(--border); border-radius: 12px; background: var(--bg-card); font-size: 22px; cursor: pointer; }
+  .emoji-grid button.on { border-color: var(--accent); background: var(--accent-soft); }
+  .avatar-lg {
+    width: 72px; height: 72px; border-radius: 50%; background: linear-gradient(145deg, var(--accent), var(--accent-2));
+    color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px; overflow: hidden; flex-shrink: 0;
+    box-shadow: 0 4px 16px var(--accent-glow);
   }
-  .list-chevron {
-    color: var(--text-muted);
-    opacity: .5;
-    font-size: 18px;
-    margin-left: 4px;
-  }
+  .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
 </style>
 </head>
 <body>
 <div id="app">
-  <!-- Login -->
   <div id="login-screen" class="hidden">
     <div class="login-card">
       <div class="login-logo">✓</div>
       <h1>Чеклисты</h1>
-      <p class="subtitle">Войдите в свой аккаунт</p>
-      <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
+      <p class="subtitle">Войдите в аккаунт</p>
+      <label for="login-id">Email или никнейм</label>
+      <input type="text" id="login-id" placeholder="you@example.com или nickname" autocomplete="username">
       <label for="password">Пароль</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       <button class="btn btn-primary" id="login-btn">Войти</button>
@@ -735,27 +286,23 @@
       <div id="login-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
-
-  <!-- 2FA -->
   <div id="tfa-screen" class="hidden">
     <div class="login-card">
-      <div class="login-logo" style="background:linear-gradient(145deg,#7c5cfc,#5b3fd4)">🔐</div>
+      <div class="login-logo">🔐</div>
       <h1>Подтверждение</h1>
-      <p class="subtitle">Введите код из приложения-аутентификатора</p>
+      <p class="subtitle">Код из приложения-аутентификатора</p>
       <label for="tfa-code">Код</label>
-      <input type="text" id="tfa-code" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      <input type="text" id="tfa-code" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="8">
       <button class="btn btn-primary" id="tfa-btn">Подтвердить</button>
       <button class="btn btn-ghost" id="tfa-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
       <div id="tfa-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
-
-  <!-- Forgot password -->
   <div id="forgot-screen" class="hidden">
     <div class="login-card">
-      <div class="login-logo" style="background:linear-gradient(145deg,#f0a000,#d48900)">✉</div>
+      <div class="login-logo">✉</div>
       <h1>Восстановление</h1>
-      <p class="subtitle">Укажите email — отправим ссылку для сброса пароля</p>
+      <p class="subtitle">Укажите email</p>
       <label for="forgot-email">Email</label>
       <input type="email" id="forgot-email" placeholder="you@example.com">
       <button class="btn btn-primary" id="forgot-submit">Отправить</button>
@@ -763,8 +310,6 @@
       <div id="forgot-msg" class="hidden" style="margin-top:16px"></div>
     </div>
   </div>
-
-  <!-- Main app -->
   <div id="app-screen" class="hidden">
     <header class="topbar">
       <button class="topbar-btn" id="menu-btn" aria-label="Меню">
@@ -776,113 +321,88 @@
         <button class="topbar-btn muted" id="search-btn" aria-label="Поиск">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
         </button>
-        <button class="topbar-btn muted" id="theme-btn" aria-label="Тема">
-          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke-linecap="round"/></svg>
-          <svg id="theme-icon-moon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
       </div>
     </header>
-
     <div class="overlay" id="overlay"></div>
     <aside class="sidemenu" id="sidemenu">
-      <div class="sidemenu-header">
-        <div class="sidemenu-user">
-          <div class="avatar" id="side-avatar">?</div>
-          <div>
-            <div class="sidemenu-name" id="side-name">—</div>
-            <div class="sidemenu-email" id="side-email">—</div>
-          </div>
+      <button class="side-close" id="side-close" aria-label="Закрыть">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+      </button>
+      <div class="side-profile" id="side-profile">
+        <div class="avatar" id="side-avatar">?</div>
+        <div class="side-profile-text">
+          <div class="side-profile-name" id="side-name">—</div>
+          <div class="side-profile-sub" id="side-role">Профиль</div>
+          <div class="side-profile-mail" id="side-email">—</div>
         </div>
       </div>
       <nav class="sidemenu-nav" id="sidemenu-nav"></nav>
       <div class="sidemenu-footer">
-        <button class="sidemenu-item" id="logout-side">
+        <button class="sidemenu-item logout" id="logout-side">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Выйти
+          Выйти<span class="chev">›</span>
         </button>
       </div>
     </aside>
-
     <main id="view"></main>
     <nav class="bottom-nav" id="bottom-nav"></nav>
   </div>
 </div>
-
 <div id="toast" class="toast"></div>
-
 <script type="module">
 const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
 const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
-
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
-
 const $ = (id) => document.getElementById(id);
 let csrfToken = null;
 const state = {
-  me: null,
-  workspaces: [],
-  wsId: localStorage.getItem('wsId') || null,
-  tab: 'mine',
-  filter: '',
+  me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null,
+  tab: 'mine', filter: '', searchQuery: '', searchPrevTab: 'mine',
   theme: localStorage.getItem('theme') || 'light',
-  searchQuery: '',
-  searchPrevTab: 'mine',
+  accent: localStorage.getItem('accent') || 'blue',
+  contrast: localStorage.getItem('contrast') || 'normal',
   avatarEmoji: localStorage.getItem('avatarEmoji') || '',
+  avatarDataUrl: localStorage.getItem('avatarDataUrl') || '',
 };
-
+const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
 const icons = {
   list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
   all: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
   template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
   people: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-  user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
   audit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
   settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
   bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
   search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
   empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`,
 };
-
 function h(tag, props, ...kids) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(props || {})) {
     if (k === 'class') e.className = v;
     else if (k === 'html') e.innerHTML = v;
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
-    else if (v !== false && v !== null && v !== undefined) e.setAttribute(k, v === true ? '' : v);
+    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
   }
   for (const c of kids.flat(Infinity)) {
-    if (c === null || c === undefined || c === false) continue;
+    if (c == null || c === false) continue;
     e.append(c.nodeType ? c : document.createTextNode(String(c)));
   }
   return e;
 }
-
 const arr = (d) => Array.isArray(d) ? d : (d && (d.items || d.data || d.runs || d.templates || d.users)) || [];
 const can = (p) => !!state.me?.permissions?.includes(p);
 const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
 const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
 const statusName = (s) => STATUS[s] || s || '';
-const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.email || '') : '';
-const initials = (u) => {
-  const n = personName(u);
-  if (!n) return '?';
-  return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-};
-
-function setView(...nodes) {
-  $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
-}
-
+const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || u.email || '') : '';
+const initials = (u) => { const n = personName(u); if (!n) return '?'; return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); };
+function setView(...nodes) { $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType)); }
 function toast(msg, bad = false) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (bad ? ' bad' : '') + ' show';
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => { t.className = 'toast'; }, 3800);
+  const t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : '') + ' show';
+  clearTimeout(toast._t); toast._t = setTimeout(() => { t.className = 'toast'; }, 3800);
 }
-
 function authHeaders() {
   const headers = { 'ngrok-skip-browser-warning': '1' };
   const token = localStorage.getItem('token');
@@ -890,84 +410,52 @@ function authHeaders() {
   if (csrfToken) headers['x-csrf-token'] = csrfToken;
   return headers;
 }
-
 async function api(method, path, body) {
   const headers = authHeaders();
   let payload;
   if (body instanceof FormData) payload = body;
   else if (body !== undefined) { headers['content-type'] = 'application/json'; payload = JSON.stringify(body); }
   let res;
-  try {
-    res = await fetch(API_BASE + path, { method, headers, credentials: 'include', body: payload });
-  } catch {
-    throw new Error('Нет связи с сервером. Проверьте, что приложение и ngrok запущены.');
-  }
+  try { res = await fetch(API_BASE + path, { method, headers, credentials: 'include', body: payload }); }
+  catch { throw new Error('Нет связи с сервером'); }
   const text = await res.text();
   let data = null;
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
   if (!res.ok) {
     const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
     const err = new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
-    err.status = res.status;
-    throw err;
+    err.status = res.status; throw err;
   }
   return data;
 }
-
 async function show(fn) {
-  setView(h('div', { class: 'stack', style: 'padding:8px 2px' },
-    h('div', { class: 'skeleton', style: 'height:22px;width:55%' }),
-    h('div', { class: 'skeleton', style: 'height:72px;margin-top:14px' }),
-    h('div', { class: 'skeleton', style: 'height:72px' }),
-  ));
+  setView(h('div', { class: 'stack', style: 'padding:8px 2px' }, h('div', { class: 'skeleton', style: 'height:22px;width:55%' }), h('div', { class: 'skeleton', style: 'height:72px;margin-top:14px' })));
   try { await fn(); }
   catch (e) {
-    if (e.status === 401) { toLogin('Сессия истекла, войдите снова'); return; }
-    setView(
-      h('div', { class: 'alert alert-error' }, e.message),
-      h('button', { class: 'btn btn-secondary', onclick: () => show(fn) }, 'Повторить')
-    );
+    if (e.status === 401) { toLogin('Сессия истекла'); return; }
+    setView(h('div', { class: 'alert alert-error' }, e.message), h('button', { class: 'btn btn-secondary', onclick: () => show(fn) }, 'Повторить'));
   }
 }
-
-/* Theme */
-function applyTheme(theme) {
-  state.theme = theme;
-  document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
-  localStorage.setItem('theme', theme);
-  $('theme-icon-sun').classList.toggle('hidden', theme === 'dark');
-  $('theme-icon-moon').classList.toggle('hidden', theme !== 'dark');
-  if (tg?.setHeaderColor) {
-    try { tg.setHeaderColor(theme === 'dark' ? '#1c1c1e' : '#ffffff'); } catch {}
-  }
-  if (tg?.setBackgroundColor) {
-    try { tg.setBackgroundColor(theme === 'dark' ? '#0e0e0e' : '#f0f2f5'); } catch {}
-  }
+function applyAppearance() {
+  document.documentElement.setAttribute('data-theme', state.theme === 'dark' ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-accent', state.accent || 'blue');
+  document.documentElement.setAttribute('data-contrast', state.contrast || 'normal');
+  localStorage.setItem('theme', state.theme);
+  localStorage.setItem('accent', state.accent);
+  localStorage.setItem('contrast', state.contrast);
+  try { tg?.setHeaderColor?.(state.theme === 'dark' ? '#14181f' : '#ffffff'); } catch {}
+  try { tg?.setBackgroundColor?.(state.theme === 'dark' ? '#0a0c10' : '#eef1f5'); } catch {}
 }
-applyTheme(state.theme);
-$('theme-btn').onclick = () => applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-
-/* Auth screens */
-function showScreen(id) {
-  ['login-screen', 'tfa-screen', 'forgot-screen', 'app-screen'].forEach(s => {
-    $(s).classList.toggle('hidden', s !== id);
-  });
-}
-
+applyAppearance();
+function showScreen(id) { ['login-screen','tfa-screen','forgot-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
 function toLogin(msg) {
-  csrfToken = null;
-  state.me = null;
-  localStorage.removeItem('token');
-  showScreen('login-screen');
+  csrfToken = null; state.me = null; localStorage.removeItem('token'); showScreen('login-screen');
   const el = $('login-error');
-  if (msg) { el.textContent = msg; el.classList.remove('hidden'); }
-  else el.classList.add('hidden');
+  if (msg) { el.textContent = msg; el.classList.remove('hidden'); } else el.classList.add('hidden');
 }
-
 async function afterLogin() {
   state.me = await api('GET', '/auth/me');
   csrfToken = state.me.csrfToken || csrfToken;
-  // Локальные правки профиля (пока сервер не умеет PATCH)
   try {
     const local = JSON.parse(localStorage.getItem('profileLocal') || 'null');
     if (local && state.me) {
@@ -977,1210 +465,538 @@ async function afterLogin() {
     }
   } catch {}
   state.workspaces = arr(await api('GET', '/workspaces'));
-  if (!state.workspaces.find(w => w.id === state.wsId)) {
-    state.wsId = state.workspaces[0]?.id || null;
-  }
+  if (!state.workspaces.find(w => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
   localStorage.setItem('wsId', state.wsId || '');
-  showScreen('app-screen');
-  updateSideUser();
-  renderWsSelect();
-  renderSideMenu();
-  renderBottomNav();
+  showScreen('app-screen'); updateSideUser(); renderWsSelect(); renderSideMenu(); renderBottomNav();
   go(state.me.requirePasswordChange ? 'me' : 'mine');
 }
-
 function updateSideUser() {
-  const me = state.me;
-  const av = $('side-avatar');
-  if (state.avatarEmoji) {
-    av.textContent = state.avatarEmoji;
-    av.style.fontSize = '22px';
-  } else {
-    av.textContent = initials(me);
-    av.style.fontSize = '';
-  }
+  const me = state.me; const av = $('side-avatar'); av.innerHTML = '';
+  if (state.avatarDataUrl) { const img = document.createElement('img'); img.src = state.avatarDataUrl; av.append(img); }
+  else if (state.avatarEmoji) { av.textContent = state.avatarEmoji; av.style.fontSize = '22px'; }
+  else { av.textContent = initials(me); av.style.fontSize = ''; }
+  const online = document.createElement('span'); online.className = 'online'; av.append(online);
   $('side-name').textContent = personName(me) || 'Пользователь';
-  $('side-email').textContent = me?.email || '';
+  $('side-role').textContent = me?.nickname ? '@' + me.nickname : 'Профиль';
+  $('side-email').textContent = '✉ ' + (me?.email || '');
 }
-
 function renderWsSelect() {
   const sel = $('ws-select');
-  if (state.workspaces.length < 2) {
-    sel.classList.add('hidden');
-    return;
-  }
+  if (state.workspaces.length < 2) { sel.classList.add('hidden'); return; }
   sel.classList.remove('hidden');
-  sel.replaceChildren(...state.workspaces.map(w =>
-    h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)
-  ));
-  sel.onchange = () => {
-    state.wsId = sel.value;
-    localStorage.setItem('wsId', state.wsId);
-    go(state.tab);
-  };
+  sel.replaceChildren(...state.workspaces.map(w => h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)));
+  sel.onchange = () => { state.wsId = sel.value; localStorage.setItem('wsId', state.wsId); go(state.tab); };
 }
-
 $('login-btn').onclick = async () => {
   $('login-error').classList.add('hidden');
-  const email = $('email').value.trim();
-  const password = $('password').value;
-  if (!email || !password) { toLogin('Заполните email и пароль'); return; }
+  const id = $('login-id').value.trim(); const password = $('password').value;
+  if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
   $('login-btn').disabled = true;
   try {
-    const data = await api('POST', '/auth/login', { email, password });
+    const payload = id.includes('@') ? { email: id, password } : { email: id, password, nickname: id };
+    const data = await api('POST', '/auth/login', payload);
     if (data.twoFactorRequired) {
-      showScreen('tfa-screen');
-      $('tfa-code').value = '';
-      $('tfa-error').classList.add('hidden');
-      $('tfa-code').focus();
+      showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
       if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-      csrfToken = data.csrfToken || null;
-      return;
+      csrfToken = data.csrfToken || null; return;
     }
     if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-    csrfToken = data.csrfToken || null;
-    $('password').value = '';
-    await afterLogin();
-  } catch (e) {
-    toLogin(e.message);
-  } finally {
-    $('login-btn').disabled = false;
-  }
+    csrfToken = data.csrfToken || null; $('password').value = ''; await afterLogin();
+  } catch (e) { toLogin(e.message); }
+  finally { $('login-btn').disabled = false; }
 };
-
 $('tfa-btn').onclick = async () => {
   const code = $('tfa-code').value.trim();
-  if (!code) {
-    $('tfa-error').textContent = 'Введите код';
-    $('tfa-error').classList.remove('hidden');
-    return;
-  }
+  if (!code) { $('tfa-error').textContent = 'Введите код'; $('tfa-error').classList.remove('hidden'); return; }
   $('tfa-btn').disabled = true;
   try {
     const data = await api('POST', '/auth/2fa/verify', { code });
     if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-    csrfToken = data.csrfToken || csrfToken;
-    await afterLogin();
-  } catch (e) {
-    $('tfa-error').textContent = e.message || '2FA пока не полностью поддержана на сервере';
-    $('tfa-error').classList.remove('hidden');
-  } finally {
-    $('tfa-btn').disabled = false;
-  }
+    csrfToken = data.csrfToken || csrfToken; await afterLogin();
+  } catch (e) { $('tfa-error').textContent = e.message || 'Ошибка 2FA'; $('tfa-error').classList.remove('hidden'); }
+  finally { $('tfa-btn').disabled = false; }
 };
 $('tfa-back').onclick = () => toLogin();
-
-$('forgot-btn').onclick = () => {
-  showScreen('forgot-screen');
-  $('forgot-email').value = $('email').value;
-  $('forgot-msg').classList.add('hidden');
-};
+$('forgot-btn').onclick = () => { showScreen('forgot-screen'); $('forgot-email').value = $('login-id').value.includes('@') ? $('login-id').value : ''; $('forgot-msg').classList.add('hidden'); };
 $('forgot-back').onclick = () => toLogin();
 $('forgot-submit').onclick = async () => {
-  const email = $('forgot-email').value.trim();
-  if (!email) return;
-  $('forgot-submit').disabled = true;
-  const msg = $('forgot-msg');
-  try {
-    await api('POST', '/auth/password/forgot', { email });
-    msg.className = 'alert alert-success';
-    msg.textContent = 'Если аккаунт существует, письмо со ссылкой отправлено.';
-  } catch (e) {
-    msg.className = 'alert alert-info';
-    msg.textContent = e.status === 404
-      ? 'Функция восстановления пароля пока не реализована на сервере. Обратитесь к администратору.'
-      : (e.message || 'Не удалось отправить письмо.');
-  }
-  msg.classList.remove('hidden');
-  $('forgot-submit').disabled = false;
+  const email = $('forgot-email').value.trim(); if (!email) return;
+  $('forgot-submit').disabled = true; const msg = $('forgot-msg');
+  try { await api('POST', '/auth/password/forgot', { email }); msg.className = 'alert alert-success'; msg.textContent = 'Если аккаунт есть — письмо отправлено.'; }
+  catch (e) { msg.className = 'alert alert-info'; msg.textContent = e.status === 404 ? 'Восстановление пока не на сервере.' : (e.message || 'Ошибка'); }
+  msg.classList.remove('hidden'); $('forgot-submit').disabled = false;
 };
-
-/* Side menu */
-function closeMenu() {
-  $('sidemenu').classList.remove('open');
-  $('overlay').classList.remove('open');
-}
-function openMenu() {
-  $('sidemenu').classList.add('open');
-  $('overlay').classList.add('open');
-  renderSideMenu();
-}
-$('menu-btn').onclick = openMenu;
-$('overlay').onclick = closeMenu;
-
+function closeMenu() { $('sidemenu').classList.remove('open'); $('overlay').classList.remove('open'); }
+function openMenu() { $('sidemenu').classList.add('open'); $('overlay').classList.add('open'); renderSideMenu(); }
+$('menu-btn').onclick = openMenu; $('overlay').onclick = closeMenu; $('side-close').onclick = closeMenu;
+$('side-profile').onclick = () => { closeMenu(); go('me'); };
 function renderSideMenu() {
-  const nav = $('sidemenu-nav');
   const items = [];
-
   items.push(h('div', { class: 'sidemenu-section' }, 'Основное'));
   items.push(sideItem('mine', icons.list, 'Мои чеклисты'));
   if (can('checklists.runs.read_all')) items.push(sideItem('all', icons.all, 'Все чеклисты'));
   if (can('checklists.templates.read')) items.push(sideItem('tpl', icons.template, 'Шаблоны'));
-
   items.push(h('div', { class: 'sidemenu-section' }, 'Управление'));
-  if (can('users.create') || can('users.read')) {
-    items.push(sideItem('people', icons.people, 'Сотрудники'));
-  }
+  if (can('users.create') || can('users.read')) items.push(sideItem('people', icons.people, 'Сотрудники'));
   items.push(sideItem('audit', icons.audit, 'Журнал аудита', true));
   items.push(sideItem('notifications', icons.bell, 'Уведомления', true));
-
   items.push(h('div', { class: 'sidemenu-section' }, 'Система'));
   items.push(sideItem('settings', icons.settings, 'Настройки'));
-  items.push(sideItem('me', icons.user, 'Профиль'));
-
-  nav.replaceChildren(...items);
+  $('sidemenu-nav').replaceChildren(...items);
 }
-
 function sideItem(tab, iconHtml, label, isStub = false) {
-  return h('button', {
-    class: 'sidemenu-item' + (state.tab === tab ? ' active' : ''),
-    onclick: () => { closeMenu(); go(tab); },
-  },
-    h('span', { html: iconHtml }),
-    label,
-    isStub && h('span', { class: 'soon' }, 'скоро')
-  );
+  return h('button', { class: 'sidemenu-item' + (state.tab === tab ? ' active' : ''), onclick: () => { closeMenu(); go(tab); } },
+    h('span', { html: iconHtml }), label, isStub ? h('span', { class: 'soon' }, 'скоро') : h('span', { class: 'chev' }, '›'));
 }
-
-$('logout-side').onclick = async () => {
-  closeMenu();
-  try { await api('POST', '/auth/logout'); } catch {}
-  toLogin();
-};
-
-/* Bottom nav */
+$('logout-side').onclick = async () => { closeMenu(); try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
 function renderBottomNav() {
   const tabs = [{ k: 'mine', t: 'Мои', icon: icons.list }];
   if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все', icon: icons.all });
   if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны', icon: icons.template });
   if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Люди', icon: icons.people });
-  tabs.push({ k: 'me', t: 'Профиль', icon: icons.user });
-
+  tabs.push({ k: 'settings', t: 'Ещё', icon: icons.settings });
   $('bottom-nav').replaceChildren(...tabs.map(({ k, t, icon }) =>
-    h('button', {
-      class: state.tab === k ? 'active' : '',
-      onclick: () => go(k),
-    }, h('span', { html: icon }), h('span', {}, t))
-  ));
+    h('button', { class: state.tab === k ? 'active' : '', onclick: () => go(k) }, h('span', { html: icon }), h('span', {}, t))));
 }
-
 function go(tab) {
-  if (tab === 'search' && state.tab !== 'search') {
-    state.searchPrevTab = state.tab;
-  }
+  if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
   state.tab = tab;
-  const titles = {
-    mine: 'Мои чеклисты',
-    all: 'Все чеклисты',
-    tpl: 'Шаблоны',
-    people: 'Сотрудники',
-    me: 'Профиль',
-    audit: 'Журнал аудита',
-    notifications: 'Уведомления',
-    settings: 'Настройки',
-    search: 'Поиск',
-  };
+  const titles = { mine:'Мои чеклисты', all:'Все чеклисты', tpl:'Шаблоны', people:'Сотрудники', me:'Профиль', audit:'Журнал аудита', notifications:'Уведомления', settings:'Настройки', search:'Поиск' };
   $('topbar-title').textContent = titles[tab] || 'Чеклисты';
-  renderBottomNav();
-  renderSideMenu();
-
-  const screens = {
-    mine: renderMine,
-    all: renderAll,
-    tpl: renderTemplates,
-    people: renderPeople,
-    me: renderProfile,
-    audit: renderAuditStub,
-    notifications: renderNotificationsStub,
-    settings: renderSettings,
-    search: renderSearch,
-  };
+  renderBottomNav(); renderSideMenu();
+  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAuditStub, notifications:renderNotificationsStub, settings:renderSettings, search:renderSearch };
   show(screens[tab] || renderMine);
 }
-
 $('search-btn').onclick = () => go('search');
-
-/* Runs */
 function statusBadge(r) {
   if (r.overdue) return h('span', { class: 'badge bad' }, 'Просрочен');
-  const s = r.status;
-  if (s === 'COMPLETED') return h('span', { class: 'badge ok' }, 'Завершён');
-  if (s === 'IN_PROGRESS') return h('span', { class: 'badge' }, 'В работе');
-  if (s === 'CANCELLED' || s === 'CANCELED') return h('span', { class: 'badge neutral' }, 'Отменён');
-  return h('span', { class: 'badge' }, statusName(s));
+  if (r.status === 'COMPLETED') return h('span', { class: 'badge ok' }, 'Завершён');
+  if (r.status === 'IN_PROGRESS') return h('span', { class: 'badge' }, 'В работе');
+  if (r.status === 'CANCELLED' || r.status === 'CANCELED') return h('span', { class: 'badge neutral' }, 'Отменён');
+  return h('span', { class: 'badge' }, statusName(r.status));
 }
-
 function runCard(r, withWho) {
   const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
   const who = personName(r.assignee);
   return h('div', { class: 'card click', onclick: () => show(() => openRun(r.id)) },
-    h('div', { class: 'row' },
-      h('strong', { style: 'font-size:15px;letter-spacing:-.01em' }, title),
-      statusBadge(r)
-    ),
+    h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, title), statusBadge(r)),
     r.dueAt && h('div', { class: 'muted', style: 'margin-top:5px' }, 'Срок: ' + fmt(r.dueAt)),
-    withWho && who && h('div', { class: 'muted', style: 'margin-top:2px' }, who)
-  );
+    withWho && who && h('div', { class: 'muted', style: 'margin-top:2px' }, who));
 }
-
 function emptyState(title, desc) {
-  return h('div', { class: 'empty' },
-    h('div', { class: 'empty-icon', html: icons.empty }),
-    h('div', { class: 'empty-title' }, title),
-    desc && h('div', { class: 'empty-desc' }, desc)
-  );
+  return h('div', { class: 'empty' }, h('div', { class: 'empty-icon', html: icons.empty }), h('div', { class: 'empty-title' }, title), desc && h('div', { class: 'empty-desc' }, desc));
 }
-
 async function renderMine() {
   const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  setView(
-    d.length
-      ? d.map(r => runCard(r))
-      : emptyState('Нет чеклистов', 'Вам пока ничего не назначили')
-  );
+  setView(d.length ? d.map(r => runCard(r)) : emptyState('Нет чеклистов', 'Вам пока ничего не назначили'));
 }
-
 async function renderAll() {
   let q = `/checklists/runs?workspaceId=${state.wsId}&scope=all`;
   if (state.filter === 'overdue') q += '&overdue=true';
   if (state.filter === 'done') q += '&status=COMPLETED';
   const d = arr(await api('GET', q));
-
-  setView(
-    h('div', { class: 'chips' },
-      chip('', 'Все'),
-      chip('overdue', 'Просроченные'),
-      chip('done', 'Выполненные')
-    ),
-    d.length
-      ? d.map(r => runCard(r, true))
-      : emptyState('Ничего не найдено')
-  );
+  setView(h('div', { class: 'chips' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')), d.length ? d.map(r => runCard(r, true)) : emptyState('Ничего не найдено'));
 }
-
-function chip(k, label) {
-  return h('button', {
-    class: 'chip' + (state.filter === k ? ' active' : ''),
-    onclick: () => { state.filter = k; go('all'); },
-  }, label);
-}
-
-/* Open run */
+function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
 async function photoURL(id) {
   const r = await fetch(API_BASE + '/files/' + id, { headers: authHeaders(), credentials: 'include' });
   if (!r.ok) throw new Error('Не удалось загрузить фото');
   return URL.createObjectURL(await r.blob());
 }
-
 function itemNode(run, it, editable) {
-  const status = h('div', { class: 'small', style: 'margin-top:6px' });
-  const flag = h('div', { class: 'flag' });
-  const mark = () => { flag.textContent = it.flagged ? '⚠ Отмечено как проблема' : ''; };
-  mark();
-
+  const status = h('div', { class: 'small', style: 'margin-top:6px' }); const flag = h('div', { class: 'flag' });
+  const mark = () => { flag.textContent = it.flagged ? '⚠ Отмечено как проблема' : ''; }; mark();
   const save = async (body) => {
     try {
       status.textContent = 'Сохраняю…';
       const r = await api('PUT', `/checklists/runs/${run.id}/items/${it.id}`, body);
       if (r && typeof r === 'object' && 'flagged' in r) it.flagged = r.flagged;
-      Object.assign(it, body);
-      status.textContent = 'Сохранено ✓';
-      mark();
-      return true;
-    } catch (e) {
-      status.textContent = '';
-      toast(e.message, true);
-      return false;
-    }
+      Object.assign(it, body); status.textContent = 'Сохранено ✓'; mark(); return true;
+    } catch (e) { status.textContent = ''; toast(e.message, true); return false; }
   };
-
   let control;
   if (it.type === 'CHECK') {
     const yes = h('button', { class: 'choice yes', disabled: !editable }, 'Да');
     const no = h('button', { class: 'choice no', disabled: !editable }, 'Нет');
-    const upd = () => {
-      yes.classList.toggle('on', it.checked === true);
-      no.classList.toggle('on', it.checked === false);
-    };
+    const upd = () => { yes.classList.toggle('on', it.checked === true); no.classList.toggle('on', it.checked === false); };
     yes.onclick = async () => { if (await save({ checked: true })) upd(); };
     no.onclick = async () => { if (await save({ checked: false })) upd(); };
-    upd();
-    control = h('div', { class: 'choices' }, yes, no);
+    upd(); control = h('div', { class: 'choices' }, yes, no);
   } else if (it.type === 'NUMBER') {
     const num = h('input', { type: 'number', step: 'any', inputmode: 'decimal', value: it.numberValue ?? '', disabled: !editable });
-    const com = h('input', { type: 'text', placeholder: 'Комментарий (необязательно)', value: it.comment ?? '', disabled: !editable });
-    const send = () => {
-      if (num.value === '') return;
-      const b = { numberValue: Number(num.value) };
-      if (com.value.trim()) b.comment = com.value.trim();
-      save(b);
-    };
-    num.addEventListener('change', send);
-    com.addEventListener('change', send);
+    const com = h('input', { type: 'text', placeholder: 'Комментарий', value: it.comment ?? '', disabled: !editable });
+    const send = () => { if (num.value === '') return; const b = { numberValue: Number(num.value) }; if (com.value.trim()) b.comment = com.value.trim(); save(b); };
+    num.addEventListener('change', send); com.addEventListener('change', send);
     const hasRange = it.minValue != null || it.maxValue != null;
-    control = h('div', {},
-      (hasRange || it.unit) && h('div', { class: 'small', style: 'margin-bottom:6px' },
-        (hasRange ? `Норма: ${it.minValue ?? '…'} – ${it.maxValue ?? '…'} ` : '') + (it.unit || '')),
-      num,
-      h('div', { style: 'height:8px' }),
-      com
-    );
+    control = h('div', {}, (hasRange || it.unit) && h('div', { class: 'small', style: 'margin-bottom:6px' }, (hasRange ? `Норма: ${it.minValue ?? '…'} – ${it.maxValue ?? '…'} ` : '') + (it.unit || '')), num, h('div', { style: 'height:8px' }), com);
   } else if (it.type === 'TEXT') {
     const ta = h('textarea', { rows: 3, disabled: !editable }, it.textValue || '');
-    ta.addEventListener('change', () => save({ textValue: ta.value }));
-    control = ta;
+    ta.addEventListener('change', () => save({ textValue: ta.value })); control = ta;
   } else if (it.type === 'PHOTO') {
-    const img = h('img', { class: 'photo hidden' });
-    const fid = it.fileId || it.file?.id;
+    const img = h('img', { class: 'photo hidden' }); const fid = it.fileId || it.file?.id;
     if (fid) photoURL(fid).then(u => { img.src = u; img.classList.remove('hidden'); }).catch(() => {});
     const inp = h('input', { type: 'file', accept: 'image/*', disabled: !editable });
     inp.onchange = async () => {
-      const f = inp.files[0];
-      if (!f) return;
+      const f = inp.files[0]; if (!f) return;
       try {
-        status.textContent = 'Загружаю фото…';
-        const fd = new FormData();
-        fd.append('workspaceId', run.workspaceId || state.wsId);
-        fd.append('file', f);
+        status.textContent = 'Загружаю…'; const fd = new FormData();
+        fd.append('workspaceId', run.workspaceId || state.wsId); fd.append('file', f);
         const up = await api('POST', '/files', fd);
-        if (await save({ fileId: up.id })) {
-          img.src = URL.createObjectURL(f);
-          img.classList.remove('hidden');
-        }
-      } catch (e) {
-        status.textContent = '';
-        toast(e.message, true);
-      }
+        if (await save({ fileId: up.id })) { img.src = URL.createObjectURL(f); img.classList.remove('hidden'); }
+      } catch (e) { status.textContent = ''; toast(e.message, true); }
     };
     control = h('div', {}, inp, img);
-  } else {
-    control = h('div', { class: 'muted' }, 'Тип пункта не поддерживается: ' + it.type);
-  }
-
-  return h('div', { class: 'card' },
-    h('div', { class: 'row' },
-      h('strong', { style: 'font-size:15px' }, it.title),
-      it.required && h('span', { class: 'badge' }, 'обязательно')
-    ),
-    h('div', { style: 'margin-top:12px' }, control),
-    flag,
-    status
-  );
+  } else control = h('div', { class: 'muted' }, 'Тип: ' + it.type);
+  return h('div', { class: 'card' }, h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, it.title), it.required && h('span', { class: 'badge' }, 'обязательно')), h('div', { style: 'margin-top:12px' }, control), flag, status);
 }
-
 async function openRun(id) {
   const run = await api('GET', `/checklists/runs/${id}`);
-  const closed = ['COMPLETED', 'CANCELLED', 'CANCELED'].includes(run.status);
+  const closed = ['COMPLETED','CANCELLED','CANCELED'].includes(run.status);
   const mine = !run.assigneeId || run.assigneeId === state.me.id || run.assignee?.id === state.me.id;
   const editable = !closed && mine;
   const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
-
   const nodes = [
     h('button', { class: 'btn btn-ghost back-btn', onclick: () => go(state.tab) }, '← Назад'),
     h('h1', {}, title),
-    h('div', { class: 'muted', style: 'margin-bottom:16px' },
-      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')
-    ),
+    h('div', { class: 'muted', style: 'margin-bottom:16px' }, statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')),
     ...(run.items || []).map(it => itemNode(run, it, editable)),
   ];
-
-  if (editable) {
-    nodes.push(h('button', {
-      class: 'btn btn-primary',
-      onclick: async (e) => {
-        e.target.disabled = true;
-        try {
-          const r = await api('POST', `/checklists/runs/${run.id}/complete`);
-          toast(`Чеклист завершён. Проблемных пунктов: ${r?.flaggedCount ?? 0}`);
-          go(state.tab);
-        } catch (err) {
-          toast(err.message, true);
-          e.target.disabled = false;
-        }
-      },
-    }, 'Завершить чеклист'));
-  }
-
-  if (!closed && can('checklists.assign')) {
-    nodes.push(h('button', {
-      class: 'btn btn-secondary',
-      style: 'margin-top:8px',
-      onclick: async () => {
-        if (!confirm('Отменить этот чеклист?')) return;
-        try {
-          await api('POST', `/checklists/runs/${run.id}/cancel`);
-          go(state.tab);
-        } catch (err) {
-          toast(err.message, true);
-        }
-      },
-    }, 'Отменить чеклист'));
-  }
-
+  if (editable) nodes.push(h('button', { class: 'btn btn-primary', onclick: async (e) => {
+    e.target.disabled = true;
+    try { const r = await api('POST', `/checklists/runs/${run.id}/complete`); toast(`Завершён. Проблем: ${r?.flaggedCount ?? 0}`); go(state.tab); }
+    catch (err) { toast(err.message, true); e.target.disabled = false; }
+  } }, 'Завершить чеклист'));
+  if (!closed && can('checklists.assign')) nodes.push(h('button', { class: 'btn btn-secondary', style: 'margin-top:8px', onclick: async () => {
+    if (!confirm('Отменить?')) return;
+    try { await api('POST', `/checklists/runs/${run.id}/cancel`); go(state.tab); } catch (err) { toast(err.message, true); }
+  } }, 'Отменить'));
   setView(nodes);
 }
-
-/* Templates */
-async function loadUsers() {
-  try { return arr(await api('GET', '/users')); } catch { return []; }
-}
-
+async function loadUsers() { try { return arr(await api('GET', '/users')); } catch { return []; } }
 async function renderTemplates() {
   let list;
-  try {
-    list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
-  } catch (e) {
-    if (e.status === 400) list = arr(await api('GET', '/checklists/templates'));
-    else throw e;
-  }
+  try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
+  catch (e) { if (e.status === 400) list = arr(await api('GET', '/checklists/templates')); else throw e; }
   const manage = can('checklists.templates.manage');
-
   setView(
-    manage && h('button', {
-      class: 'btn btn-primary',
-      style: 'margin-bottom:14px',
-      onclick: () => showBuilder(),
-    }, '+ Новый шаблон'),
-    list.length
-      ? list.map(t => h('div', { class: 'card' },
-          h('strong', { style: 'font-size:15px' }, t.title),
-          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
-          h('div', { class: 'small', style: 'margin-top:6px' },
-            'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—')
-          ),
-          h('div', { class: 'gap' },
-            can('checklists.assign') && h('button', {
-              class: 'btn btn-primary btn-sm',
-              onclick: () => show(() => showAssign(t)),
-            }, 'Назначить'),
-            manage && h('button', {
-              class: 'btn btn-secondary btn-sm',
-              onclick: () => {
-                const items = (t.items || []).map(it => ({
-                  title: it.title || '',
-                  type: it.type || 'CHECK',
-                  required: !!it.required,
-                  unit: it.unit || '',
-                  minValue: it.minValue ?? '',
-                  maxValue: it.maxValue ?? '',
-                }));
-                showBuilder({
-                  title: (t.title || '') + ' (копия)',
-                  description: t.description || '',
-                  items: items.length ? items : [{ title: '', type: 'CHECK', required: true }],
-                });
-              },
-            }, 'Копировать'),
-            manage && h('button', {
-              class: 'btn btn-danger btn-sm',
-              onclick: async () => {
-                if (!confirm('Архивировать шаблон «' + t.title + '»?')) return;
-                try {
-                  await api('DELETE', `/checklists/templates/${t.id}`);
-                  go('tpl');
-                } catch (e) { toast(e.message, true); }
-              },
-            }, 'Архивировать')
-          )
-        ))
-      : emptyState('Шаблонов пока нет', 'Создайте первый шаблон чеклиста')
+    manage && h('button', { class: 'btn btn-primary', style: 'margin-bottom:14px', onclick: () => showBuilder() }, '+ Новый шаблон'),
+    list.length ? list.map(t => h('div', { class: 'card' },
+      h('strong', { style: 'font-size:15px' }, t.title),
+      t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
+      h('div', { class: 'small', style: 'margin-top:6px' }, 'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—')),
+      h('div', { class: 'gap' },
+        can('checklists.assign') && h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'),
+        manage && h('button', { class: 'btn btn-secondary btn-sm', onclick: () => {
+          const items = (t.items || []).map(it => ({ title: it.title || '', type: it.type || 'CHECK', required: !!it.required, unit: it.unit || '', minValue: it.minValue ?? '', maxValue: it.maxValue ?? '' }));
+          showBuilder({ title: (t.title || '') + ' (копия)', description: t.description || '', items: items.length ? items : [{ title: '', type: 'CHECK', required: true }] });
+        } }, 'Копировать'),
+        manage && h('button', { class: 'btn btn-danger btn-sm', onclick: async () => {
+          if (!confirm('Архивировать «' + t.title + '»?')) return;
+          try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); } catch (e) { toast(e.message, true); }
+        } }, 'Архивировать')
+      )
+    )) : emptyState('Шаблонов пока нет')
   );
 }
-
 async function showAssign(t) {
   const users = await loadUsers();
-  const sel = h('select', {},
-    users.map(u => h('option', { value: u.id }, personName(u) + (u.email ? ` (${u.email})` : '')))
-  );
+  const sel = h('select', {}, users.map(u => h('option', { value: u.id }, personName(u) + (u.email ? ` (${u.email})` : ''))));
   const due = h('input', { type: 'datetime-local' });
-
   setView(
     h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← Назад'),
-    h('h1', {}, 'Назначить'),
-    h('p', { class: 'page-desc' }, t.title),
-    users.length
-      ? [h('label', {}, 'Сотрудник'), sel]
-      : h('div', { class: 'alert alert-error' }, 'Не удалось получить список сотрудников.'),
-    h('label', {}, 'Срок выполнения (необязательно)'),
-    due,
-    h('button', {
-      class: 'btn btn-primary',
-      onclick: async (e) => {
-        const body = { templateId: t.id, assigneeId: sel.value };
-        if (due.value) body.dueAt = new Date(due.value).toISOString();
-        e.target.disabled = true;
-        try {
-          await api('POST', '/checklists/runs', body);
-          toast('Чеклист назначен');
-          go('tpl');
-        } catch (err) {
-          toast(err.message, true);
-          e.target.disabled = false;
-        }
-      },
-    }, 'Назначить')
+    h('h1', {}, 'Назначить'), h('p', { class: 'page-desc' }, t.title),
+    users.length ? [h('label', {}, 'Сотрудник'), sel] : h('div', { class: 'alert alert-error' }, 'Нет сотрудников'),
+    h('label', {}, 'Срок'), due,
+    h('button', { class: 'btn btn-primary', onclick: async (e) => {
+      const body = { templateId: t.id, assigneeId: sel.value };
+      if (due.value) body.dueAt = new Date(due.value).toISOString();
+      e.target.disabled = true;
+      try { await api('POST', '/checklists/runs', body); toast('Назначен'); go('tpl'); }
+      catch (err) { toast(err.message, true); e.target.disabled = false; }
+    } }, 'Назначить')
   );
 }
-
 function showBuilder(draft) {
   draft = draft || { title: '', description: '', items: [{ title: '', type: 'CHECK', required: true }] };
   const again = () => showBuilder(draft);
   const typeNames = { CHECK: 'Да / нет', NUMBER: 'Число', TEXT: 'Текст', PHOTO: 'Фото' };
-
   const rows = draft.items.map((it, i) => h('div', { class: 'itemrow' },
-    h('input', {
-      type: 'text',
-      placeholder: 'Название пункта',
-      value: it.title,
-      oninput: (e) => { it.title = e.target.value; },
-    }),
-    h('select', {
-      style: 'margin-top:8px',
-      onchange: (e) => { it.type = e.target.value; again(); },
-    }, Object.entries(typeNames).map(([k, v]) =>
-      h('option', { value: k, selected: it.type === k }, v)
-    )),
+    h('input', { type: 'text', placeholder: 'Название', value: it.title, oninput: (e) => { it.title = e.target.value; } }),
+    h('select', { style: 'margin-top:8px', onchange: (e) => { it.type = e.target.value; again(); } }, Object.entries(typeNames).map(([k, v]) => h('option', { value: k, selected: it.type === k }, v))),
     it.type === 'NUMBER' && h('div', { class: 'gap', style: 'margin-top:8px' },
-      h('input', {
-        type: 'text', placeholder: 'Единица (°C)', value: it.unit || '',
-        style: 'flex:1', oninput: (e) => { it.unit = e.target.value; },
-      }),
-      h('input', {
-        type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '',
-        style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; },
-      }),
-      h('input', {
-        type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '',
-        style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; },
-      })
-    ),
+      h('input', { type: 'text', placeholder: 'Ед.', value: it.unit || '', style: 'flex:1', oninput: (e) => { it.unit = e.target.value; } }),
+      h('input', { type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '', style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; } }),
+      h('input', { type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '', style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; } })),
     h('div', { class: 'row', style: 'margin-top:10px' },
-      h('label', { style: 'margin:0;display:flex;gap:8px;align-items:center;font-weight:400' },
-        h('input', {
-          type: 'checkbox',
-          checked: it.required,
-          onchange: (e) => { it.required = e.target.checked; },
-        }),
-        'Обязательный'
-      ),
-      draft.items.length > 1 && h('button', {
-        class: 'btn btn-danger btn-sm',
-        onclick: () => { draft.items.splice(i, 1); again(); },
-      }, 'Удалить')
-    )
+      h('label', { style: 'margin:0;display:flex;gap:8px;align-items:center;font-weight:400' }, h('input', { type: 'checkbox', checked: it.required, onchange: (e) => { it.required = e.target.checked; } }), 'Обязательный'),
+      draft.items.length > 1 && h('button', { class: 'btn btn-danger btn-sm', onclick: () => { draft.items.splice(i, 1); again(); } }, 'Удалить'))
   ));
-
   setView(
     h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← Назад'),
     h('h1', {}, 'Новый шаблон'),
-    h('label', {}, 'Название'),
-    h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
-    h('label', {}, 'Описание (необязательно)'),
-    h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
-    h('h2', {}, 'Пункты'),
-    ...rows,
-    h('button', {
-      class: 'btn btn-secondary',
-      onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false }); again(); },
-    }, '+ Добавить пункт'),
-    h('button', {
-      class: 'btn btn-primary',
-      onclick: async (e) => {
-        if (!draft.title.trim()) return toast('Введите название шаблона', true);
-        if (draft.items.some(it => !it.title.trim())) return toast('У каждого пункта должно быть название', true);
-        const items = draft.items.map(it => {
-          const o = { title: it.title.trim(), type: it.type, required: !!it.required };
-          if (it.type === 'NUMBER') {
-            if (it.unit?.trim()) o.unit = it.unit.trim();
-            if (it.minValue !== undefined && it.minValue !== '') o.minValue = Number(it.minValue);
-            if (it.maxValue !== undefined && it.maxValue !== '') o.maxValue = Number(it.maxValue);
-          }
-          return o;
-        });
-        const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
-        if (draft.description.trim()) body.description = draft.description.trim();
-        e.target.disabled = true;
-        try {
-          await api('POST', '/checklists/templates', body);
-          toast('Шаблон создан');
-          go('tpl');
-        } catch (err) {
-          toast(err.message, true);
-          e.target.disabled = false;
+    h('label', {}, 'Название'), h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
+    h('label', {}, 'Описание'), h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
+    h('h2', {}, 'Пункты'), ...rows,
+    h('button', { class: 'btn btn-secondary', onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false }); again(); } }, '+ Пункт'),
+    h('button', { class: 'btn btn-primary', onclick: async (e) => {
+      if (!draft.title.trim()) return toast('Введите название', true);
+      if (draft.items.some(it => !it.title.trim())) return toast('Названия пунктов обязательны', true);
+      const items = draft.items.map(it => {
+        const o = { title: it.title.trim(), type: it.type, required: !!it.required };
+        if (it.type === 'NUMBER') {
+          if (it.unit?.trim()) o.unit = it.unit.trim();
+          if (it.minValue !== '' && it.minValue != null) o.minValue = Number(it.minValue);
+          if (it.maxValue !== '' && it.maxValue != null) o.maxValue = Number(it.maxValue);
         }
-      },
-    }, 'Сохранить шаблон')
+        return o;
+      });
+      const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
+      if (draft.description.trim()) body.description = draft.description.trim();
+      e.target.disabled = true;
+      try { await api('POST', '/checklists/templates', body); toast('Создан'); go('tpl'); }
+      catch (err) { toast(err.message, true); e.target.disabled = false; }
+    } }, 'Сохранить')
   );
 }
-
-/* People */
 async function deleteUser(u) {
-  // Сервер пока не поддерживает DELETE /users/:id — один запрос, одно понятное сообщение
-  try {
-    await api('DELETE', `/users/${u.id}`);
-    toast('Сотрудник удалён');
-    return true;
-  } catch (err) {
+  try { await api('DELETE', `/users/${u.id}`); toast('Удалён'); return true; }
+  catch (err) {
     const msg = String(err.message || '');
-    if (
-      err.status === 404 ||
-      err.status === 405 ||
-      /cannot\s+delete|not\s+allowed|method\s+not|not\s+implemented|not\s+found/i.test(msg)
-    ) {
-      toast('Удаление сотрудников пока не доступно на сервере', true);
-    } else if (err.status === 403) {
-      toast('Недостаточно прав для удаления', true);
-    } else {
-      toast(msg || 'Не удалось удалить сотрудника', true);
-    }
+    if (err.status === 404 || err.status === 405 || /cannot\s+delete|not\s+allowed|method/i.test(msg)) toast('Удаление пока недоступно на сервере', true);
+    else if (err.status === 403) toast('Недостаточно прав', true);
+    else toast(msg || 'Ошибка', true);
     return false;
   }
 }
-
 async function renderPeople() {
   const users = can('users.read') ? await loadUsers() : [];
-  const out = h('div');
-  const nodes = [];
-
+  const out = h('div'); const nodes = [];
   if (can('users.create')) {
     const f = {
       email: h('input', { type: 'email', placeholder: 'email@company.com' }),
       first: h('input', { type: 'text', placeholder: 'Имя' }),
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
-      role: h('select', {},
-        h('option', { value: 'MEMBER' }, 'Исполнитель'),
-        h('option', { value: 'MANAGER' }, 'Руководитель'),
-        h('option', { value: 'VIEWER' }, 'Наблюдатель')
-      ),
+      role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
     };
     nodes.push(h('div', { class: 'card' },
-      h('strong', { style: 'font-size:15px' }, 'Добавить сотрудника'),
-      h('label', {}, 'Email'), f.email,
-      h('label', {}, 'Имя'), f.first,
-      h('label', {}, 'Фамилия'), f.last,
-      h('label', {}, 'Роль'), f.role,
-      h('button', {
-        class: 'btn btn-primary',
-        onclick: async (e) => {
-          e.target.disabled = true;
-          try {
-            const r = await api('POST', '/users', {
-              email: f.email.value.trim(),
-              firstName: f.first.value.trim(),
-              lastName: f.last.value.trim(),
-              roleCode: f.role.value,
-              workspaceId: state.wsId,
-            });
-            out.replaceChildren(h('div', { class: 'alert alert-success' },
-              `Сотрудник создан. Временный пароль (показывается один раз): ${r.temporaryPassword}`
-            ));
-            f.email.value = f.first.value = f.last.value = '';
-          } catch (err) {
-            toast(err.message, true);
-          }
-          e.target.disabled = false;
-        },
-      }, 'Создать'),
-      out
-    ));
+      h('strong', {}, 'Добавить'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+      h('button', { class: 'btn btn-primary', onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          const r = await api('POST', '/users', { email: f.email.value.trim(), firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId });
+          out.replaceChildren(h('div', { class: 'alert alert-success' }, `Создан. Пароль: ${r.temporaryPassword}`));
+          f.email.value = f.first.value = f.last.value = '';
+        } catch (err) { toast(err.message, true); }
+        e.target.disabled = false;
+      } }, 'Создать'), out));
   }
-
   if (can('users.read')) {
     nodes.push(h('div', { class: 'section-label' }, 'Список'));
     if (users.length) {
       const group = h('div', { class: 'list-group' });
       const canDelete = can('users.create') || can('users.delete') || can('users.manage') || can('users.update');
-
-      const closeAllSwipes = (except) => {
-        group.querySelectorAll('.list-row.open').forEach(row => {
-          if (row !== except) row.classList.remove('open');
-        });
-      };
-
+      const closeAll = (ex) => group.querySelectorAll('.list-row.open').forEach(r => { if (r !== ex) r.classList.remove('open'); });
       users.forEach(u => {
         const isMe = u.id === state.me?.id;
         const roleLabel = u.roleCode || u.role || u.roleName || '';
         const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
-
         const row = h('div', { class: 'list-row' });
         const inner = h('div', { class: 'list-row-inner' },
-          h('div', {
-            class: 'avatar',
-            style: 'width:40px;height:40px;font-size:14px;flex-shrink:0',
-          }, initials(u)),
-          h('div', { style: 'min-width:0;flex:1' },
-            h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'),
-            h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, u.email || '')
-          ),
-          showRole && h('span', { class: 'badge neutral list-row-meta' }, roleLabel)
-        );
-
-        // Swipe to delete (Apple-style)
+          h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
+          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, u.email || '')),
+          showRole && h('span', { class: 'badge neutral' }, roleLabel));
         if (!isMe && canDelete) {
-          const actions = h('div', { class: 'list-row-actions' },
-            h('button', {
-              class: 'act-delete',
-              type: 'button',
-              onclick: async (e) => {
-                e.stopPropagation();
-                if (!confirm(`Удалить «${personName(u)}»?`)) {
-                  row.classList.remove('open');
-                  return;
-                }
-                const ok = await deleteUser(u);
-                if (ok) go('people');
-                else row.classList.remove('open');
-              },
-            }, 'Удалить')
-          );
+          const actions = h('div', { class: 'list-row-actions' }, h('button', { class: 'act-delete', type: 'button', onclick: async (e) => {
+            e.stopPropagation();
+            if (!confirm(`Удалить «${personName(u)}»?`)) { row.classList.remove('open'); return; }
+            if (await deleteUser(u)) go('people'); else row.classList.remove('open');
+          } }, 'Удалить'));
           row.append(actions, inner);
-
           let startX = 0, currentX = 0, dragging = false;
-          inner.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].clientX;
-            currentX = startX;
-            dragging = true;
-            closeAllSwipes(row);
-          }, { passive: true });
-          inner.addEventListener('touchmove', (e) => {
-            if (!dragging) return;
-            currentX = e.touches[0].clientX;
-            const dx = currentX - startX;
-            if (dx < 0) {
-              const offset = Math.max(dx, -88);
-              inner.style.transition = 'none';
-              inner.style.transform = `translateX(${offset}px)`;
-            }
-          }, { passive: true });
-          inner.addEventListener('touchend', () => {
-            if (!dragging) return;
-            dragging = false;
-            inner.style.transition = '';
-            const dx = currentX - startX;
-            if (dx < -40) {
-              row.classList.add('open');
-              inner.style.transform = '';
-            } else {
-              row.classList.remove('open');
-              inner.style.transform = '';
-            }
-          });
-          // click closes
-          inner.addEventListener('click', () => {
-            if (row.classList.contains('open')) row.classList.remove('open');
-          });
-        } else {
-          row.append(inner);
-        }
-
+          inner.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentX = startX; dragging = true; closeAll(row); }, { passive: true });
+          inner.addEventListener('touchmove', (e) => { if (!dragging) return; currentX = e.touches[0].clientX; const dx = currentX - startX; if (dx < 0) { inner.style.transition = 'none'; inner.style.transform = `translateX(${Math.max(dx, -88)}px)`; } }, { passive: true });
+          inner.addEventListener('touchend', () => { if (!dragging) return; dragging = false; inner.style.transition = ''; if (currentX - startX < -40) { row.classList.add('open'); inner.style.transform = ''; } else { row.classList.remove('open'); inner.style.transform = ''; } });
+          inner.addEventListener('click', () => { if (row.classList.contains('open')) row.classList.remove('open'); });
+        } else row.append(inner);
         group.append(row);
       });
       nodes.push(group);
-      nodes.push(h('div', { class: 'small', style: 'margin-top:10px;padding:0 4px' },
-        'Свайп влево по сотруднику — удалить'
-      ));
-    } else {
-      nodes.push(emptyState('Список пуст'));
-    }
+      nodes.push(h('div', { class: 'small', style: 'margin-top:10px;padding:0 4px' }, 'Свайп влево — удалить'));
+    } else nodes.push(emptyState('Список пуст'));
   }
-
-  if (!nodes.length) {
-    nodes.push(emptyState('Недостаточно прав'));
-  }
-
+  if (!nodes.length) nodes.push(emptyState('Недостаточно прав'));
   setView(nodes);
 }
-
-/* Profile */
 async function changePassword(current, next) {
-  const variants = [
-    { currentPassword: current, newPassword: next },
-    { oldPassword: current, newPassword: next },
-    { password: current, newPassword: next },
-  ];
+  const variants = [{ currentPassword: current, newPassword: next }, { oldPassword: current, newPassword: next }, { password: current, newPassword: next }];
   let last;
   for (const body of variants) {
-    try {
-      return await api('POST', '/auth/password/change', body);
-    } catch (e) {
-      last = e;
-      if (e.status === 400 && /should not exist|should not be empty|must be a string|must be longer/i.test(e.message) &&
-          /property|must be a string|should not be empty/i.test(e.message)) continue;
-      throw e;
-    }
+    try { return await api('POST', '/auth/password/change', body); }
+    catch (e) { last = e; if (e.status === 400 && /should not exist|property/i.test(e.message || '')) continue; throw e; }
   }
   throw last;
 }
-
 async function renderProfile() {
   const me = state.me;
-  const displayAvatar = state.avatarEmoji || initials(me);
-
   const first = h('input', { type: 'text', value: me.firstName || '', placeholder: 'Имя' });
   const last = h('input', { type: 'text', value: me.lastName || '', placeholder: 'Фамилия' });
-  const nick = h('input', { type: 'text', value: me.nickname || me.username || '', placeholder: 'Никнейм (необязательно)' });
+  const nick = h('input', { type: 'text', value: me.nickname || '', placeholder: 'Никнейм' });
   const email = h('input', { type: 'email', value: me.email || '', placeholder: 'email@company.com' });
-
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
   const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
-
-  const emojiList = ['😊','😎','🧑‍💼','👩‍💻','👨‍💻','🦁','🐯','🐻','🦊','🐸','⭐','🔥','💼','📋','✅'];
-  const emojiRow = h('div', { class: 'gap', style: 'margin-top:10px' });
-  emojiList.forEach(em => {
-    emojiRow.append(h('button', {
-      type: 'button',
-      class: 'btn btn-sm btn-secondary',
-      style: 'font-size:18px;padding:6px 10px;min-width:40px',
-      onclick: () => {
-        state.avatarEmoji = em;
-        localStorage.setItem('avatarEmoji', em);
-        updateSideUser();
-        go('me');
-      },
-    }, em));
-  });
-  emojiRow.append(h('button', {
-    type: 'button',
-    class: 'btn btn-sm btn-secondary',
-    style: 'font-size:13px',
-    onclick: () => {
-      state.avatarEmoji = '';
-      localStorage.removeItem('avatarEmoji');
-      updateSideUser();
-      go('me');
-    },
-  }, 'Сброс'));
-
+  const avatarBox = h('div', { class: 'avatar-lg' });
+  if (state.avatarDataUrl) { const img = document.createElement('img'); img.src = state.avatarDataUrl; avatarBox.append(img); }
+  else if (state.avatarEmoji) avatarBox.textContent = state.avatarEmoji;
+  else { avatarBox.textContent = initials(me); avatarBox.style.fontSize = '22px'; }
+  const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'hidden' });
+  fileInput.onchange = () => {
+    const f = fileInput.files?.[0]; if (!f) return;
+    if (f.size > 2 * 1024 * 1024) return toast('До 2 МБ', true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.avatarDataUrl = String(reader.result); state.avatarEmoji = '';
+      localStorage.setItem('avatarDataUrl', state.avatarDataUrl); localStorage.removeItem('avatarEmoji');
+      updateSideUser(); go('me');
+    };
+    reader.readAsDataURL(f);
+  };
+  let emojiOpen = false;
+  const emojiPanel = h('div', { class: 'hidden' });
+  const emojiBtn = h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => { emojiOpen = !emojiOpen; emojiPanel.classList.toggle('hidden', !emojiOpen); } }, 'Выбрать эмодзи');
+  const grid = h('div', { class: 'emoji-grid' });
+  EMOJIS.forEach(em => grid.append(h('button', { type: 'button', class: state.avatarEmoji === em ? 'on' : '', onclick: () => {
+    state.avatarEmoji = em; state.avatarDataUrl = '';
+    localStorage.setItem('avatarEmoji', em); localStorage.removeItem('avatarDataUrl');
+    updateSideUser(); go('me');
+  } }, em)));
+  emojiPanel.append(grid);
   setView(
-    me.requirePasswordChange && h('div', { class: 'alert alert-info' },
-      'Сервер просит сменить пароль. Сделайте это ниже.'
-    ),
+    me.requirePasswordChange && h('div', { class: 'alert alert-info' }, 'Нужно сменить пароль.'),
     h('div', { class: 'card' },
-      h('div', { class: 'row' },
-        h('div', {
-          class: 'avatar',
-          style: 'width:56px;height:56px;font-size:' + (state.avatarEmoji ? '28px' : '18px'),
-        }, displayAvatar),
-        h('div', { style: 'flex:1' },
-          h('strong', { style: 'font-size:17px' }, personName(me)),
-          h('div', { class: 'muted' }, me.email)
-        )
-      ),
-      h('div', { class: 'small', style: 'margin-top:12px' }, 'Аватар (эмодзи)'),
-      emojiRow
+      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, me.email), me.nickname && h('div', { class: 'small' }, '@' + me.nickname))),
+      h('div', { class: 'gap', style: 'margin-top:14px' },
+        h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: () => fileInput.click() }, 'Фото'),
+        emojiBtn,
+        (state.avatarDataUrl || state.avatarEmoji) && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => {
+          state.avatarDataUrl = ''; state.avatarEmoji = '';
+          localStorage.removeItem('avatarDataUrl'); localStorage.removeItem('avatarEmoji');
+          updateSideUser(); go('me');
+        } }, 'Сбросить')
+      ), fileInput, emojiPanel
     ),
-
-    h('h2', {}, 'Данные профиля'),
+    h('h2', {}, 'Данные'),
     h('div', { class: 'card' },
-      h('label', { style: 'margin-top:0' }, 'Имя'), first,
-      h('label', {}, 'Фамилия'), last,
-      h('label', {}, 'Никнейм'), nick,
-      h('label', {}, 'Email'), email,
-      h('button', {
-        class: 'btn btn-primary',
-        onclick: async (e) => {
-          const body = {
-            firstName: first.value.trim(),
-            lastName: last.value.trim(),
-          };
-          if (nick.value.trim()) body.nickname = nick.value.trim();
-          if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
-
-          e.target.disabled = true;
-          try {
-            // Один запрос — сервер пока может не поддерживать обновление профиля
-            try {
-              await api('PATCH', `/users/${me.id}`, body);
-            } catch (err) {
-              const msg = String(err.message || '');
-              if (
-                err.status === 404 ||
-                err.status === 405 ||
-                /cannot|not allowed|method not|not implemented|not found/i.test(msg)
-              ) {
-                // Локально сохраняем то, что можем (отображение)
-                if (body.firstName !== undefined) state.me.firstName = body.firstName;
-                if (body.lastName !== undefined) state.me.lastName = body.lastName;
-                if (body.nickname) state.me.nickname = body.nickname;
-                localStorage.setItem('profileLocal', JSON.stringify({
-                  firstName: state.me.firstName,
-                  lastName: state.me.lastName,
-                  nickname: state.me.nickname || '',
-                }));
-                updateSideUser();
-                toast('Данные сохранены локально. На сервере изменение профиля пока недоступно', true);
-                e.target.disabled = false;
-                go('me');
-                return;
-              }
-              throw err;
-            }
-
-            toast('Профиль обновлён');
-            try {
-              state.me = await api('GET', '/auth/me');
-              csrfToken = state.me.csrfToken || csrfToken;
-            } catch {
+      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм'), nick, h('label', {}, 'Email'), email,
+      h('button', { class: 'btn btn-primary', onclick: async (e) => {
+        const body = { firstName: first.value.trim(), lastName: last.value.trim() };
+        if (nick.value.trim()) body.nickname = nick.value.trim();
+        if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
+        e.target.disabled = true;
+        try {
+          try { await api('PATCH', `/users/${me.id}`, body); toast('Профиль обновлён'); }
+          catch (err) {
+            const msg = String(err.message || '');
+            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) {
               Object.assign(state.me, body);
-            }
-            updateSideUser();
-            go('me');
-          } catch (err) {
-            toast(err.message || 'Не удалось сохранить профиль', true);
-            e.target.disabled = false;
+              localStorage.setItem('profileLocal', JSON.stringify({ firstName: state.me.firstName, lastName: state.me.lastName, nickname: state.me.nickname || '' }));
+              toast('Сохранено локально (сервер пока без API)', true);
+            } else throw err;
           }
-        },
-      }, 'Сохранить профиль')
+          try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; } catch { Object.assign(state.me, body); }
+          updateSideUser(); go('me');
+        } catch (err) { toast(err.message || 'Ошибка', true); e.target.disabled = false; }
+      } }, 'Сохранить профиль')
     ),
-
-    h('h2', {}, 'Смена пароля'),
+    h('h2', {}, 'Пароль'),
     h('div', { class: 'card' },
-      h('label', { style: 'margin-top:0' }, 'Текущий пароль'), cur,
-      h('label', {}, 'Новый пароль'), n1,
-      h('label', {}, 'Повторите новый пароль'), n2,
-      h('button', {
-        class: 'btn btn-primary',
-        onclick: async (e) => {
-          if (!cur.value || !n1.value) return toast('Заполните все поля', true);
-          if (n1.value !== n2.value) return toast('Новые пароли не совпадают', true);
-          e.target.disabled = true;
-          try {
-            await changePassword(cur.value, n1.value);
-            toast('Пароль изменён');
-            try {
-              state.me = await api('GET', '/auth/me');
-              csrfToken = state.me.csrfToken || csrfToken;
-              go('me');
-            } catch {
-              toLogin('Пароль изменён. Войдите с новым паролем.');
-            }
-          } catch (err) {
-            toast(err.message, true);
-            e.target.disabled = false;
-          }
-        },
-      }, 'Сменить пароль')
+      h('label', { style: 'margin-top:0' }, 'Текущий'), cur, h('label', {}, 'Новый'), n1, h('label', {}, 'Повтор'), n2,
+      h('button', { class: 'btn btn-primary', onclick: async (e) => {
+        if (!cur.value || !n1.value) return toast('Заполните поля', true);
+        if (n1.value !== n2.value) return toast('Пароли не совпадают', true);
+        e.target.disabled = true;
+        try {
+          await changePassword(cur.value, n1.value); toast('Пароль изменён');
+          try { state.me = await api('GET', '/auth/me'); go('me'); } catch { toLogin('Войдите с новым паролем'); }
+        } catch (err) { toast(err.message, true); e.target.disabled = false; }
+      } }, 'Сменить пароль')
     ),
-
     h('div', { class: 'divider' }),
-    h('button', {
-      class: 'btn btn-secondary',
-      onclick: async () => {
-        try { await api('POST', '/auth/logout'); } catch {}
-        toLogin();
-      },
-    }, 'Выйти из аккаунта')
+    h('button', { class: 'btn btn-secondary', onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); } }, 'Выйти')
   );
 }
-
-/* Stubs */
-function renderStub(title, description, iconHtml) {
+function renderSettings() {
+  const accents = [
+    { id: 'blue', color: '#2AABEE' }, { id: 'violet', color: '#8b5cf6' }, { id: 'teal', color: '#14b8a6' },
+    { id: 'orange', color: '#f97316' }, { id: 'pink', color: '#ec4899' }, { id: 'green', color: '#22c55e' },
+  ];
   setView(
-    h('div', { class: 'empty', style: 'padding-top:56px' },
-      h('div', { class: 'stub-icon', html: iconHtml }),
-      h('div', { class: 'empty-title' }, title),
-      h('div', { class: 'empty-desc' }, description),
-      h('p', { class: 'small', style: 'margin-top:18px' }, 'Раздел подготовлен · API пока не подключено')
-    )
+    h('div', { class: 'card' }, h('strong', {}, 'Тема'), h('div', { class: 'gap', style: 'margin-top:12px' },
+      h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'light'; applyAppearance(); go('settings'); } }, 'Светлая'),
+      h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'dark'; applyAppearance(); go('settings'); } }, 'Тёмная')
+    )),
+    h('div', { class: 'card' }, h('strong', {}, 'Цвет акцента'), h('div', { class: 'swatches' },
+      ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: () => { state.accent = a.id; applyAppearance(); go('settings'); } }))
+    )),
+    h('div', { class: 'card' }, h('strong', {}, 'Контрастность'), h('div', { class: 'gap', style: 'margin-top:12px' },
+      h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'normal'; applyAppearance(); go('settings'); } }, 'Обычная'),
+      h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'high'; applyAppearance(); go('settings'); } }, 'Высокая')
+    ), h('div', { class: 'small', style: 'margin-top:10px' }, 'Высокая — лучше читаемость текста')),
+    h('div', { class: 'card' }, h('strong', {}, 'Профиль'), h('div', { class: 'muted', style: 'margin-top:8px;font-size:14px' }, 'Откройте профиль из бокового меню — нажмите на свою карточку сверху.'),
+      h('button', { class: 'btn btn-secondary', style: 'margin-top:12px', onclick: () => go('me') }, 'Открыть профиль')),
+    h('div', { class: 'card' }, h('strong', {}, 'О приложении'), h('div', { class: 'muted', style: 'margin-top:8px' }, 'Чеклисты · Telegram Web App'), h('div', { class: 'small', style: 'margin-top:4px' }, 'UI 3.0 · glass + themes'))
   );
-}
-
-function renderAuditStub() {
-  renderStub('Журнал аудита', 'История действий: входы, изменения, назначения чеклистов', icons.audit);
-}
-function renderNotificationsStub() {
-  renderStub('Уведомления', 'Пуш-уведомления и лента событий появятся позже', icons.bell);
 }
 async function renderSearch() {
-  const q = (state.searchQuery || '').trim().toLowerCase();
-
   const inputWrap = h('div', { style: 'position:relative;margin-bottom:14px' });
-  const input = h('input', {
-    type: 'search',
-    placeholder: 'Чеклисты, шаблоны, сотрудники…',
-    value: state.searchQuery || '',
-    style: 'padding-right:44px',
-  });
-  const clearBtn = h('button', {
-    class: 'topbar-btn',
-    type: 'button',
-    style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
-    title: 'Очистить и закрыть',
-    onclick: () => {
-      state.searchQuery = '';
-      go(state.searchPrevTab || 'mine');
-    },
-  });
+  const input = h('input', { type: 'search', placeholder: 'Чеклисты, шаблоны, люди…', value: state.searchQuery || '', style: 'padding-right:44px' });
+  const clearBtn = h('button', { class: 'topbar-btn', type: 'button', style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)', onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); } });
   clearBtn.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>`;
-
   inputWrap.append(input, clearBtn);
-
   const runSearch = async () => {
-    state.searchQuery = input.value;
-    const query = input.value.trim().toLowerCase();
-
-    if (!query) {
-      setView(
-        inputWrap,
-        h('div', { class: 'empty', style: 'padding-top:36px' },
-          h('div', { class: 'stub-icon', html: icons.search }),
-          h('div', { class: 'empty-title' }, 'Поиск'),
-          h('div', { class: 'empty-desc' }, 'Введите запрос — ищем по чеклистам, шаблонам и сотрудникам')
-        )
-      );
-      input.focus();
-      return;
-    }
-
-    setView(
-      inputWrap,
-      h('div', { class: 'stack', style: 'padding:4px 0' },
-        h('div', { class: 'skeleton', style: 'height:18px;width:40%' }),
-        h('div', { class: 'skeleton', style: 'height:64px;margin-top:10px' })
-      )
-    );
-
+    state.searchQuery = input.value; const query = input.value.trim().toLowerCase();
+    if (!query) { setView(inputWrap, emptyState('Поиск', 'Введите запрос')); input.focus(); return; }
+    setView(inputWrap, h('div', { class: 'skeleton', style: 'height:64px' }));
     const results = [];
     try {
       const runs = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
-      runs.filter(r => {
-        const title = (r.title || r.template?.title || r.templateTitle || '').toLowerCase();
-        const who = personName(r.assignee).toLowerCase();
-        return title.includes(query) || who.includes(query);
-      }).forEach(r => results.push({ type: 'run', data: r }));
+      runs.filter(r => ((r.title || r.template?.title || r.templateTitle || '') + personName(r.assignee)).toLowerCase().includes(query)).forEach(r => results.push({ type: 'run', data: r }));
     } catch {}
-
     try {
       let templates = [];
-      try {
-        templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
-      } catch (e) {
-        if (e.status === 400) templates = arr(await api('GET', '/checklists/templates'));
-      }
-      templates.filter(t => {
-        const title = (t.title || '').toLowerCase();
-        const desc = (t.description || '').toLowerCase();
-        return title.includes(query) || desc.includes(query);
-      }).forEach(t => results.push({ type: 'tpl', data: t }));
+      try { templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); } catch (e) { if (e.status === 400) templates = arr(await api('GET', '/checklists/templates')); }
+      templates.filter(t => ((t.title || '') + ' ' + (t.description || '')).toLowerCase().includes(query)).forEach(t => results.push({ type: 'tpl', data: t }));
     } catch {}
-
     if (can('users.read')) {
       try {
         const users = arr(await api('GET', '/users'));
-        users.filter(u => {
-          const name = personName(u).toLowerCase();
-          const email = (u.email || '').toLowerCase();
-          return name.includes(query) || email.includes(query);
-        }).forEach(u => results.push({ type: 'user', data: u }));
+        users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query)).forEach(u => results.push({ type: 'user', data: u }));
       } catch {}
     }
-
     const nodes = [inputWrap];
-    if (!results.length) {
-      nodes.push(emptyState('Ничего не найдено', 'Попробуйте другой запрос'));
-    } else {
+    if (!results.length) nodes.push(emptyState('Ничего не найдено'));
+    else {
       const runs = results.filter(r => r.type === 'run');
       const tpls = results.filter(r => r.type === 'tpl');
       const users = results.filter(r => r.type === 'user');
-
-      if (runs.length) {
-        nodes.push(h('div', { class: 'section-label' }, 'Чеклисты'));
-        runs.forEach(({ data: r }) => nodes.push(runCard(r, true)));
-      }
-      if (tpls.length) {
-        nodes.push(h('div', { class: 'section-label' }, 'Шаблоны'));
-        tpls.forEach(({ data: t }) => nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) },
-          h('strong', { style: 'font-size:15px' }, t.title),
-          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description)
-        )));
-      }
-      if (users.length) {
-        nodes.push(h('div', { class: 'section-label' }, 'Сотрудники'));
-        users.forEach(({ data: u }) => {
-          const roleLabel = u.roleCode || u.role || u.roleName || '';
-          const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
-          nodes.push(h('div', { class: 'card' },
-            h('div', { class: 'row' },
-              h('div', { style: 'display:flex;align-items:center;gap:12px;min-width:0;flex:1' },
-                h('div', { class: 'avatar', style: 'width:40px;height:40px;font-size:14px;flex-shrink:0' }, initials(u)),
-                h('div', { style: 'min-width:0' },
-                  h('strong', { style: 'font-size:15px' }, personName(u)),
-                  h('div', { class: 'muted' }, u.email || '')
-                )
-              ),
-              showRole && h('span', { class: 'badge neutral' }, roleLabel)
-            )
-          ));
-        });
-      }
+      if (runs.length) { nodes.push(h('div', { class: 'section-label' }, 'Чеклисты')); runs.forEach(({ data: r }) => nodes.push(runCard(r, true))); }
+      if (tpls.length) { nodes.push(h('div', { class: 'section-label' }, 'Шаблоны')); tpls.forEach(({ data: t }) => nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) }, h('strong', {}, t.title), t.description && h('div', { class: 'muted' }, t.description)))); }
+      if (users.length) { nodes.push(h('div', { class: 'section-label' }, 'Сотрудники')); users.forEach(({ data: u }) => nodes.push(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { style: 'display:flex;gap:12px;align-items:center' }, h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)), h('div', {}, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email || '')))))); }
     }
-    setView(nodes);
-    input.focus();
-    // caret to end
-    const len = input.value.length;
-    input.setSelectionRange(len, len);
+    setView(nodes); input.focus();
+    try { const len = input.value.length; input.setSelectionRange(len, len); } catch {}
   };
-
   let debounce;
-  input.addEventListener('input', () => {
-    clearTimeout(debounce);
-    debounce = setTimeout(runSearch, 280);
-  });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      state.searchQuery = '';
-      go(state.searchPrevTab || 'mine');
-    }
-  });
-
-  setView(inputWrap);
-  await runSearch();
-  input.focus();
+  input.addEventListener('input', () => { clearTimeout(debounce); debounce = setTimeout(runSearch, 280); });
+  input.addEventListener('keydown', (e) => { if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); } });
+  setView(inputWrap); await runSearch(); input.focus();
 }
-
-function renderSettings() {
-  setView(
-    h('div', { class: 'card' },
-      h('strong', { style: 'font-size:15px' }, 'Оформление'),
-      h('div', { class: 'row', style: 'margin-top:14px' },
-        h('span', {}, 'Тёмная тема'),
-        h('button', {
-          class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'),
-          onclick: () => {
-            applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-            go('settings');
-          },
-        }, state.theme === 'dark' ? 'Вкл' : 'Выкл')
-      )
-    ),
-    h('div', { class: 'card' },
-      h('strong', { style: 'font-size:15px' }, 'Язык'),
-      h('div', { class: 'muted', style: 'margin-top:8px;font-size:14px' },
-        'Сейчас доступен русский. Подготовка к другим языкам сделана.'
-      ),
-      h('select', { style: 'margin-top:12px', disabled: true },
-        h('option', { selected: true }, 'Русский'),
-        h('option', {}, 'English (скоро)'),
-        h('option', {}, 'Қазақша (скоро)')
-      )
-    ),
-    h('div', { class: 'card' },
-      h('strong', { style: 'font-size:15px' }, 'О приложении'),
-      h('div', { class: 'muted', style: 'margin-top:8px' }, 'Чеклисты · Telegram Web App'),
-      h('div', { class: 'small', style: 'margin-top:4px' }, 'Интерфейс 2.1 · Telegram + Soft Modern')
-    )
-  );
+function renderStub(title, description, iconHtml) {
+  setView(h('div', { class: 'empty', style: 'padding-top:56px' }, h('div', { class: 'stub-icon', html: iconHtml }), h('div', { class: 'empty-title' }, title), h('div', { class: 'empty-desc' }, description), h('p', { class: 'small', style: 'margin-top:18px' }, 'Раздел подготовлен')));
 }
-
-/* Boot */
-(async () => {
-  try {
-    await afterLogin();
-  } catch {
-    toLogin();
-  }
-})();
+function renderAuditStub() { renderStub('Журнал аудита', 'История действий', icons.audit); }
+function renderNotificationsStub() { renderStub('Уведомления', 'Лента событий позже', icons.bell); }
+(async () => { try { await afterLogin(); } catch { toLogin(); } })();
 </script>
 </body>
 </html>
