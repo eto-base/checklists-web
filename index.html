@@ -1108,6 +1108,14 @@
   .cm-photos img { width: 72px; height: 72px; object-fit: cover; border-radius: 18px; border: 1px solid var(--lg-bd); }
   .audit-det { margin-top: 8px; padding-top: 8px; border-top: .5px dashed var(--border); }
   .audit-det pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; color: var(--text-secondary); margin-top: 6px; }
+
+  /* sorting + compact date */
+  .sortbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 6px; margin-bottom: 6px; }
+  .sortbar::-webkit-scrollbar { display: none; }
+  .sortbar .chip { flex: 0 0 auto; white-space: nowrap; }
+  .sort-dir { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
+  .sort-dir svg { width: 16px; height: 16px; }
+  input[type="datetime-local"] { width: auto; min-width: 200px; max-width: 100%; height: 40px; min-height: 40px; padding: 6px 14px; font-size: 14px; border-radius: 999px; display: block; }
 </style>
 </head>
 <body>
@@ -1777,16 +1785,46 @@ function runCard(r, withWho) {
 function emptyState(title, desc) {
   return h('div', { class: 'empty' }, h('div', { class: 'empty-icon', html: icons.empty }), h('div', { class: 'empty-title' }, title), desc && h('div', { class: 'empty-desc' }, desc));
 }
+const SORTS = { due: 'Срок', created: 'Назначен', progress: 'Выполнение', status: 'Статус', title: 'Название' };
+const runSort = (() => { try { return JSON.parse(localStorage.getItem('runSort') || 'null') || { key: 'due', dir: 'asc' }; } catch { return { key: 'due', dir: 'asc' }; } })();
+function sortRuns(list) {
+  const t = (r) => new Date(r.dueAt || 0).getTime() || null;
+  const c = (r) => new Date(r.createdAt || r.assignedAt || 0).getTime() || 0;
+  const pr = (r) => { const tot = r.itemsCount ?? r.items?.length ?? r._count?.items, dn = r.completedItemsCount; if (r.status === 'COMPLETED') return 1; return tot ? (dn || 0) / tot : 0; };
+  const ORD = { IN_PROGRESS: 1, ASSIGNED: 2, PENDING: 2, COMPLETED: 3, CANCELLED: 4, CANCELED: 4 };
+  const st = (r) => r.overdue ? 0 : (ORD[r.status] ?? 5);
+  const ttl = (r) => (r.title || r.template?.title || r.templateTitle || '').toLowerCase();
+  const k = runSort.key, m = runSort.dir === 'desc' ? -1 : 1;
+  return [...list].sort((a, b) => {
+    if (k === 'due') { const x = t(a), y = t(b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return (x - y) * m; }
+    if (k === 'created') return (c(a) - c(b)) * m;
+    if (k === 'progress') return (pr(a) - pr(b)) * m;
+    if (k === 'status') return (st(a) - st(b)) * m;
+    return ttl(a).localeCompare(ttl(b), 'ru') * m;
+  });
+}
+function sortBar(redraw) {
+  const save = () => { localStorage.setItem('runSort', JSON.stringify(runSort)); redraw(); };
+  return h('div', { class: 'chips sortbar' },
+    h('button', { class: 'chip sort-dir', type: 'button', title: 'Направление', html: runSort.dir === 'asc' ? icons.up : icons.down, onclick: () => { runSort.dir = runSort.dir === 'asc' ? 'desc' : 'asc'; save(); } }),
+    ...Object.entries(SORTS).map(([k, v]) => h('button', { class: 'chip' + (runSort.key === k ? ' active' : ''), type: 'button', onclick: () => { runSort.key = k; save(); } }, v)));
+}
+function runsScreen(d, withWho, head, emptyNode) {
+  const box = h('div');
+  const draw = () => { const sorted = sortRuns(d); box.replaceChildren(sortBar(draw), ...(sorted.length ? sorted.map(r => runCard(r, withWho)) : [emptyNode])); };
+  draw();
+  setView(head, box);
+}
 async function renderMine() {
   const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  setView(d.length ? d.map(r => runCard(r)) : emptyState('Нет задач', 'Вам пока ничего не назначили'));
+  runsScreen(d, false, null, emptyState('Нет задач', 'Вам пока ничего не назначили'));
 }
 async function renderAll() {
   let q = `/checklists/runs?workspaceId=${state.wsId}&scope=all`;
   if (state.filter === 'overdue') q += '&overdue=true';
   if (state.filter === 'done') q += '&status=COMPLETED';
   const d = arr(await api('GET', q));
-  setView(h('div', { class: 'chips' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')), d.length ? d.map(r => runCard(r, true)) : emptyState('Ничего не найдено'));
+  runsScreen(d, true, h('div', { class: 'chips' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')), emptyState('Ничего не найдено'));
 }
 function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
 async function photoURL(id) {
@@ -2362,6 +2400,19 @@ async function deleteUser(u) {
     return false;
   }
 }
+function genPassword(len = 12) {
+  const sets = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnpqrstuvwxyz', '23456789', '!@#$%*?'];
+  const all = sets.join(''), rnd = (n) => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+  const out = sets.map(x => x[rnd(x.length)]);
+  while (out.length < len) out.push(all[rnd(all.length)]);
+  for (let i = out.length - 1; i > 0; i--) { const j = rnd(i + 1); [out[i], out[j]] = [out[j], out[i]]; }
+  return out.join('');
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); toast('Скопировано'); return; } catch {}
+  const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); toast('Скопировано'); } catch { toast('Выделите пароль и скопируйте вручную', true); } ta.remove();
+}
 async function renderPeople() {
   const users = can('users.read') ? await loadUsers() : [];
   const out = h('div'); const nodes = [];
@@ -2372,16 +2423,35 @@ async function renderPeople() {
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
       role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
     };
+    const manual = h('input', { type: 'text', placeholder: 'Не короче 8 символов', autocomplete: 'off', style: 'font-family:monospace' });
+    const mode = h('select', {}, h('option', { value: 'auto' }, 'Сервер создаст пароль'), h('option', { value: 'manual' }, 'Задать временный пароль'));
+    const manualRow = h('div', { class: 'hidden' }, h('label', {}, 'Временный пароль'), manual,
+      h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { manual.value = genPassword(); } }, 'Сгенерировать'));
+    mode.onchange = () => { manualRow.classList.toggle('hidden', mode.value !== 'manual'); if (mode.value === 'manual' && !manual.value) manual.value = genPassword(); };
     window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
       h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
-      h('button', { class: 'btn btn-primary', onclick: async (e) => {
-        e.target.disabled = true;
+      h('label', {}, 'Пароль'), mode, manualRow,
+      h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
+        const btn = e.currentTarget, email = f.email.value.trim(), pw = mode.value === 'manual' ? manual.value.trim() : '';
+        if (!email) return toast('Укажите email', true);
+        if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
+        btn.disabled = true;
+        const base = { email, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
+        const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
         try {
-          const r = await api('POST', '/users', { email: f.email.value.trim(), firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId });
-          out.replaceChildren(h('div', { class: 'alert alert-success' }, `Создан. Пароль: ${r.temporaryPassword}`));
-          f.email.value = f.first.value = f.last.value = '';
-        } catch (err) { toast(err.message, true); }
-        e.target.disabled = false;
+          let r, last;
+          for (const b of tries) { try { r = await api('POST', '/users', b); break; } catch (err) { last = err; if (err.status !== 400 && err.status !== 422) throw err; } }
+          if (!r) throw last;
+          const shown = pw || r?.temporaryPassword || r?.tempPassword || r?.initialPassword || r?.password || r?.data?.temporaryPassword;
+          const box = h('div', { class: 'alert alert-success' }, h('div', {}, 'Сотрудник создан'));
+          if (shown) box.append(h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, shown),
+            h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(shown) }, 'Копировать'),
+            h('div', { class: 'small', style: 'margin-top:6px' }, 'Временный пароль: при первом входе сотрудник задаст свой'));
+          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Сотрудник может нажать «Забыли пароль?» при входе'));
+          out.replaceChildren(box);
+          f.email.value = f.first.value = f.last.value = manual.value = '';
+        } catch (err) { toast(err.message || 'Не удалось создать сотрудника', true); }
+        btn.disabled = false;
       } }, 'Создать'), out));
   }
   if (can('users.read')) {
