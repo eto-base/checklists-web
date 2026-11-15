@@ -7,30 +7,30 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    /* Soft Modern + Telegram hybrid */
-    --bg: #f0f2f5;
+    /* Soft Modern + Telegram hybrid — improved contrast */
+    --bg: #eef1f5;
     --bg-card: #ffffff;
     --bg-elevated: #ffffff;
-    --bg-input: #f0f2f5;
-    --text: #0e1621;
-    --text-secondary: #707579;
-    --text-muted: #a0a7b0;
-    --border: #e7e8eb;
-    --border-strong: #dfe1e5;
+    --bg-input: #ffffff;
+    --text: #0b141a;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --border: #d8dee6;
+    --border-strong: #c5ced8;
     --primary: #2AABEE;
-    --primary-hover: #229ED9;
-    --primary-soft: #e5f6fd;
-    --primary-soft-2: #d0effc;
+    --primary-hover: #1e9ad8;
+    --primary-soft: #e3f4fc;
+    --primary-soft-2: #c8ebfa;
     --danger: #e53935;
     --danger-soft: #fdecea;
-    --success: #31b545;
-    --success-soft: #e8f8ea;
-    --warning: #f0a000;
-    --warning-soft: #fff6e0;
-    --info: #6b7c93;
-    --shadow: 0 1px 2px rgba(0,0,0,.04);
-    --shadow-md: 0 2px 8px rgba(0,0,0,.06);
-    --shadow-lg: 0 8px 24px rgba(0,0,0,.08);
+    --success: #2ea043;
+    --success-soft: #e6f7e9;
+    --warning: #d97706;
+    --warning-soft: #fff7e6;
+    --info: #4a5568;
+    --shadow: 0 1px 2px rgba(0,0,0,.05);
+    --shadow-md: 0 2px 8px rgba(0,0,0,.07);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,.09);
     --radius: 14px;
     --radius-sm: 10px;
     --radius-xs: 8px;
@@ -42,29 +42,29 @@
   }
 
   [data-theme="dark"] {
-    --bg: #0e0e0e;
-    --bg-card: #1c1c1e;
-    --bg-elevated: #2c2c2e;
-    --bg-input: #2c2c2e;
-    --text: #ffffff;
-    --text-secondary: #8e8e93;
-    --text-muted: #636366;
-    --border: #2c2c2e;
-    --border-strong: #3a3a3c;
-    --primary: #2AABEE;
-    --primary-hover: #5bc0f0;
-    --primary-soft: #0d2a38;
-    --primary-soft-2: #123447;
-    --danger: #ff453a;
-    --danger-soft: #3b1513;
-    --success: #30d158;
-    --success-soft: #0f2a16;
-    --warning: #ffd60a;
-    --warning-soft: #2e2a0a;
-    --info: #8e8e93;
-    --shadow: 0 1px 2px rgba(0,0,0,.25);
-    --shadow-md: 0 2px 8px rgba(0,0,0,.3);
-    --shadow-lg: 0 8px 24px rgba(0,0,0,.4);
+    --bg: #0c0c0e;
+    --bg-card: #1a1a1e;
+    --bg-elevated: #25252b;
+    --bg-input: #25252b;
+    --text: #f0f2f5;
+    --text-secondary: #a8b0bc;
+    --text-muted: #7a8494;
+    --border: #2e2e36;
+    --border-strong: #3d3d48;
+    --primary: #3bb4f0;
+    --primary-hover: #5cc4f5;
+    --primary-soft: #0f2a38;
+    --primary-soft-2: #153a4d;
+    --danger: #ff5a5f;
+    --danger-soft: #3a1518;
+    --success: #3dd68c;
+    --success-soft: #0f2a1a;
+    --warning: #f5c518;
+    --warning-soft: #2e2808;
+    --info: #a8b0bc;
+    --shadow: 0 1px 2px rgba(0,0,0,.3);
+    --shadow-md: 0 2px 8px rgba(0,0,0,.35);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,.45);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -360,19 +360,25 @@
     width: 100%;
     padding: 12px 14px;
     border-radius: var(--radius-sm);
-    border: none;
+    border: 1.5px solid var(--border-strong);
     background: var(--bg-input);
     color: var(--text);
-    transition: box-shadow .15s, background .15s;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+  }
+  input::placeholder, textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
   }
   input:focus, select:focus, textarea:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 22%, transparent);
     background: var(--bg-card);
   }
   input:disabled, select:disabled, textarea:disabled {
-    opacity: .5;
+    opacity: .55;
     cursor: not-allowed;
+    background: var(--bg);
   }
   textarea { resize: vertical; min-height: 84px; }
 
@@ -402,8 +408,9 @@
   }
   .btn-primary:active:not(:disabled) { background: var(--primary-hover); }
   .btn-secondary {
-    background: var(--bg-input);
+    background: var(--bg-card);
     color: var(--text);
+    border: 1.5px solid var(--border-strong);
   }
   .btn-danger {
     background: var(--danger);
@@ -485,8 +492,8 @@
     margin-bottom: 12px;
     line-height: 1.4;
   }
-  .alert-info { background: var(--warning-soft); color: #9a6b00; }
-  [data-theme="dark"] .alert-info { color: var(--warning); }
+  .alert-info { background: var(--warning-soft); color: #8a5a00; }
+  [data-theme="dark"] .alert-info { color: #f5d76e; }
   .alert-error { background: var(--danger-soft); color: var(--danger); }
   .alert-success { background: var(--success-soft); color: var(--success); word-break: break-all; }
 
@@ -573,7 +580,7 @@
   .chip {
     padding: 7px 14px;
     border-radius: 20px;
-    border: none;
+    border: 1.5px solid var(--border-strong);
     background: var(--bg-card);
     color: var(--text-secondary);
     font-size: 13px;
@@ -586,6 +593,7 @@
   .chip.active {
     background: var(--primary);
     color: #fff;
+    border-color: var(--primary);
     box-shadow: 0 2px 8px rgba(42,171,238,.3);
   }
 
@@ -764,6 +772,9 @@ const state = {
   tab: 'mine',
   filter: '',
   theme: localStorage.getItem('theme') || 'light',
+  searchQuery: '',
+  searchPrevTab: 'mine',
+  avatarEmoji: localStorage.getItem('avatarEmoji') || '',
 };
 
 const icons = {
@@ -917,7 +928,14 @@ async function afterLogin() {
 
 function updateSideUser() {
   const me = state.me;
-  $('side-avatar').textContent = initials(me);
+  const av = $('side-avatar');
+  if (state.avatarEmoji) {
+    av.textContent = state.avatarEmoji;
+    av.style.fontSize = '22px';
+  } else {
+    av.textContent = initials(me);
+    av.style.fontSize = '';
+  }
   $('side-name').textContent = personName(me) || 'Пользователь';
   $('side-email').textContent = me?.email || '';
 }
@@ -1084,6 +1102,9 @@ function renderBottomNav() {
 }
 
 function go(tab) {
+  if (tab === 'search' && state.tab !== 'search') {
+    state.searchPrevTab = state.tab;
+  }
   state.tab = tab;
   const titles = {
     mine: 'Мои чеклисты',
@@ -1109,7 +1130,7 @@ function go(tab) {
     audit: renderAuditStub,
     notifications: renderNotificationsStub,
     settings: renderSettings,
-    search: renderSearchStub,
+    search: renderSearch,
   };
   show(screens[tab] || renderMine);
 }
@@ -1370,6 +1391,24 @@ async function renderTemplates() {
               onclick: () => show(() => showAssign(t)),
             }, 'Назначить'),
             manage && h('button', {
+              class: 'btn btn-secondary btn-sm',
+              onclick: () => {
+                const items = (t.items || []).map(it => ({
+                  title: it.title || '',
+                  type: it.type || 'CHECK',
+                  required: !!it.required,
+                  unit: it.unit || '',
+                  minValue: it.minValue ?? '',
+                  maxValue: it.maxValue ?? '',
+                }));
+                showBuilder({
+                  title: (t.title || '') + ' (копия)',
+                  description: t.description || '',
+                  items: items.length ? items : [{ title: '', type: 'CHECK', required: true }],
+                });
+              },
+            }, 'Копировать'),
+            manage && h('button', {
               class: 'btn btn-danger btn-sm',
               onclick: async () => {
                 if (!confirm('Архивировать шаблон «' + t.title + '»?')) return;
@@ -1564,19 +1603,42 @@ async function renderPeople() {
     nodes.push(h('div', { class: 'section-label' }, 'Список'));
     if (users.length) {
       users.forEach(u => {
+        const isMe = u.id === state.me?.id;
         nodes.push(h('div', { class: 'card' },
           h('div', { class: 'row' },
-            h('div', { style: 'display:flex;align-items:center;gap:12px' },
+            h('div', { style: 'display:flex;align-items:center;gap:12px;min-width:0;flex:1' },
               h('div', {
                 class: 'avatar',
-                style: 'width:40px;height:40px;font-size:14px',
+                style: 'width:40px;height:40px;font-size:14px;flex-shrink:0',
               }, initials(u)),
-              h('div', {},
+              h('div', { style: 'min-width:0' },
                 h('strong', { style: 'font-size:15px' }, personName(u)),
-                h('div', { class: 'muted' }, u.email || '')
+                h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis' }, u.email || '')
               )
             ),
             h('span', { class: 'badge neutral' }, u.roleCode || u.role || '—')
+          ),
+          !isMe && (can('users.create') || can('users.delete') || can('users.manage')) && h('div', { class: 'gap' },
+            h('button', {
+              class: 'btn btn-danger btn-sm',
+              onclick: async () => {
+                if (!confirm(`Удалить сотрудника «${personName(u)}»?`)) return;
+                try {
+                  await api('DELETE', `/users/${u.id}`);
+                  toast('Сотрудник удалён');
+                  go('people');
+                } catch (err) {
+                  // try alternate endpoints
+                  try {
+                    await api('POST', `/users/${u.id}/delete`);
+                    toast('Сотрудник удалён');
+                    go('people');
+                  } catch (err2) {
+                    toast(err.message || 'Удаление пока не поддержано на сервере', true);
+                  }
+                }
+              },
+            }, 'Удалить')
           )
         ));
       });
@@ -1615,9 +1677,43 @@ async function changePassword(current, next) {
 
 async function renderProfile() {
   const me = state.me;
+  const displayAvatar = state.avatarEmoji || initials(me);
+
+  const first = h('input', { type: 'text', value: me.firstName || '', placeholder: 'Имя' });
+  const last = h('input', { type: 'text', value: me.lastName || '', placeholder: 'Фамилия' });
+  const nick = h('input', { type: 'text', value: me.nickname || me.username || '', placeholder: 'Никнейм (необязательно)' });
+  const email = h('input', { type: 'email', value: me.email || '', placeholder: 'email@company.com' });
+
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
   const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
+
+  const emojiList = ['😊','😎','🧑‍💼','👩‍💻','👨‍💻','🦁','🐯','🐻','🦊','🐸','⭐','🔥','💼','📋','✅'];
+  const emojiRow = h('div', { class: 'gap', style: 'margin-top:10px' });
+  emojiList.forEach(em => {
+    emojiRow.append(h('button', {
+      type: 'button',
+      class: 'btn btn-sm btn-secondary',
+      style: 'font-size:18px;padding:6px 10px;min-width:40px',
+      onclick: () => {
+        state.avatarEmoji = em;
+        localStorage.setItem('avatarEmoji', em);
+        updateSideUser();
+        go('me');
+      },
+    }, em));
+  });
+  emojiRow.append(h('button', {
+    type: 'button',
+    class: 'btn btn-sm btn-secondary',
+    style: 'font-size:13px',
+    onclick: () => {
+      state.avatarEmoji = '';
+      localStorage.removeItem('avatarEmoji');
+      updateSideUser();
+      go('me');
+    },
+  }, 'Сброс'));
 
   setView(
     me.requirePasswordChange && h('div', { class: 'alert alert-info' },
@@ -1625,39 +1721,110 @@ async function renderProfile() {
     ),
     h('div', { class: 'card' },
       h('div', { class: 'row' },
-        h('div', { class: 'avatar', style: 'width:52px;height:52px;font-size:18px' }, initials(me)),
+        h('div', {
+          class: 'avatar',
+          style: 'width:56px;height:56px;font-size:' + (state.avatarEmoji ? '28px' : '18px'),
+        }, displayAvatar),
         h('div', { style: 'flex:1' },
           h('strong', { style: 'font-size:17px' }, personName(me)),
           h('div', { class: 'muted' }, me.email)
         )
-      )
+      ),
+      h('div', { class: 'small', style: 'margin-top:12px' }, 'Аватар (эмодзи)'),
+      emojiRow
     ),
-    h('h2', {}, 'Смена пароля'),
-    h('label', {}, 'Текущий пароль'), cur,
-    h('label', {}, 'Новый пароль'), n1,
-    h('label', {}, 'Повторите новый пароль'), n2,
-    h('button', {
-      class: 'btn btn-primary',
-      onclick: async (e) => {
-        if (!cur.value || !n1.value) return toast('Заполните все поля', true);
-        if (n1.value !== n2.value) return toast('Новые пароли не совпадают', true);
-        e.target.disabled = true;
-        try {
-          await changePassword(cur.value, n1.value);
-          toast('Пароль изменён');
+
+    h('h2', {}, 'Данные профиля'),
+    h('div', { class: 'card' },
+      h('label', { style: 'margin-top:0' }, 'Имя'), first,
+      h('label', {}, 'Фамилия'), last,
+      h('label', {}, 'Никнейм'), nick,
+      h('label', {}, 'Email'), email,
+      h('button', {
+        class: 'btn btn-primary',
+        onclick: async (e) => {
+          const body = {
+            firstName: first.value.trim(),
+            lastName: last.value.trim(),
+          };
+          if (nick.value.trim()) body.nickname = nick.value.trim();
+          if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
+
+          e.target.disabled = true;
           try {
-            state.me = await api('GET', '/auth/me');
-            csrfToken = state.me.csrfToken || csrfToken;
-            go('me');
-          } catch {
-            toLogin('Пароль изменён. Войдите с новым паролем.');
+            // try common update endpoints
+            let updated = null;
+            const attempts = [
+              () => api('PATCH', '/auth/me', body),
+              () => api('PUT', '/auth/me', body),
+              () => api('PATCH', `/users/${me.id}`, body),
+              () => api('PUT', `/users/${me.id}`, body),
+              () => api('POST', '/auth/profile', body),
+            ];
+            let lastErr;
+            for (const attempt of attempts) {
+              try {
+                updated = await attempt();
+                break;
+              } catch (err) {
+                lastErr = err;
+                if (err.status && err.status !== 404 && err.status !== 405) {
+                  // validation or auth error — stop
+                  if (err.status === 400 || err.status === 401 || err.status === 403) throw err;
+                }
+              }
+            }
+            if (!updated && lastErr) throw lastErr;
+
+            toast('Профиль обновлён');
+            try {
+              state.me = await api('GET', '/auth/me');
+              csrfToken = state.me.csrfToken || csrfToken;
+              updateSideUser();
+              go('me');
+            } catch {
+              // keep local optimistic update
+              Object.assign(state.me, body);
+              updateSideUser();
+              go('me');
+            }
+          } catch (err) {
+            toast(err.message || 'Обновление профиля пока не поддержано на сервере', true);
+            e.target.disabled = false;
           }
-        } catch (err) {
-          toast(err.message, true);
-          e.target.disabled = false;
-        }
-      },
-    }, 'Сменить пароль'),
+        },
+      }, 'Сохранить профиль')
+    ),
+
+    h('h2', {}, 'Смена пароля'),
+    h('div', { class: 'card' },
+      h('label', { style: 'margin-top:0' }, 'Текущий пароль'), cur,
+      h('label', {}, 'Новый пароль'), n1,
+      h('label', {}, 'Повторите новый пароль'), n2,
+      h('button', {
+        class: 'btn btn-primary',
+        onclick: async (e) => {
+          if (!cur.value || !n1.value) return toast('Заполните все поля', true);
+          if (n1.value !== n2.value) return toast('Новые пароли не совпадают', true);
+          e.target.disabled = true;
+          try {
+            await changePassword(cur.value, n1.value);
+            toast('Пароль изменён');
+            try {
+              state.me = await api('GET', '/auth/me');
+              csrfToken = state.me.csrfToken || csrfToken;
+              go('me');
+            } catch {
+              toLogin('Пароль изменён. Войдите с новым паролем.');
+            }
+          } catch (err) {
+            toast(err.message, true);
+            e.target.disabled = false;
+          }
+        },
+      }, 'Сменить пароль')
+    ),
+
     h('div', { class: 'divider' }),
     h('button', {
       class: 'btn btn-secondary',
@@ -1687,15 +1854,146 @@ function renderAuditStub() {
 function renderNotificationsStub() {
   renderStub('Уведомления', 'Пуш-уведомления и лента событий появятся позже', icons.bell);
 }
-function renderSearchStub() {
-  const input = h('input', { type: 'search', placeholder: 'Поиск по чеклистам, шаблонам…' });
-  setView(
-    input,
-    h('div', { class: 'empty', style: 'padding-top:40px' },
-      h('div', { class: 'stub-icon', html: icons.search }),
-      h('div', { class: 'empty-desc' }, 'Глобальный поиск будет доступен после реализации на сервере')
-    )
-  );
+async function renderSearch() {
+  const q = (state.searchQuery || '').trim().toLowerCase();
+
+  const inputWrap = h('div', { style: 'position:relative;margin-bottom:14px' });
+  const input = h('input', {
+    type: 'search',
+    placeholder: 'Чеклисты, шаблоны, сотрудники…',
+    value: state.searchQuery || '',
+    style: 'padding-right:44px',
+  });
+  const clearBtn = h('button', {
+    class: 'topbar-btn',
+    type: 'button',
+    style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
+    title: 'Очистить и закрыть',
+    onclick: () => {
+      state.searchQuery = '';
+      go(state.searchPrevTab || 'mine');
+    },
+  });
+  clearBtn.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>`;
+
+  inputWrap.append(input, clearBtn);
+
+  const runSearch = async () => {
+    state.searchQuery = input.value;
+    const query = input.value.trim().toLowerCase();
+
+    if (!query) {
+      setView(
+        inputWrap,
+        h('div', { class: 'empty', style: 'padding-top:36px' },
+          h('div', { class: 'stub-icon', html: icons.search }),
+          h('div', { class: 'empty-title' }, 'Поиск'),
+          h('div', { class: 'empty-desc' }, 'Введите запрос — ищем по чеклистам, шаблонам и сотрудникам')
+        )
+      );
+      input.focus();
+      return;
+    }
+
+    setView(
+      inputWrap,
+      h('div', { class: 'stack', style: 'padding:4px 0' },
+        h('div', { class: 'skeleton', style: 'height:18px;width:40%' }),
+        h('div', { class: 'skeleton', style: 'height:64px;margin-top:10px' })
+      )
+    );
+
+    const results = [];
+    try {
+      const runs = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
+      runs.filter(r => {
+        const title = (r.title || r.template?.title || r.templateTitle || '').toLowerCase();
+        const who = personName(r.assignee).toLowerCase();
+        return title.includes(query) || who.includes(query);
+      }).forEach(r => results.push({ type: 'run', data: r }));
+    } catch {}
+
+    try {
+      let templates = [];
+      try {
+        templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
+      } catch (e) {
+        if (e.status === 400) templates = arr(await api('GET', '/checklists/templates'));
+      }
+      templates.filter(t => {
+        const title = (t.title || '').toLowerCase();
+        const desc = (t.description || '').toLowerCase();
+        return title.includes(query) || desc.includes(query);
+      }).forEach(t => results.push({ type: 'tpl', data: t }));
+    } catch {}
+
+    if (can('users.read')) {
+      try {
+        const users = arr(await api('GET', '/users'));
+        users.filter(u => {
+          const name = personName(u).toLowerCase();
+          const email = (u.email || '').toLowerCase();
+          return name.includes(query) || email.includes(query);
+        }).forEach(u => results.push({ type: 'user', data: u }));
+      } catch {}
+    }
+
+    const nodes = [inputWrap];
+    if (!results.length) {
+      nodes.push(emptyState('Ничего не найдено', 'Попробуйте другой запрос'));
+    } else {
+      const runs = results.filter(r => r.type === 'run');
+      const tpls = results.filter(r => r.type === 'tpl');
+      const users = results.filter(r => r.type === 'user');
+
+      if (runs.length) {
+        nodes.push(h('div', { class: 'section-label' }, 'Чеклисты'));
+        runs.forEach(({ data: r }) => nodes.push(runCard(r, true)));
+      }
+      if (tpls.length) {
+        nodes.push(h('div', { class: 'section-label' }, 'Шаблоны'));
+        tpls.forEach(({ data: t }) => nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) },
+          h('strong', { style: 'font-size:15px' }, t.title),
+          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description)
+        )));
+      }
+      if (users.length) {
+        nodes.push(h('div', { class: 'section-label' }, 'Сотрудники'));
+        users.forEach(({ data: u }) => nodes.push(h('div', { class: 'card' },
+          h('div', { class: 'row' },
+            h('div', { style: 'display:flex;align-items:center;gap:12px' },
+              h('div', { class: 'avatar', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
+              h('div', {},
+                h('strong', { style: 'font-size:15px' }, personName(u)),
+                h('div', { class: 'muted' }, u.email || '')
+              )
+            ),
+            h('span', { class: 'badge neutral' }, u.roleCode || u.role || '—')
+          )
+        )));
+      }
+    }
+    setView(nodes);
+    input.focus();
+    // caret to end
+    const len = input.value.length;
+    input.setSelectionRange(len, len);
+  };
+
+  let debounce;
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(runSearch, 280);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      state.searchQuery = '';
+      go(state.searchPrevTab || 'mine');
+    }
+  });
+
+  setView(inputWrap);
+  await runSearch();
   input.focus();
 }
 
