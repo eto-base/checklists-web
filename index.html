@@ -729,6 +729,147 @@
     bottom: calc(70px + var(--safe-bottom) + 24px);
   }
 
+
+  /* Narrow matte console */
+  .bottom-nav {
+    position: fixed; left: 50%; right: auto;
+    bottom: calc(16px + var(--safe-bottom));
+    transform: translateX(-50%);
+    width: min(280px, calc(100% - 64px));
+    height: 58px; padding: 4px;
+    background: rgba(255, 255, 255, 0.38);
+    backdrop-filter: blur(30px) saturate(1.25);
+    -webkit-backdrop-filter: blur(30px) saturate(1.25);
+    border-radius: 29px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 28px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.55);
+    display: flex; align-items: stretch; z-index: 30;
+  }
+  [data-theme="dark"] .bottom-nav {
+    background: rgba(24, 28, 36, 0.5);
+    border-color: rgba(255,255,255,.12);
+    box-shadow: 0 8px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .bottom-nav button {
+    flex: 1; border: none; background: transparent;
+    color: var(--text-secondary);
+    font-size: 0; /* hide labels — icon only like Shortcuts dock feel, keep aria via title */
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    cursor: pointer; font-family: inherit;
+    padding: 0; min-height: 0; border-radius: 24px;
+    margin: 0; position: relative; z-index: 1;
+    transition: color .3s ease;
+  }
+  .bottom-nav button .nav-label {
+    font-size: 9px; font-weight: 600; margin-top: 1px;
+    max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  }
+  .bottom-nav button svg {
+    width: 26px; height: 26px;
+    color: inherit;
+  }
+  .bottom-nav button.active { color: var(--text); }
+
+  /* Liquid droplet — almost full height of console */
+  .nav-blob {
+    position: absolute;
+    top: 4px; bottom: 4px;
+    left: 4px;
+    width: 48px; height: auto;
+    border-radius: 999px;
+    background: linear-gradient(160deg, rgba(255,255,255,.72), rgba(255,255,255,.38));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,.65);
+    box-shadow:
+      0 4px 14px rgba(0,0,0,.10),
+      inset 0 1px 1px rgba(255,255,255,.85),
+      inset 0 -2px 6px rgba(0,0,0,.06);
+    pointer-events: none; z-index: 0;
+    transition:
+      left .45s cubic-bezier(.22, 1, .36, 1),
+      width .45s cubic-bezier(.22, 1, .36, 1),
+      border-radius .35s ease,
+      transform .45s cubic-bezier(.22, 1, .36, 1);
+    transform: scale(1);
+  }
+  .nav-blob.stretch {
+    border-radius: 40% 40% 40% 40% / 45% 45% 45% 45%;
+    transform: scaleY(0.92) scaleX(1.08);
+  }
+  [data-theme="dark"] .nav-blob {
+    background: linear-gradient(160deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
+    border-color: rgba(255,255,255,.18);
+    box-shadow: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
+  }
+
+  /* Top folders with long liquid pill */
+  .folders {
+    position: sticky; top: var(--header-height); z-index: 35;
+    background: transparent;
+    padding: 6px 12px 8px;
+    display: flex; gap: 0; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    position: sticky;
+  }
+  .folders-track {
+    position: relative;
+    display: flex; gap: 0;
+    background: rgba(255,255,255,.32);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 22px;
+    padding: 3px;
+    border: 1px solid rgba(255,255,255,.4);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    margin: 0 auto;
+    max-width: 100%;
+  }
+  [data-theme="dark"] .folders-track {
+    background: rgba(30,36,46,.45);
+    border-color: rgba(255,255,255,.1);
+  }
+  .folder {
+    flex: 0 0 auto; border: none; cursor: pointer; font-family: inherit;
+    padding: 8px 14px; border-radius: 19px; font-size: 13px; font-weight: 600;
+    background: transparent; color: var(--text-secondary);
+    border: none; min-height: 34px; box-shadow: none;
+    position: relative; z-index: 1;
+    white-space: nowrap;
+  }
+  .folder.active {
+    background: transparent; color: var(--text);
+    border: none;
+  }
+  .folder-blob {
+    position: absolute; top: 3px; bottom: 3px; left: 3px;
+    border-radius: 19px;
+    background: linear-gradient(165deg, rgba(255,255,255,.75), rgba(255,255,255,.4));
+    border: 1px solid rgba(255,255,255,.55);
+    box-shadow: 0 2px 10px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
+    pointer-events: none; z-index: 0;
+    transition: left .4s cubic-bezier(.22,1,.36,1), width .4s cubic-bezier(.22,1,.36,1), transform .35s ease;
+  }
+  .folder-blob.stretch {
+    transform: scaleY(0.9) scaleX(1.06);
+    border-radius: 14px;
+  }
+  [data-theme="dark"] .folder-blob {
+    background: linear-gradient(165deg, rgba(255,255,255,.2), rgba(255,255,255,.08));
+    border-color: rgba(255,255,255,.14);
+  }
+
+  /* Compact topbar — no title noise */
+  .topbar-title { display: none; }
+  #search-btn { display: none !important; }
+  .topbar { justify-content: flex-start; }
+
+  #view { padding-bottom: calc(58px + var(--safe-bottom) + 28px); }
+  .fab { bottom: calc(58px + var(--safe-bottom) + 28px); }
+  .toast { bottom: calc(58px + var(--safe-bottom) + 24px); }
+
 </style>
 </head>
 <body>
@@ -830,18 +971,19 @@ const state = {
 };
 const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
 const icons = {
-  list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3.2"/></svg>`,
-  all: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="7" cy="7" r="2.2"/><circle cx="17" cy="7" r="2.2"/><circle cx="7" cy="17" r="2.2"/><circle cx="17" cy="17" r="2.2"/></svg>`,
-  template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>`,
-  people: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-2.8 2.7-5 6-5s6 2.2 6 5"/><circle cx="17" cy="9" r="2.4"/><path d="M21 19c0-2-1.6-3.6-4-4"/></svg>`,
-  audit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 4v16M6 9l6-4 6 4M6 15l6 4 6-4"/></svg>`,
-  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.4M12 18.8v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.8 12h2.4M18.8 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/></svg>`,
-  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9.5a6 6 0 0 1 12 0c0 6.5 2.5 7 2.5 7H3.5S6 16 6 9.5"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>`,
-  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.2"/><path d="M20 20l-3.2-3.2"/></svg>`,
-  empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="4" width="14" height="16" rx="2.5"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>`,
+  // Стиль близкий к «Командам» iOS: плотный глиф, currentColor
+  list: `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="5" width="16" height="2.6" rx="1.3"/><rect x="4" y="10.7" width="16" height="2.6" rx="1.3"/><rect x="4" y="16.4" width="11" height="2.6" rx="1.3"/></svg>`,
+  all: `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>`,
+  template: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm7 1.5V8h4.5L14 3.5zM8 12h8v2H8v-2zm0 4h6v2H8v-2z"/></svg>`,
+  people: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 19.5c0-3.1 2.9-5.5 6.5-5.5s6.5 2.4 6.5 5.5V20H2.5v-.5z"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.2c2.4.4 4.5 2.2 4.5 5V20H16.5v-1.2c0-1.7-.2-3.2-.5-4.6z"/></svg>`,
+  audit: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.2 6.5H21l-5.4 4 2.1 6.5L12 15.5 6.3 19l2.1-6.5L3 8.5h6.8L12 2z"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 8.5a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7zm0-5.5.7 2.2 2.1-.8 1.4 1.4-.8 2.1 2.2.7v2l-2.2.7.8 2.1-1.4 1.4-2.1-.8L12 21l-.7-2.2-2.1.8-1.4-1.4.8-2.1L6 14.5v-2l2.2-.7-.8-2.1L8.8 8l2.1.8L12 3z"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3a6 6 0 0 1 6 6v3.2c0 .8.3 1.6.8 2.2L20 16H4l1.2-1.6c.5-.6.8-1.4.8-2.2V9a6 6 0 0 1 6-6zm-1.5 16h3a1.5 1.5 0 0 1-3 0z"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10.5 3a7.5 7.5 0 1 1 0 15 7.5 7.5 0 0 1 0-15zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zm7.6 11.5 3.2 3.2-1.4 1.4-3.2-3.2 1.4-1.4z"/></svg>`,
+  empty: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 2h7l5 5v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm7 1.5V8h4.5L14 3.5z"/></svg>`,
   more: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>`,
-  msg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 7h14a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"/></svg>`,
-  back: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,
+  msg: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>`,
+  back: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.7 5.3a1 1 0 0 1 0 1.4L10.4 11l4.3 4.3a1 1 0 1 1-1.4 1.4l-5-5a1 1 0 0 1 0-1.4l5-5a1 1 0 0 1 1.4 0z"/></svg>`,
 };
 function h(tag, props, ...kids) {
   const e = document.createElement(tag);
@@ -1005,19 +1147,53 @@ if ($('logout-side')) $('logout-side').onclick = async () => { try { await api('
 function renderFolders() {
   const el = $('folders');
   if (!el) return;
-  const tabs = [{ k: 'mine', t: 'Мои задачи' }];
-  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все задачи' });
+  const tabs = [{ k: 'mine', t: 'Мои' }];
+  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все' });
   if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны' });
   if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Команда' });
   const hide = ['search', 'me', 'audit', 'notifications', 'settings'].includes(state.tab);
   el.style.display = hide ? 'none' : 'flex';
-  el.replaceChildren(...tabs.map(({ k, t }) =>
-    h('button', {
+  const track = h('div', { class: 'folders-track' });
+  const blob = h('div', { class: 'folder-blob' });
+  track.append(blob);
+  tabs.forEach(({ k, t }) => {
+    track.append(h('button', {
       class: 'folder' + (state.tab === k ? ' active' : ''),
       type: 'button',
+      'data-tab': k,
       onclick: () => go(k),
-    }, t)
-  ));
+    }, t));
+  });
+  el.replaceChildren(track);
+  requestAnimationFrame(() => {
+    const activeBtn = track.querySelector('.folder.active') || track.querySelector('.folder');
+    if (!activeBtn) return;
+    const tr = track.getBoundingClientRect();
+    const br = activeBtn.getBoundingClientRect();
+    const left = br.left - tr.left;
+    const width = br.width;
+    const prevL = track._blobLeft;
+    const prevW = track._blobWidth;
+    if (prevL != null && Math.abs(prevL - left) > 2) {
+      blob.classList.add('stretch');
+      const midL = Math.min(prevL, left);
+      const midR = Math.max(prevL + (prevW || width), left + width);
+      blob.style.left = midL + 'px';
+      blob.style.width = (midR - midL) + 'px';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          blob.style.left = left + 'px';
+          blob.style.width = width + 'px';
+          setTimeout(() => blob.classList.remove('stretch'), 380);
+        });
+      });
+    } else {
+      blob.style.left = left + 'px';
+      blob.style.width = width + 'px';
+    }
+    track._blobLeft = left;
+    track._blobWidth = width;
+  });
 }
 function renderBottomNav() {
   const tabs = [
@@ -1027,27 +1203,54 @@ function renderBottomNav() {
   tabs.push({ k: 'search', t: 'Поиск', icon: icons.search });
   tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
   const nav = $('bottom-nav');
+  const prevLeft = nav._blobLeft;
+  const prevWidth = nav._blobWidth;
   const blob = h('div', { class: 'nav-blob' });
   const btns = tabs.map(({ k, t, icon }) => {
     const active = state.tab === k || (k === 'settings' && ['settings','me','audit','notifications'].includes(state.tab));
     return h('button', {
       class: active ? 'active' : '',
       type: 'button',
+      title: t,
       'data-tab': k,
       onclick: () => go(k),
-    }, h('span', { html: icon }), h('span', {}, t));
+    }, h('span', { html: icon }), h('span', { class: 'nav-label' }, t));
   });
   nav.replaceChildren(blob, ...btns);
   requestAnimationFrame(() => {
-    const activeBtn = nav.querySelector('button.active');
-    if (!activeBtn) { blob.style.width = '0'; return; }
+    const activeBtn = nav.querySelector('button.active') || nav.querySelector('button');
+    if (!activeBtn) return;
     const navRect = nav.getBoundingClientRect();
     const br = activeBtn.getBoundingClientRect();
-    const size = Math.min(br.width, br.height) - 2;
-    blob.style.width = size + 'px';
-    blob.style.height = size + 'px';
-    blob.style.top = ((nav.clientHeight - size) / 2) + 'px';
-    blob.style.left = (br.left - navRect.left + (br.width - size) / 2) + 'px';
+    // almost full height, width ≈ button width - tight to console
+    const pad = 4;
+    const h = nav.clientHeight - pad * 2;
+    const w = br.width - 2;
+    const left = br.left - navRect.left + 1;
+    blob.style.top = pad + 'px';
+    blob.style.bottom = pad + 'px';
+    blob.style.height = h + 'px';
+    // stretch animation if moving
+    if (prevLeft != null && Math.abs(prevLeft - left) > 2) {
+      blob.classList.add('stretch');
+      // intermediate width covers gap
+      const midLeft = Math.min(prevLeft, left);
+      const midRight = Math.max(prevLeft + (prevWidth || w), left + w);
+      blob.style.left = midLeft + 'px';
+      blob.style.width = (midRight - midLeft) + 'px';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          blob.style.left = left + 'px';
+          blob.style.width = w + 'px';
+          setTimeout(() => blob.classList.remove('stretch'), 420);
+        });
+      });
+    } else {
+      blob.style.left = left + 'px';
+      blob.style.width = w + 'px';
+    }
+    nav._blobLeft = left;
+    nav._blobWidth = w;
   });
 }
 function toggleFavorite(id) {
