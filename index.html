@@ -967,6 +967,15 @@ function toLogin(msg) {
 async function afterLogin() {
   state.me = await api('GET', '/auth/me');
   csrfToken = state.me.csrfToken || csrfToken;
+  // Локальные правки профиля (пока сервер не умеет PATCH)
+  try {
+    const local = JSON.parse(localStorage.getItem('profileLocal') || 'null');
+    if (local && state.me) {
+      if (local.firstName) state.me.firstName = local.firstName;
+      if (local.lastName) state.me.lastName = local.lastName;
+      if (local.nickname) state.me.nickname = local.nickname;
+    }
+  } catch {}
   state.workspaces = arr(await api('GET', '/workspaces'));
   if (!state.workspaces.find(w => w.id === state.wsId)) {
     state.wsId = state.workspaces[0]?.id || null;
@@ -1606,34 +1615,26 @@ function showBuilder(draft) {
 
 /* People */
 async function deleteUser(u) {
-  const id = u.id;
-  const attempts = [
-    () => api('DELETE', `/users/${id}`),
-    () => api('POST', `/users/${id}/delete`),
-    () => api('POST', `/users/${id}/deactivate`),
-    () => api('PATCH', `/users/${id}`, { status: 'DISABLED', isActive: false, active: false }),
-    () => api('PUT', `/users/${id}`, { status: 'DISABLED', isActive: false }),
-  ];
-  let lastErr;
-  for (const attempt of attempts) {
-    try {
-      await attempt();
-      toast('Сотрудник удалён');
-      return true;
-    } catch (err) {
-      lastErr = err;
-      // real permission/validation error — stop
-      if (err.status === 403 || err.status === 401) break;
-      if (err.status === 400 && !/cannot|not allowed|method/i.test(err.message || '')) break;
+  // Сервер пока не поддерживает DELETE /users/:id — один запрос, одно понятное сообщение
+  try {
+    await api('DELETE', `/users/${u.id}`);
+    toast('Сотрудник удалён');
+    return true;
+  } catch (err) {
+    const msg = String(err.message || '');
+    if (
+      err.status === 404 ||
+      err.status === 405 ||
+      /cannot\s+delete|not\s+allowed|method\s+not|not\s+implemented|not\s+found/i.test(msg)
+    ) {
+      toast('Удаление сотрудников пока не доступно на сервере', true);
+    } else if (err.status === 403) {
+      toast('Недостаточно прав для удаления', true);
+    } else {
+      toast(msg || 'Не удалось удалить сотрудника', true);
     }
+    return false;
   }
-  const msg = lastErr?.message || '';
-  if (/cannot delete|method not allowed|404|not found/i.test(msg)) {
-    toast('Удаление пользователей пока не реализовано на сервере', true);
-  } else {
-    toast(msg || 'Не удалось удалить сотрудника', true);
-  }
-  return false;
 }
 
 async function renderPeople() {
@@ -1888,51 +1889,43 @@ async function renderProfile() {
 
           e.target.disabled = true;
           try {
-            let updated = null;
-            const attempts = [
-              () => api('PATCH', '/auth/me', body),
-              () => api('PUT', '/auth/me', body),
-              () => api('PATCH', `/users/${me.id}`, body),
-              () => api('PUT', `/users/${me.id}`, body),
-              () => api('POST', '/auth/profile', body),
-              () => api('POST', '/users/me', body),
-            ];
-            let lastErr;
-            for (const attempt of attempts) {
-              try {
-                updated = await attempt();
-                break;
-              } catch (err) {
-                lastErr = err;
-                if (err.status === 400) {
-                  // validation — show real message
-                  throw err;
-                }
-                if (err.status === 401 || err.status === 403) throw err;
+            // Один запрос — сервер пока может не поддерживать обновление профиля
+            try {
+              await api('PATCH', `/users/${me.id}`, body);
+            } catch (err) {
+              const msg = String(err.message || '');
+              if (
+                err.status === 404 ||
+                err.status === 405 ||
+                /cannot|not allowed|method not|not implemented|not found/i.test(msg)
+              ) {
+                // Локально сохраняем то, что можем (отображение)
+                if (body.firstName !== undefined) state.me.firstName = body.firstName;
+                if (body.lastName !== undefined) state.me.lastName = body.lastName;
+                if (body.nickname) state.me.nickname = body.nickname;
+                localStorage.setItem('profileLocal', JSON.stringify({
+                  firstName: state.me.firstName,
+                  lastName: state.me.lastName,
+                  nickname: state.me.nickname || '',
+                }));
+                updateSideUser();
+                toast('Данные сохранены локально. На сервере изменение профиля пока недоступно', true);
+                e.target.disabled = false;
+                go('me');
+                return;
               }
-            }
-            if (!updated) {
-              const msg = lastErr?.message || '';
-              if (/cannot|not allowed|404|405|not found|method/i.test(msg) || !lastErr) {
-                toast('Изменение профиля пока не реализовано на сервере', true);
-              } else {
-                toast(msg, true);
-              }
-              e.target.disabled = false;
-              return;
+              throw err;
             }
 
             toast('Профиль обновлён');
             try {
               state.me = await api('GET', '/auth/me');
               csrfToken = state.me.csrfToken || csrfToken;
-              updateSideUser();
-              go('me');
             } catch {
               Object.assign(state.me, body);
-              updateSideUser();
-              go('me');
             }
+            updateSideUser();
+            go('me');
           } catch (err) {
             toast(err.message || 'Не удалось сохранить профиль', true);
             e.target.disabled = false;
