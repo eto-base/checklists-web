@@ -433,6 +433,40 @@
     border: none; background: transparent; font-size: 20px; cursor: pointer;
     padding: 8px; line-height: 1; min-width: 44px; min-height: 44px;
   }
+
+  .card {
+    box-shadow: none;
+  }
+  .card.click:active { background: var(--surface-2); }
+  .list-group { box-shadow: none; }
+  .login-card { box-shadow: var(--shadow-md); }
+  .icon-btn {
+    width: 40px; height: 40px; border: none; background: transparent;
+    border-radius: 10px; color: var(--text-secondary); cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 700; line-height: 1; font-family: inherit;
+  }
+  .icon-btn:active { background: var(--surface-2); }
+  .menu-pop {
+    position: absolute; right: 8px; top: 40px; z-index: 20;
+    min-width: 180px; background: var(--surface); border: 0.5px solid var(--border);
+    border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px;
+  }
+  .menu-pop button {
+    display: block; width: 100%; text-align: left; border: none; background: transparent;
+    padding: 12px 14px; border-radius: 8px; font-size: 15px; font-weight: 500;
+    color: var(--text); cursor: pointer; font-family: inherit;
+  }
+  .menu-pop button:active { background: var(--surface-2); }
+  .menu-pop button.danger { color: var(--danger); }
+  .card-head { position: relative; }
+  .hint {
+    font-size: 12px; color: var(--text-muted); padding: 8px 4px 4px;
+  }
+  .run-row-overdue {
+    background: var(--danger-soft);
+  }
+
 </style>
 </head>
 <body>
@@ -750,6 +784,7 @@ function go(tab) {
   show(screens[tab] || renderMine);
 }
 $('search-btn').onclick = () => go('search');
+document.addEventListener('click', () => { document.querySelectorAll('.menu-pop').forEach(m => m.remove()); });
 function statusBadge(r) {
   if (r.overdue) return h('span', { class: 'badge bad' }, 'Просрочен');
   if (r.status === 'COMPLETED') return h('span', { class: 'badge ok' }, 'Завершён');
@@ -760,10 +795,18 @@ function statusBadge(r) {
 function runCard(r, withWho) {
   const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
   const who = personName(r.assignee);
-  return h('div', { class: 'card click', onclick: () => show(() => openRun(r.id)) },
-    h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, title), statusBadge(r)),
+  const overdue = !!r.overdue;
+  return h('div', {
+    class: 'card click' + (overdue ? ' run-row-overdue' : ''),
+    onclick: () => show(() => openRun(r.id)),
+  },
+    h('div', { class: 'row' },
+      h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, title),
+      statusBadge(r)
+    ),
     r.dueAt && h('div', { class: 'muted', style: 'margin-top:5px' }, 'Срок: ' + fmt(r.dueAt)),
-    withWho && who && h('div', { class: 'muted', style: 'margin-top:2px' }, who));
+    withWho && who && h('div', { class: 'muted', style: 'margin-top:2px' }, who)
+  );
 }
 function emptyState(title, desc) {
   return h('div', { class: 'empty' }, h('div', { class: 'empty-icon', html: icons.empty }), h('div', { class: 'empty-title' }, title), desc && h('div', { class: 'empty-desc' }, desc));
@@ -973,52 +1016,79 @@ async function renderTemplates() {
   const manage = can('checklists.templates.manage');
   const favIds = new Set(state.favorites || []);
   const sorted = [...list].sort((a, b) => (favIds.has(b.id) ? 1 : 0) - (favIds.has(a.id) ? 1 : 0));
-
+  let openMenuId = null;
   const nodes = [];
-  if (sorted.length) {
+
+  if (!sorted.length) {
+    nodes.push(emptyState('Шаблонов пока нет', manage ? 'Создайте первый шаблон кнопкой +' : 'Попросите администратора добавить шаблоны'));
+  } else {
     sorted.forEach(t => {
       const fav = isFavorite(t.id);
-      nodes.push(h('div', { class: 'card' },
-        h('div', { class: 'row' },
-          h('strong', { style: 'font-size:15px;flex:1' }, t.title),
-          h('button', {
-            class: 'star-btn', type: 'button', title: fav ? 'Убрать из избранного' : 'В избранное',
-            onclick: (e) => { e.stopPropagation(); toggleFavorite(t.id); go('tpl'); },
-          }, fav ? '★' : '☆')
+      const head = h('div', { class: 'card-head row' },
+        h('div', { style: 'min-width:0;flex:1' },
+          h('strong', { style: 'font-size:15px' }, t.title),
+          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
+          h('div', { class: 'small', style: 'margin-top:6px' }, 'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—'))
         ),
-        t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
-        h('div', { class: 'small', style: 'margin-top:6px' }, 'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—')),
-        h('div', { class: 'gap' },
-          can('checklists.assign') && h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'),
-          manage && h('button', { class: 'btn btn-secondary btn-sm', onclick: () => {
-            const items = (t.items || []).map(it => {
-              const parsed = parseChoiceUnit(it.unit);
-              return {
-                title: it.title || '',
-                type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
-                required: !!it.required,
-                unit: it.unit || '',
-                minValue: it.minValue ?? '',
-                maxValue: it.maxValue ?? '',
-                options: parsed ? parsed.options : (it.options || ['']),
-              };
-            });
-            showBuilder({
-              title: (t.title || '') + ' (копия)',
-              description: t.description || '',
-              items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
-            });
-          } }, 'Копировать'),
-          manage && h('button', { class: 'btn btn-danger btn-sm', onclick: async () => {
-            if (!confirm('Архивировать «' + t.title + '»?')) return;
-            try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); } catch (e) { toast(e.message, true); }
-          } }, 'Архивировать')
-        )
+        h('button', {
+          class: 'star-btn', type: 'button', title: fav ? 'Убрать из избранного' : 'В избранное',
+          onclick: (e) => { e.stopPropagation(); toggleFavorite(t.id); go('tpl'); },
+        }, fav ? '★' : '☆'),
+        manage && h('button', {
+          class: 'icon-btn', type: 'button', title: 'Ещё',
+          onclick: (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.menu-pop').forEach(m => m.remove());
+            if (openMenuId === t.id) { openMenuId = null; return; }
+            openMenuId = t.id;
+            const pop = h('div', { class: 'menu-pop' },
+              can('checklists.assign') && h('button', { type: 'button', onclick: () => { openMenuId = null; show(() => showAssign(t)); } }, 'Назначить'),
+              h('button', { type: 'button', onclick: () => {
+                openMenuId = null;
+                const items = (t.items || []).map(it => {
+                  const parsed = parseChoiceUnit(it.unit);
+                  return {
+                    title: it.title || '',
+                    type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
+                    required: !!it.required,
+                    unit: it.unit || '',
+                    minValue: it.minValue ?? '',
+                    maxValue: it.maxValue ?? '',
+                    options: parsed ? parsed.options : (it.options || ['']),
+                  };
+                });
+                showBuilder({
+                  title: (t.title || '') + ' (копия)',
+                  description: t.description || '',
+                  items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
+                });
+              } }, 'Копировать'),
+              h('button', { type: 'button', class: 'danger', onclick: async () => {
+                openMenuId = null;
+                if (!confirm('Архивировать «' + t.title + '»?')) return;
+                try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); }
+                catch (err) { toast(err.message, true); }
+              } }, 'Архивировать')
+            );
+            head.append(pop);
+          },
+        }, '⋯')
+      );
+
+      const actions = [];
+      if (can('checklists.assign') && !manage) {
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+      } else if (can('checklists.assign')) {
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+      }
+
+      nodes.push(h('div', { class: 'card' },
+        head,
+        actions.length ? h('div', { class: 'gap' }, ...actions) : null
       ));
     });
-  } else {
-    nodes.push(emptyState('Шаблонов пока нет'));
   }
+
   if (manage) {
     nodes.push(h('button', { class: 'fab', type: 'button', title: 'Новый шаблон', onclick: () => showBuilder() }, '+'));
   }
@@ -1209,7 +1279,10 @@ async function renderPeople() {
         group.append(row);
       });
       nodes.push(group);
-      nodes.push(h('div', { class: 'small', style: 'margin-top:10px;padding:0 4px' }, 'Свайп влево — удалить'));
+      if (!localStorage.getItem('hintSwipe')) {
+        nodes.push(h('div', { class: 'hint' }, 'Подсказка: смахните строку влево, чтобы удалить'));
+        localStorage.setItem('hintSwipe', '1');
+      }
     } else nodes.push(emptyState('Список пуст'));
   }
   if (!nodes.length) nodes.push(emptyState('Недостаточно прав'));
