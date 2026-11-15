@@ -105,15 +105,15 @@ const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev';
         }
 
         // Обёртка над fetch: автоматически ставит заголовки, кидает понятные ошибки
-        async function api(method, path, body) {
+                async function api(method, path, body) {
             const headers = {};
+            // ДОБАВЛЯЕМ ЭТУ СТРОКУ: берем токен из хранилища
+            const savedToken = localStorage.getItem('auth_token');
+            if (savedToken) headers['Authorization'] = 'Bearer ' + savedToken;
+
             if (csrfToken) headers['x-csrf-token'] = csrfToken;
             if (body !== undefined) headers['content-type'] = 'application/json';
-            const res = await fetch(API_BASE + path, {
-                method,
-                headers,
-                credentials: 'include',   // важно: куки sid должны ходить
-                body: body === undefined ? undefined : JSON.stringify(body),
+            // ... дальше без изменений
             });
             const text = await res.text();
             let data = null;
@@ -139,6 +139,10 @@ const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev';
                     return;
                 }
                 csrfToken = data.csrfToken || null;
+                // ДОБАВЛЯЕМ ЭТУ СТРОКУ: сохраняем токен, если он есть в ответе
+                if (data.token) {
+                    localStorage.setItem('auth_token', data.token);
+                }
                 // Дозапрашиваем профиль, чтобы увидеть права
                 const me = await api('GET', '/auth/me');
                 csrfToken = me.csrfToken || csrfToken;
