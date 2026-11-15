@@ -949,48 +949,106 @@ function renderSettings() {
 }
 async function renderSearch() {
   const inputWrap = h('div', { style: 'position:relative;margin-bottom:14px' });
-  const input = h('input', { type: 'search', placeholder: 'Чеклисты, шаблоны, люди…', value: state.searchQuery || '', style: 'padding-right:44px' });
-  const clearBtn = h('button', { class: 'topbar-btn', type: 'button', style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)', onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); } });
+  const input = h('input', {
+    type: 'search',
+    placeholder: 'Чеклисты, шаблоны, люди…',
+    value: state.searchQuery || '',
+    style: 'padding-right:44px',
+  });
+  const clearBtn = h('button', {
+    class: 'topbar-btn',
+    type: 'button',
+    style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
+    onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); },
+  });
   clearBtn.innerHTML = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>`;
   inputWrap.append(input, clearBtn);
+
+  // Отдельный контейнер результатов — input НЕ пересоздаём
+  const resultsBox = h('div', { id: 'search-results' });
+  setView(inputWrap, resultsBox);
+  input.focus();
+
+  const setResults = (...nodes) => {
+    resultsBox.replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
+  };
+
   const runSearch = async () => {
-    state.searchQuery = input.value; const query = input.value.trim().toLowerCase();
-    if (!query) { setView(inputWrap, emptyState('Поиск', 'Введите запрос')); input.focus(); return; }
-    setView(inputWrap, h('div', { class: 'skeleton', style: 'height:64px' }));
+    state.searchQuery = input.value;
+    const query = input.value.trim().toLowerCase();
+    if (!query) {
+      setResults(emptyState('Поиск', 'Введите запрос'));
+      return;
+    }
+    setResults(h('div', { class: 'skeleton', style: 'height:64px' }));
     const results = [];
     try {
       const runs = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
-      runs.filter(r => ((r.title || r.template?.title || r.templateTitle || '') + personName(r.assignee)).toLowerCase().includes(query)).forEach(r => results.push({ type: 'run', data: r }));
+      runs.filter(r => ((r.title || r.template?.title || r.templateTitle || '') + personName(r.assignee)).toLowerCase().includes(query))
+        .forEach(r => results.push({ type: 'run', data: r }));
     } catch {}
     try {
       let templates = [];
-      try { templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); } catch (e) { if (e.status === 400) templates = arr(await api('GET', '/checklists/templates')); }
-      templates.filter(t => ((t.title || '') + ' ' + (t.description || '')).toLowerCase().includes(query)).forEach(t => results.push({ type: 'tpl', data: t }));
+      try { templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
+      catch (e) { if (e.status === 400) templates = arr(await api('GET', '/checklists/templates')); }
+      templates.filter(t => ((t.title || '') + ' ' + (t.description || '')).toLowerCase().includes(query))
+        .forEach(t => results.push({ type: 'tpl', data: t }));
     } catch {}
     if (can('users.read')) {
       try {
         const users = arr(await api('GET', '/users'));
-        users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query)).forEach(u => results.push({ type: 'user', data: u }));
+        users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query))
+          .forEach(u => results.push({ type: 'user', data: u }));
       } catch {}
     }
-    const nodes = [inputWrap];
-    if (!results.length) nodes.push(emptyState('Ничего не найдено'));
-    else {
-      const runs = results.filter(r => r.type === 'run');
-      const tpls = results.filter(r => r.type === 'tpl');
-      const users = results.filter(r => r.type === 'user');
-      if (runs.length) { nodes.push(h('div', { class: 'section-label' }, 'Чеклисты')); runs.forEach(({ data: r }) => nodes.push(runCard(r, true))); }
-      if (tpls.length) { nodes.push(h('div', { class: 'section-label' }, 'Шаблоны')); tpls.forEach(({ data: t }) => nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) }, h('strong', {}, t.title), t.description && h('div', { class: 'muted' }, t.description)))); }
-      if (users.length) { nodes.push(h('div', { class: 'section-label' }, 'Сотрудники')); users.forEach(({ data: u }) => nodes.push(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { style: 'display:flex;gap:12px;align-items:center' }, h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)), h('div', {}, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email || ''))))))); }
+    if (!results.length) {
+      setResults(emptyState('Ничего не найдено'));
+      return;
     }
-    setView(nodes); input.focus();
-    try { const len = input.value.length; input.setSelectionRange(len, len); } catch {}
+    const nodes = [];
+    const runs = results.filter(r => r.type === 'run');
+    const tpls = results.filter(r => r.type === 'tpl');
+    const users = results.filter(r => r.type === 'user');
+    if (runs.length) {
+      nodes.push(h('div', { class: 'section-label' }, 'Чеклисты'));
+      runs.forEach(({ data: r }) => nodes.push(runCard(r, true)));
+    }
+    if (tpls.length) {
+      nodes.push(h('div', { class: 'section-label' }, 'Шаблоны'));
+      tpls.forEach(({ data: t }) => nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) },
+        h('strong', {}, t.title), t.description && h('div', { class: 'muted' }, t.description))));
+    }
+    if (users.length) {
+      nodes.push(h('div', { class: 'section-label' }, 'Сотрудники'));
+      users.forEach(({ data: u }) => {
+        nodes.push(h('div', { class: 'card' },
+          h('div', { class: 'row' },
+            h('div', { style: 'display:flex;gap:12px;align-items:center' },
+              h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
+              h('div', {},
+                h('strong', {}, personName(u)),
+                h('div', { class: 'muted' }, u.email || '')
+              )
+            )
+          )
+        ));
+      });
+    }
+    setResults(...nodes);
   };
+
   let debounce;
-  input.addEventListener('input', () => { clearTimeout(debounce); debounce = setTimeout(runSearch, 280); });
-  input.addEventListener('keydown', (e) => { if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); } });
-  setView(inputWrap); await runSearch(); input.focus();
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    debounce = setTimeout(runSearch, 280);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); }
+  });
+  await runSearch();
+  // не трогаем focus повторно после await — иначе на мобиле клавиатура дёргается
 }
+
 function renderStub(title, description, iconHtml) {
   setView(h('div', { class: 'empty', style: 'padding-top:56px' }, h('div', { class: 'stub-icon', html: iconHtml }), h('div', { class: 'empty-title' }, title), h('div', { class: 'empty-desc' }, description), h('p', { class: 'small', style: 'margin-top:18px' }, 'Раздел подготовлен')));
 }
