@@ -1083,6 +1083,24 @@
   .bottom-nav button { flex: 0 0 var(--d); width: var(--d); height: var(--d); min-width: 0; max-width: none; padding: 0; border-radius: 50%; }
   .bottom-nav button svg { width: calc(var(--d) * .46); height: calc(var(--d) * .46); }
   .nav-blob { border-radius: 50%; }
+
+  /* ===== v5: soft local press effect, orbs column ===== */
+  [data-lq].lq-down { transform: none !important; border-radius: inherit !important; }
+  .lq-ring { animation: none !important; }
+  .lq-glint { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%; pointer-events: none; animation: none;
+    background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 70%); opacity: .8; transform: scale(1);
+    transition: transform .5s cubic-bezier(.2,.7,.2,1), opacity .45s ease; }
+  .lq-glint.grow { transform: scale(11); }
+  .lq-glint.out { opacity: 0; }
+  .btn-secondary .lq-glint, .chip:not(.active) .lq-glint, .choice:not(.on) .lq-glint, .choice-opt .lq-glint, .icon-btn .lq-glint, .topbar-btn .lq-glint, .float-back .lq-glint, .lay-mv .lq-glint, .menu-pop button .lq-glint, .search-orb:not(.plus-orb) .lq-glint, .bottom-nav button .lq-glint, .folder .lq-glint, .star-btn .lq-glint, .emoji-grid button .lq-glint {
+    background: radial-gradient(circle, var(--accent-glow), rgba(255,255,255,0) 70%); }
+  @keyframes popGrow { 0% { transform: scale(.82); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .menu-pop, .menu-pop button, .emoji-grid button, .choice-opt, .option-row, .alert, .lay-row { animation-duration: .28s; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
+  .lq-sheet { transition: transform .5s cubic-bezier(.22,1,.36,1), opacity .25s, border-radius .45s ease; }
+  .lay-sw i { transition: transform .4s cubic-bezier(.22,1.1,.36,1), width .2s; }
+  .dock { align-items: flex-end; }
+  .orbs { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .dock:has(.plus-orb:not(.hidden)) .bottom-nav { --d: min(58px, calc((100vw - 28px - 68px) / var(--n, 3))); }
 </style>
 </head>
 <body>
@@ -1131,7 +1149,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
       <div class="topbar-title" id="topbar-title">Чеклисты</div>
-      <div class="topbar-actions">
+      <div class="topbar-actions" id="topbar-actions">
         <select id="ws-select" class="ws-select hidden"></select>
         <button class="topbar-btn muted" id="layout-btn" aria-label="Настроить панели"></button>
         <button class="topbar-btn muted" id="search-btn" aria-label="Поиск">
@@ -1162,7 +1180,7 @@
       </div>
     </aside>
     <main id="view"></main>
-    <div class="dock" id="dock"><nav class="bottom-nav" id="bottom-nav"></nav><button type="button" class="search-orb plus-orb hidden" id="plus-orb" title="Добавить сотрудника"></button><button type="button" class="search-orb" id="search-orb" title="Поиск"></button></div>
+    <div class="dock" id="dock"><nav class="bottom-nav" id="bottom-nav"></nav><div class="orbs"><button type="button" class="search-orb plus-orb hidden" id="plus-orb" title="Добавить сотрудника"></button><button type="button" class="search-orb" id="search-orb" title="Поиск"></button></div></div>
   </div>
 </div>
 <div id="toast" class="toast"></div>
@@ -1553,7 +1571,7 @@ function go(tab) {
   const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && can('users.create')));
   const lb = $('layout-btn'); if (lb) lb.style.display = tab === 'layout' ? 'none' : '';
   renderBottomNav(); renderFolders(); renderSideMenu();
-  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAuditStub, notifications:renderNotificationsStub, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
+  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
   show(screens[tab] || renderMine);
 }
 
@@ -1581,11 +1599,8 @@ document.addEventListener('pointerdown', (e) => {
   if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
   const r = el.getBoundingClientRect(), g = document.createElement('span');
   g.className = 'lq-glint'; g.style.left = (e.clientX - r.left) + 'px'; g.style.top = (e.clientY - r.top) + 'px';
-  el.append(g); setTimeout(() => g.remove(), 650);
-  el.classList.remove('lq-ring'); void el.offsetWidth; el.classList.add('lq-ring');
-  el.addEventListener('animationend', (ev) => { if (ev.animationName === 'lqRing') el.classList.remove('lq-ring'); });
-  el.classList.add('lq-down');
-  const up = () => { el.classList.remove('lq-down'); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
+  el.append(g); requestAnimationFrame(() => g.classList.add('grow'));
+  const up = () => { g.classList.add('out'); setTimeout(() => g.remove(), 450); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
   addEventListener('pointerup', up); addEventListener('pointercancel', up);
 });
 function saveLayout() { localStorage.setItem('layout', JSON.stringify(state.layout)); renderBottomNav(); renderFolders(); }
@@ -1610,6 +1625,81 @@ function renderLayout() {
   setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. «Избранное» — шаблоны со звездой.'),
     ...block('dock', 'Нижняя консоль', 'До 5 разделов, «Кабинет» всегда остаётся.', 5),
     h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
+}
+
+async function firstOk(paths) {
+  let last;
+  for (const p of paths) { try { return arr(await api('GET', p)); } catch (e) { last = e; if (e.status === 401 || e.status === 403) throw e; } }
+  throw last;
+}
+const ACTION_RU = { LOGIN: 'Вход', LOGOUT: 'Выход', CREATE: 'Создание', UPDATE: 'Изменение', DELETE: 'Удаление', COMPLETE: 'Сдача', ASSIGN: 'Назначение', CANCEL: 'Отмена', ARCHIVE: 'Архивация' };
+function actionLabel(a) { const k = String(a || '').toUpperCase(); const hit = Object.keys(ACTION_RU).find(x => k.includes(x)); return hit ? ACTION_RU[hit] : (a || 'Действие'); }
+function loadFail(e, title, retry) {
+  const msg = e.status === 403 ? 'Недостаточно прав' : e.status === 404 ? 'Сервер пока не отдаёт этот раздел (адрес API не найден)' : (e.message || 'Ошибка');
+  setView(emptyState(title, msg), h('button', { class: 'btn btn-secondary', onclick: retry }, 'Повторить'));
+}
+async function renderAudit() {
+  let rows;
+  try { rows = await firstOk([`/audit?workspaceId=${state.wsId}&limit=200`, '/audit/logs?limit=200', '/audit-logs?limit=200', '/audit']); }
+  catch (e) { return loadFail(e, 'Журнал аудита', () => show(renderAudit)); }
+  rows = [...rows].sort((a, b) => new Date(b.createdAt || b.at || b.timestamp || 0) - new Date(a.createdAt || a.at || a.timestamp || 0));
+  let q = '', shown = 30;
+  const input = h('input', { type: 'search', placeholder: 'Поиск по действиям и людям…' });
+  const box = h('div');
+  const text = (r) => [r.action || r.type || r.event, personName(r.actor || r.user), r.actorEmail, r.entity || r.entityType, r.entityId, typeof (r.details || r.meta) === 'string' ? (r.details || r.meta) : ''].join(' ').toLowerCase();
+  const draw = () => {
+    const f = rows.filter(r => !q || text(r).includes(q));
+    if (!f.length) { box.replaceChildren(emptyState(rows.length ? 'Ничего не найдено' : 'Записей пока нет')); return; }
+    const nodes = f.slice(0, shown).map(r => {
+      const who = personName(r.actor || r.user) || r.actorEmail || 'Система';
+      const ent = [r.entity || r.entityType, r.entityId && String(r.entityId).slice(0, 8)].filter(Boolean).join(' · ');
+      return h('div', { class: 'card' },
+        h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, actionLabel(r.action || r.type || r.event)), h('span', { class: 'badge neutral' }, fmt(r.createdAt || r.at || r.timestamp))),
+        h('div', { class: 'muted', style: 'margin-top:4px' }, who),
+        ent && h('div', { class: 'small', style: 'margin-top:4px' }, ent));
+    });
+    if (f.length > shown) nodes.push(h('button', { class: 'btn btn-secondary', onclick: () => { shown += 30; draw(); } }, `Показать ещё (${f.length - shown})`));
+    box.replaceChildren(...nodes);
+  };
+  input.addEventListener('input', () => { q = input.value.trim().toLowerCase(); shown = 30; draw(); });
+  draw();
+  setView(h('div', { class: 'page-desc' }, `Записей: ${rows.length}`), input, h('div', { style: 'height:10px' }), box);
+}
+async function renderNotifications() {
+  let rows;
+  try { rows = await firstOk(['/notifications?limit=100', '/notifications']); }
+  catch (e) { return loadFail(e, 'Сообщения', () => show(renderNotifications)); }
+  rows = [...rows].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  const isRead = (n) => !!(n.readAt || n.read || n.isRead);
+  let onlyNew = false;
+  const box = h('div');
+  const markRead = async (n) => {
+    if (isRead(n)) return;
+    n.readAt = new Date().toISOString();
+    try { await api('PATCH', `/notifications/${n.id}/read`); }
+    catch { try { await api('POST', `/notifications/${n.id}/read`); } catch {} }
+  };
+  const draw = () => {
+    const f = rows.filter(n => !onlyNew || !isRead(n));
+    const unread = rows.filter(n => !isRead(n)).length;
+    const head = h('div', { class: 'row', style: 'margin-bottom:10px' },
+      h('div', { class: 'chips', style: 'margin:0' },
+        h('button', { class: 'chip' + (!onlyNew ? ' active' : ''), onclick: () => { onlyNew = false; draw(); } }, 'Все'),
+        h('button', { class: 'chip' + (onlyNew ? ' active' : ''), onclick: () => { onlyNew = true; draw(); } }, `Новые · ${unread}`)),
+      unread > 0 && h('button', { class: 'btn btn-ghost', onclick: async () => { await Promise.all(rows.filter(n => !isRead(n)).map(markRead)); draw(); } }, 'Прочитать все'));
+    const list = f.length ? f.map(n => {
+      const runId = n.runId || n.data?.runId || n.payload?.runId;
+      return h('div', { class: 'card click', onclick: async () => { await markRead(n); if (runId) show(() => openRun(runId)); else draw(); } },
+        h('div', { class: 'row' },
+          h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, n.title || n.type || 'Уведомление'),
+          !isRead(n) && h('span', { class: 'badge' }, 'Новое')),
+        (n.body || n.message || n.text) && h('div', { class: 'muted', style: 'margin-top:4px' }, n.body || n.message || n.text),
+        n.createdAt && h('div', { class: 'small', style: 'margin-top:6px' }, fmt(n.createdAt)));
+    }) : [emptyState(onlyNew ? 'Новых сообщений нет' : 'Сообщений пока нет')];
+    box.replaceChildren(head, ...list);
+  };
+  draw();
+  setView(box);
 }
 async function renderFav() {
   let t = []; try { t = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); } catch {}
@@ -1792,7 +1882,7 @@ async function openRun(id) {
   const extra = h('div', { style: 'display:flex;align-items:center;gap:0;position:relative' });
   const backBtn = h('button', {
     class: 'topbar-btn muted', type: 'button', title: 'Назад',
-    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'mine') : (['mine','all'].includes(state.tab) ? state.tab : 'mine')),
+    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'mine') : (rootSet().includes(state.tab) ? state.tab : 'mine')),
   });
   backBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -1856,7 +1946,7 @@ async function openRun(id) {
   const menuBtn = $('menu-btn');
   // temporary replace menu with back while in run
   const prevMenuHandler = menuBtn.onclick;
-  menuBtn.onclick = () => go(['mine','all'].includes(state.tab) ? state.tab : 'mine');
+  menuBtn.onclick = () => go(rootSet().includes(state.tab) ? state.tab : 'mine');
   menuBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   menuBtn.setAttribute('aria-label', 'Назад');
   search.classList.add('hidden');
@@ -1877,6 +1967,7 @@ async function openRun(id) {
       /* search is same node if only class hidden */
     }
     if (!acc.contains(search)) acc.append(search);
+    const lbt = $('layout-btn'); if (lbt && !acc.contains(lbt)) acc.prepend(lbt);
   };
 
   const commentField = h('textarea', { rows: 2, placeholder: 'Комментарий к сдаче (необязательно)' });
@@ -1902,7 +1993,7 @@ async function openRun(id) {
           const r = await api('POST', `/checklists/runs/${run.id}/complete`, Object.keys(body).length ? body : undefined);
           toast(`Сдано. Проблем: ${r?.flaggedCount ?? 0}`);
           restoreChrome();
-          go(['mine','all'].includes(state.tab) ? state.tab : 'mine');
+          go(rootSet().includes(state.tab) ? state.tab : 'mine');
         } catch (err) { toast(err.message, true); e.target.disabled = false; }
       },
     }, 'Сдать чеклист'));
