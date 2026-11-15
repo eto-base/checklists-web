@@ -975,6 +975,69 @@
   .fab { bottom: calc(56px + var(--safe-bottom) + 28px); }
   .toast { bottom: calc(56px + var(--safe-bottom) + 24px); }
 
+
+  /* ===== Liquid glass buttons & animations ===== */
+  :root { --lg-bg: linear-gradient(165deg, rgba(255,255,255,.74), rgba(255,255,255,.34)); --lg-bd: rgba(255,255,255,.7); --lg-sh: 0 4px 14px rgba(0,0,0,.09), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -3px 8px rgba(0,0,0,.05); }
+  [data-theme="dark"] { --lg-bg: linear-gradient(165deg, rgba(255,255,255,.2), rgba(255,255,255,.07)); --lg-bd: rgba(255,255,255,.14); --lg-sh: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2); }
+  .btn-secondary, .chip, .choice, .choice-opt, .icon-btn, .float-back, .topbar-btn, .lay-mv {
+    background: var(--lg-bg); border: 1px solid var(--lg-bd); box-shadow: var(--lg-sh);
+    backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  }
+  .topbar-btn { border-radius: 50%; margin: 0 2px; }
+  .btn-primary, .fab, .chip.active {
+    background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent));
+    border: 1px solid rgba(255,255,255,.45); color: #fff;
+    box-shadow: 0 6px 18px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,.55), inset 0 -3px 8px rgba(0,0,0,.12);
+  }
+  .btn-danger {
+    background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 80%, #fff), var(--danger));
+    border: 1px solid rgba(255,255,255,.4); box-shadow: 0 6px 18px var(--danger-soft), inset 0 1px 1px rgba(255,255,255,.5);
+  }
+  .btn-ghost { background: transparent; border: none; box-shadow: none; }
+  [data-lq] { overflow: hidden; -webkit-tap-highlight-color: transparent; transition: transform .55s cubic-bezier(.34,1.56,.64,1), border-radius .45s ease, background .25s, box-shadow .25s; }
+  [data-lq].lq-down { transform: scale(1.07, .9) !important; border-radius: 42% 58% 55% 45% / 55% 45% 58% 42% !important; transition-duration: .14s; }
+  .lq-glint { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle, rgba(255,255,255,.8), rgba(255,255,255,0) 70%); animation: lqGlint .6s ease-out forwards; }
+  @keyframes lqGlint { to { transform: scale(18); opacity: 0; } }
+  .bottom-nav button svg, .search-orb svg { fill: none !important; stroke: currentColor !important; stroke-width: 1.9; }
+  .bottom-nav button.active svg { stroke-width: 2.3; }
+  .topbar-actions { margin-left: auto; }
+
+  /* flexible dock + top panel */
+  .bottom-nav { width: auto !important; max-width: calc(100% - 132px); flex: 0 1 auto; min-width: 0; }
+  .bottom-nav button { flex: 1 1 56px; min-width: 46px; max-width: 62px; }
+  .folders-track { width: max-content; min-width: 100%; }
+  .folders-track .folder { flex: 1 0 auto; }
+  .folder-blob { transition: left .4s cubic-bezier(.22,1,.36,1), width .4s cubic-bezier(.22,1,.36,1), transform .35s ease, opacity .3s; }
+
+  /* team plus orb + liquid sheet */
+  .plus-orb { background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent)) !important; color: #fff !important; border-color: rgba(255,255,255,.5) !important; box-shadow: 0 8px 24px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,.6) !important; }
+  .lq-backdrop { position: fixed; inset: 0; background: var(--overlay-bg); z-index: 70; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .lq-backdrop.open { opacity: 1; pointer-events: auto; }
+  .lq-sheet { position: fixed; left: 12px; right: 12px; bottom: calc(12px + var(--safe-bottom)); max-width: 520px; margin: 0 auto; max-height: 82vh; overflow: auto;
+    z-index: 71; padding: 8px 16px 18px; border-radius: 50%; background: rgba(255,255,255,.86);
+    backdrop-filter: blur(30px) saturate(1.3); -webkit-backdrop-filter: blur(30px) saturate(1.3); border: 1px solid var(--lg-bd); box-shadow: var(--shadow-lg);
+    transform: scale(.06); opacity: 0; pointer-events: none;
+    transition: transform .6s cubic-bezier(.34,1.35,.5,1), opacity .25s, border-radius .55s ease; }
+  [data-theme="dark"] .lq-sheet { background: rgba(24,28,36,.9); }
+  .lq-sheet.open { transform: scale(1); opacity: 1; pointer-events: auto; border-radius: 32px; }
+  .lq-grab { width: 40px; height: 5px; border-radius: 3px; background: var(--border-strong); margin: 4px auto 10px; }
+
+  /* layout editor */
+  .lay-row { display: flex; align-items: center; gap: 10px; padding: 10px 2px; border-bottom: .5px solid var(--border); }
+  .lay-row:last-child { border-bottom: none; }
+  .lay-ic { width: 22px; height: 22px; display: flex; color: var(--accent); }
+  .lay-t { flex: 1; font-weight: 500; }
+  .lay-mv { width: 32px; height: 32px; padding: 0; border-radius: 50%; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .lay-mv svg { width: 16px; height: 16px; }
+  .lay-sw { width: 52px; height: 30px; border-radius: 999px; border: 1px solid var(--lg-bd); background: var(--surface-2); position: relative; padding: 0; flex: none; cursor: pointer; transition: background .3s; }
+  .lay-sw i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 999px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25);
+    transition: transform .5s cubic-bezier(.34,1.56,.64,1), width .25s; }
+  .lay-sw:active i { width: 30px; }
+  .lay-sw.on { background: var(--accent); }
+  .lay-sw.on i { transform: translateX(22px); }
+  .lay-sw.on:active i { transform: translateX(14px); }
+  .lay-sw:disabled { opacity: .45; }
 </style>
 </head>
 <body>
@@ -1025,6 +1088,7 @@
       <div class="topbar-title" id="topbar-title">Чеклисты</div>
       <div class="topbar-actions">
         <select id="ws-select" class="ws-select hidden"></select>
+        <button class="topbar-btn muted" id="layout-btn" aria-label="Настроить панели"></button>
         <button class="topbar-btn muted" id="search-btn" aria-label="Поиск">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
         </button>
@@ -1053,7 +1117,7 @@
       </div>
     </aside>
     <main id="view"></main>
-    <div class="dock" id="dock"><nav class="bottom-nav" id="bottom-nav"></nav><button type="button" class="search-orb" id="search-orb" title="Поиск"></button></div>
+    <div class="dock" id="dock"><nav class="bottom-nav" id="bottom-nav"></nav><button type="button" class="search-orb plus-orb hidden" id="plus-orb" title="Добавить сотрудника"></button><button type="button" class="search-orb" id="search-orb" title="Поиск"></button></div>
   </div>
 </div>
 <div id="toast" class="toast"></div>
@@ -1073,22 +1137,40 @@ const state = {
   avatarEmoji: localStorage.getItem('avatarEmoji') || '',
   avatarDataUrl: localStorage.getItem('avatarDataUrl') || '',
   favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
+  layout: (() => { try { const l = JSON.parse(localStorage.getItem('layout') || 'null'); if (l && Array.isArray(l.top) && Array.isArray(l.dock)) return l; } catch {} return { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; })(),
 };
 const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
+const S = (d) => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 const icons = {
-  list: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><rect x="4" y="5" width="16" height="2.8" rx="1.4"/><rect x="4" y="10.6" width="16" height="2.8" rx="1.4"/><rect x="4" y="16.2" width="12" height="2.8" rx="1.4"/></svg>`,
-  all: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>`,
-  template: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1v4h4z"/></svg>`,
-  people: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="9" cy="8" r="3.3"/><path d="M2 19.5C2 16.5 4.9 14 9 14s7 2.5 7 5.5V21H2v-1.5z"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.5c2.2.5 4 2.2 4 4.7V21h-3.2v-1.3c0-1.9-.3-3.5-.8-5.2z"/></svg>`,
-  audit: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2l2.4 7H22l-6 4.4 2.3 7L12 16.2 5.7 20.4 8 13.4 2 9h7.6z"/></svg>`,
-  settings: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8zm8.9 3h-2.1a6.9 6.9 0 0 0-.6-1.5l1.5-1.5-1.4-1.4-1.5 1.5c-.5-.3-1-.5-1.5-.6V5.1h-2v2.1c-.5.1-1 .3-1.5.6L9.9 6.3 8.5 7.7l1.5 1.5c-.3.5-.5 1-.6 1.5H7.1v2h2.1c.1.5.3 1 .6 1.5l-1.5 1.5 1.4 1.4 1.5-1.5c.5.3 1 .5 1.5.6v2.1h2v-2.1c.5-.1 1-.3 1.5-.6l1.5 1.5 1.4-1.4-1.5-1.5c.3-.5.5-1 .6-1.5h2.1v-2z"/></svg>`,
-  search: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M10.5 3a7.5 7.5 0 105.7 12.4l3.7 3.7 1.4-1.4-3.7-3.7A7.5 7.5 0 0010.5 3zm0 2a5.5 5.5 0 110 11 5.5 5.5 0 010-11z"/></svg>`,
-  empty: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm8 1v4h4z"/></svg>`,
-  more: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="18" cy="12" r="2"/></svg>`,
-  msg: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M4 5h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9l-5 4v-4H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></svg>`,
-  back: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M15.4 5.3a1 1 0 010 1.4L10.4 11.7l5 5a1 1 0 11-1.4 1.4l-5.7-5.7a1 1 0 010-1.4l5.7-5.7a1 1 0 011.4 0z"/></svg>`,
-  bell: `<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 3a6 6 0 016 6v2.8c0 .9.3 1.7.9 2.4L20 16H4l1.1-1.8c.6-.7.9-1.5.9-2.4V9a6 6 0 016-6zm-1.2 16h2.4a1.2 1.2 0 11-2.4 0z"/></svg>`,
+  list: S('<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M8 12.5l2.8 2.8L16 9.5"/>'),
+  all: S('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/>'),
+  template: S('<rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4.5h6M9 10h6M9 14h4"/>'),
+  people: S('<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><path d="M16 5.2a3 3 0 010 5.6M17.5 14.6c1.7.6 2.7 2.1 3 4.4"/>'),
+  audit: S('<path d="M12 3l7.5 3v5.5c0 4.5-3.1 8-7.5 9.5-4.4-1.5-7.5-5-7.5-9.5V6z"/><path d="M9 12l2.2 2.2L15.2 10"/>'),
+  settings: S('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/>'),
+  search: S('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>'),
+  empty: S('<path d="M4 13l2.5-7.5A2 2 0 018.4 4h7.2a2 2 0 011.9 1.5L20 13v5a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M4 13h4.5l1 2.5h5l1-2.5H20"/>'),
+  more: S('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>'),
+  msg: S('<path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 3.5V17H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>'),
+  back: S('<path d="M15 5l-7 7 7 7"/>'),
+  bell: S('<path d="M6 16v-5a6 6 0 1112 0v5l1.5 2h-15z"/><path d="M10 21h4"/>'),
+  plus: S('<path d="M12 5v14M5 12h14"/>'),
+  tune: S('<rect x="3.5" y="4" width="17" height="6" rx="2.5"/><rect x="3.5" y="14" width="10" height="6" rx="2.5"/><path d="M17.5 17h3M19 15.5v3"/>'),
+  star: S('<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9-4.3-4.1 5.9-.8z"/>'),
+  up: S('<path d="M6 14l6-6 6 6"/>'),
+  down: S('<path d="M6 10l6 6 6-6"/>'),
 };
+const SECTIONS = {
+  mine: { t: 'Мои задачи', s: 'Мои', i: 'list', ok: () => true },
+  all: { t: 'Все задачи', s: 'Все', i: 'all', ok: () => can('checklists.runs.read_all') },
+  tpl: { t: 'Шаблоны', s: 'Шаблоны', i: 'template', ok: () => can('checklists.templates.read') },
+  people: { t: 'Команда', s: 'Команда', i: 'people', ok: () => can('users.create') || can('users.read') },
+  fav: { t: 'Избранное', s: 'Избранное', i: 'star', ok: () => can('checklists.templates.read') },
+  notifications: { t: 'Сообщения', s: 'Сообщения', i: 'msg', ok: () => true },
+  audit: { t: 'Журнал аудита', s: 'Журнал', i: 'audit', ok: () => true },
+  settings: { t: 'Кабинет', s: 'Кабинет', i: 'settings', ok: () => true },
+};
+const rootSet = () => [...new Set(['mine', ...state.layout.top, ...state.layout.dock])].filter(k => k !== 'settings');
 function pluralPunkty(n) {
   const x = Math.abs(Number(n)) || 0;
   const n10 = x % 10, n100 = x % 100;
@@ -1259,10 +1341,8 @@ if ($('logout-side')) $('logout-side').onclick = async () => { try { await api('
 function renderFolders() {
   const el = $('folders');
   if (!el) return;
-  const tabs = [{ k: 'mine', t: 'Мои' }];
-  if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны' });
-  if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Команда' });
-  const hide = ['search', 'me', 'audit', 'notifications', 'settings', 'all'].includes(state.tab);
+  const tabs = state.layout.top.filter(k => SECTIONS[k] && k !== 'settings' && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s }));
+  const hide = !tabs.length || ['search', 'me', 'settings', 'layout'].includes(state.tab);
   el.style.display = hide ? 'none' : 'flex';
   const track = h('div', { class: 'folders-track' });
   let blob = h('div', { class: 'folder-blob' });
@@ -1279,7 +1359,8 @@ function renderFolders() {
   const fromWidth = el._blobWidth;
   el.replaceChildren(track);
   requestAnimationFrame(() => {
-    const activeBtn = track.querySelector('.folder.active') || track.querySelector('.folder');
+    const activeBtn = track.querySelector('.folder.active');
+    blob.style.opacity = activeBtn ? '1' : '0';
     if (!activeBtn) return;
     const tr = track.getBoundingClientRect();
     const br = activeBtn.getBoundingClientRect();
@@ -1294,6 +1375,7 @@ function renderFolders() {
     }
     el._blobLeft = toLeft;
     el._blobWidth = toWidth;
+    el.scrollTo({ left: Math.max(0, toLeft - 40), behavior: 'smooth' });
   });
 }
 function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
@@ -1329,9 +1411,8 @@ function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
 }
 
 function renderBottomNav() {
-  const tabs = [{ k: 'mine', t: 'Задачи', icon: icons.list }];
-  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все', icon: icons.all });
-  tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
+  const tabs = state.layout.dock.filter(k => SECTIONS[k] && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s, icon: icons[SECTIONS[k].i] }));
+  if (!tabs.some(x => x.k === 'settings')) tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
   // search is separate orb
 
   const nav = $('bottom-nav');
@@ -1341,7 +1422,7 @@ function renderBottomNav() {
   if (!blob) blob = h('div', { class: 'nav-blob' });
 
   const btns = tabs.map(({ k, t, icon }) => {
-    const active = state.tab === k || (k === 'settings' && ['settings','me','audit','notifications'].includes(state.tab));
+    const active = state.tab === k || (k === 'settings' && (['settings','me','layout'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
     const b = h('button', {
       class: active ? 'active' : '',
       type: 'button',
@@ -1404,7 +1485,7 @@ function go(tab) {
   // Кнопка назад в шапке
   const menuBtn = $('menu-btn');
   if (menuBtn) {
-    const rootTabs = ['mine', 'all'];
+    const rootTabs = rootSet();
     const needBack = !rootTabs.includes(tab);
     if (needBack) {
       menuBtn.style.display = '';
@@ -1421,11 +1502,72 @@ function go(tab) {
   }
 
   state.tab = tab;
-  const titles = { mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск' };
+  const titles = { mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
   $('topbar-title').textContent = titles[tab] || 'Чеклисты';
+  const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && can('users.create')));
+  const lb = $('layout-btn'); if (lb) lb.style.display = tab === 'layout' ? 'none' : '';
   renderBottomNav(); renderFolders(); renderSideMenu();
-  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAuditStub, notifications:renderNotificationsStub, settings:renderSettings, search:renderSearch };
+  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAuditStub, notifications:renderNotificationsStub, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
   show(screens[tab] || renderMine);
+}
+
+$('layout-btn').innerHTML = icons.tune; $('layout-btn').onclick = () => go('layout');
+$('plus-orb').innerHTML = icons.plus;
+const lqBackdrop = h('div', { class: 'lq-backdrop' }), lqSheet = h('div', { class: 'lq-sheet' });
+document.body.append(lqBackdrop, lqSheet);
+function openSheet(node) {
+  const r = $('plus-orb').getBoundingClientRect();
+  lqSheet.replaceChildren(h('div', { class: 'lq-grab' }), node);
+  lqSheet.style.transformOrigin = `${r.left + r.width / 2 - lqSheet.offsetLeft}px ${r.top + r.height / 2 - lqSheet.offsetTop}px`;
+  requestAnimationFrame(() => { lqSheet.classList.add('open'); lqBackdrop.classList.add('open'); });
+}
+function closeSheet() {
+  lqSheet.classList.remove('open'); lqBackdrop.classList.remove('open');
+  if (window.__addForm?.querySelector('.alert-success') && state.tab === 'people') go('people');
+}
+lqBackdrop.onclick = closeSheet;
+$('plus-orb').onclick = () => { if (window.__addForm) openSheet(window.__addForm); };
+// liquid press: squish + glint on every button
+const LQ = '.btn,.chip,.choice,.choice-opt,.icon-btn,.topbar-btn,.fab,.float-back,.search-orb,.bottom-nav button,.folder,.lay-mv,.swatch';
+document.addEventListener('pointerdown', (e) => {
+  const el = e.target.closest(LQ); if (!el || el.disabled) return;
+  el.dataset.lq = '1';
+  if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+  const r = el.getBoundingClientRect(), g = document.createElement('span');
+  g.className = 'lq-glint'; g.style.left = (e.clientX - r.left) + 'px'; g.style.top = (e.clientY - r.top) + 'px';
+  el.append(g); setTimeout(() => g.remove(), 650);
+  el.classList.add('lq-down');
+  const up = () => { el.classList.remove('lq-down'); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
+  addEventListener('pointerup', up); addEventListener('pointercancel', up);
+});
+function saveLayout() { localStorage.setItem('layout', JSON.stringify(state.layout)); renderBottomNav(); renderFolders(); }
+function renderLayout() {
+  const block = (key, title, hint, max) => {
+    const list = state.layout[key];
+    const cur = list.filter(k => SECTIONS[k] && SECTIONS[k].ok());
+    const rest = Object.keys(SECTIONS).filter(k => !cur.includes(k) && SECTIONS[k].ok() && !(key === 'top' && k === 'settings'));
+    const move = (k, d) => { const i = list.indexOf(k), j = i + d; if (j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; saveLayout(); renderLayout(); };
+    const toggle = (k, on) => {
+      if (on) state.layout[key] = list.filter(x => x !== k);
+      else { if (max && cur.length >= max) return toast(`В консоли до ${max} разделов`, true); list.push(k); }
+      saveLayout(); renderLayout();
+    };
+    const row = (k, on) => h('div', { class: 'lay-row' },
+      h('span', { class: 'lay-ic', html: icons[SECTIONS[k].i] }), h('span', { class: 'lay-t' }, SECTIONS[k].t),
+      on && h('button', { class: 'lay-mv', type: 'button', html: icons.up, onclick: () => move(k, -1) }),
+      on && h('button', { class: 'lay-mv', type: 'button', html: icons.down, onclick: () => move(k, 1) }),
+      h('button', { class: 'lay-sw' + (on ? ' on' : ''), type: 'button', disabled: key === 'dock' && k === 'settings', onclick: () => toggle(k, on) }, h('i')));
+    return [h('h2', {}, title), h('div', { class: 'hint' }, hint), h('div', { class: 'card' }, ...cur.map(k => row(k, true)), ...rest.map(k => row(k, false)))];
+  };
+  setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. «Избранное» — шаблоны со звездой.'),
+    ...block('dock', 'Нижняя консоль', 'До 4 разделов, «Кабинет» всегда остаётся.', 4),
+    h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
+}
+async function renderFav() {
+  let t = []; try { t = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); } catch {}
+  t = t.filter(x => isFavorite(x.id));
+  setView(t.length ? t.map(x => h('div', { class: 'card click', onclick: () => show(() => showAssign(x)) }, h('strong', {}, x.title), x.description && h('div', { class: 'muted' }, x.description)))
+    : emptyState('Избранного нет', 'Отметьте шаблон звездой в разделе «Шаблоны»'));
 }
 $('search-btn').onclick = () => go('search');
 document.addEventListener('click', () => { document.querySelectorAll('.menu-pop').forEach(m => m.remove()); });
@@ -1952,8 +2094,8 @@ async function renderPeople() {
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
       role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
     };
-    nodes.push(h('div', { class: 'card' },
-      h('strong', {}, 'Добавить'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+    window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
+      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
       h('button', { class: 'btn btn-primary', onclick: async (e) => {
         e.target.disabled = true;
         try {
@@ -2126,6 +2268,11 @@ function renderSettings() {
     ),
     h('h2', {}, 'Разделы'),
     h('div', { class: 'list-group' },
+      h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('layout') },
+        h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+        h('div', { style: 'flex:1' }, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль')),
+        h('span', { class: 'muted' }, '›')
+      )),
       h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner card click', style: 'border:none;margin:0;box-shadow:none;background:transparent', onclick: () => go('notifications') },
         h('span', { html: icons.msg, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
         h('div', { style: 'flex:1' }, h('strong', {}, 'Сообщения'), h('div', { class: 'small' }, 'Уведомления и комментарии')),
