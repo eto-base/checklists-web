@@ -732,16 +732,19 @@ $('menu-btn').onclick = openMenu; $('overlay').onclick = closeMenu; $('side-clos
 $('side-profile').onclick = () => { closeMenu(); go('me'); };
 function renderSideMenu() {
   const items = [];
-  items.push(h('div', { class: 'sidemenu-section' }, 'Основное'));
+  items.push(h('div', { class: 'sidemenu-section' }, 'Работа'));
   items.push(sideItem('mine', icons.list, 'Мои чеклисты'));
   if (can('checklists.runs.read_all')) items.push(sideItem('all', icons.all, 'Все чеклисты'));
   if (can('checklists.templates.read')) items.push(sideItem('tpl', icons.template, 'Шаблоны'));
-  items.push(h('div', { class: 'sidemenu-section' }, 'Управление'));
-  if (can('users.create') || can('users.read')) items.push(sideItem('people', icons.people, 'Сотрудники'));
-  items.push(sideItem('audit', icons.audit, 'Журнал аудита', true));
-  items.push(sideItem('notifications', icons.bell, 'Уведомления', true));
+  if (can('users.create') || can('users.read')) {
+    items.push(h('div', { class: 'sidemenu-section' }, 'Управление'));
+    items.push(sideItem('people', icons.people, 'Сотрудники'));
+  }
   items.push(h('div', { class: 'sidemenu-section' }, 'Система'));
   items.push(sideItem('settings', icons.settings, 'Настройки'));
+  // заглушки — в конце, тише
+  items.push(sideItem('audit', icons.audit, 'Журнал аудита', true));
+  items.push(sideItem('notifications', icons.bell, 'Уведомления', true));
   $('sidemenu-nav').replaceChildren(...items);
 }
 function sideItem(tab, iconHtml, label, isStub = false) {
@@ -752,11 +755,20 @@ $('logout-side').onclick = async () => { closeMenu(); try { await api('POST', '/
 function renderBottomNav() {
   const tabs = [{ k: 'mine', t: 'Мои', icon: icons.list }];
   if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все', icon: icons.all });
-  if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны', icon: icons.template });
-  if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Люди', icon: icons.people });
-  // Настройки только из бокового меню
-  $('bottom-nav').replaceChildren(...tabs.map(({ k, t, icon }) =>
-    h('button', { class: state.tab === k ? 'active' : '', onclick: () => go(k) }, h('span', { html: icon }), h('span', {}, t))));
+  // Ещё = открыть боковое меню (второй этаж: шаблоны, люди, настройки)
+  tabs.push({ k: 'more', t: 'Ещё', icon: icons.settings });
+  $('bottom-nav').replaceChildren(...tabs.map(({ k, t, icon }) => {
+    const active = k === 'more'
+      ? !['mine', 'all', 'search'].includes(state.tab)
+      : state.tab === k;
+    return h('button', {
+      class: active ? 'active' : '',
+      onclick: () => {
+        if (k === 'more') openMenu();
+        else go(k);
+      },
+    }, h('span', { html: icon }), h('span', {}, t));
+  }));
 }
 function toggleFavorite(id) {
   const set = new Set(state.favorites || []);
@@ -775,6 +787,7 @@ function parseChoiceUnit(unit) {
   return { mode: parts[1], options: parts.slice(2).join(':').split('|').filter(Boolean) };
 }
 function go(tab) {
+  if (typeof openRun !== 'undefined' && openRun._restore) { try { openRun._restore(); } catch {} openRun._restore = null; }
   if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
   state.tab = tab;
   const titles = { mine:'Мои чеклисты', all:'Все чеклисты', tpl:'Шаблоны', people:'Сотрудники', me:'Профиль', audit:'Журнал аудита', notifications:'Уведомления', settings:'Настройки', search:'Поиск' };
@@ -940,42 +953,35 @@ async function openRun(id) {
   const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
   const templateId = run.templateId || run.template?.id;
 
-  const nodes = [
-    h('button', { class: 'float-back', onclick: () => go(state.tab) }, '← Назад'),
-    h('h1', {}, title),
-    h('div', { class: 'muted', style: 'margin-bottom:16px' }, statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')),
-    ...(run.items || []).map(it => itemNode(run, it, editable)),
-  ];
+  $('topbar-title').textContent = title;
 
-  if (editable) {
-    nodes.push(h('button', {
-      class: 'btn btn-primary',
-      onclick: async (e) => {
-        e.target.disabled = true;
-        try {
-          const r = await api('POST', `/checklists/runs/${run.id}/complete`);
-          toast(`Завершён. Проблем: ${r?.flaggedCount ?? 0}`);
-          go(state.tab);
-        } catch (err) { toast(err.message, true); e.target.disabled = false; }
-      },
-    }, 'Завершить чеклист'));
-  }
+  // Кнопка назад в шапке + меню ⋯ для вторичных действий
+  const actions = $('topbar-actions');
+  const extra = h('div', { style: 'display:flex;align-items:center;gap:0;position:relative' });
+  const backBtn = h('button', {
+    class: 'topbar-btn muted', type: 'button', title: 'Назад',
+    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'mine') : (['mine','all'].includes(state.tab) ? state.tab : 'mine')),
+  });
+  backBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
-  if (!closed && can('checklists.assign')) {
-    nodes.push(h('button', {
-      class: 'btn btn-secondary', style: 'margin-top:8px',
-      onclick: async () => {
+  const moreBtn = h('button', { class: 'topbar-btn muted', type: 'button', title: 'Ещё' });
+  moreBtn.textContent = '⋯';
+  moreBtn.onclick = (e) => {
+    e.stopPropagation();
+    const old = extra.querySelector('.menu-pop');
+    if (old) { old.remove(); return; }
+    const items = [];
+    if (!closed && can('checklists.assign')) {
+      items.push(h('button', { type: 'button', class: 'danger', onclick: async () => {
+        extra.querySelector('.menu-pop')?.remove();
         if (!confirm('Отменить этот чеклист?')) return;
-        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go(state.tab); }
+        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go('mine'); }
         catch (err) { toast(err.message, true); }
-      },
-    }, 'Отменить'));
-  }
-
-  if (templateId && can('checklists.templates.manage')) {
-    nodes.push(h('button', {
-      class: 'btn btn-secondary', style: 'margin-top:8px',
-      onclick: async () => {
+      } }, 'Отменить чеклист'));
+    }
+    if (templateId && can('checklists.templates.manage')) {
+      items.push(h('button', { type: 'button', onclick: async () => {
+        extra.querySelector('.menu-pop')?.remove();
         try {
           let t = run.template;
           if (!t || !t.items) {
@@ -983,7 +989,7 @@ async function openRun(id) {
             t = list.find(x => x.id === templateId) || t;
           }
           if (!t) return toast('Шаблон не найден', true);
-          const items = (t.items || run.items || []).map(it => {
+          const itemsMap = (t.items || run.items || []).map(it => {
             const parsed = parseChoiceUnit(it.unit);
             return {
               title: it.title || '',
@@ -998,14 +1004,75 @@ async function openRun(id) {
           showBuilder({
             title: (t.title || title) + ' (копия)',
             description: t.description || '',
-            items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
+            items: itemsMap.length ? itemsMap : [{ title: '', type: 'CHECK', required: true, options: [''] }],
           });
-        } catch (e) { toast(e.message, true); }
+        } catch (err) { toast(err.message, true); }
+      } }, 'Копировать как шаблон'));
+    }
+    if (!items.length) {
+      items.push(h('button', { type: 'button', onclick: () => extra.querySelector('.menu-pop')?.remove() }, 'Нет действий'));
+    }
+    const pop = h('div', { class: 'menu-pop', style: 'right:0;top:44px' }, ...items);
+    extra.append(pop);
+  };
+
+  // rebuild topbar right: keep search hidden on run detail, show back+more
+  const ws = $('ws-select');
+  const search = $('search-btn');
+  extra.append(moreBtn);
+  // insert back before title area via menu-btn side - put back next to menu
+  const menuBtn = $('menu-btn');
+  // temporary replace menu with back while in run
+  const prevMenuHandler = menuBtn.onclick;
+  menuBtn.onclick = () => go(['mine','all'].includes(state.tab) ? state.tab : 'mine');
+  menuBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  menuBtn.setAttribute('aria-label', 'Назад');
+  search.classList.add('hidden');
+  const moreHost = h('div', { style: 'position:relative;display:flex' }, moreBtn);
+  // place more into topbar-actions
+  const keepWs = ws && !ws.classList.contains('hidden') ? ws : null;
+  actions.replaceChildren(...[keepWs, moreHost].filter(Boolean));
+
+  const restoreChrome = () => {
+    menuBtn.onclick = openMenu;
+    menuBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
+    menuBtn.setAttribute('aria-label', 'Меню');
+    search.classList.remove('hidden');
+    renderWsSelect();
+    // restore search button
+    const acc = $('topbar-actions');
+    if (!$('search-btn')) {
+      /* search is same node if only class hidden */
+    }
+    if (!acc.contains(search)) acc.append(search);
+  };
+
+  const nodes = [
+    h('div', { class: 'muted', style: 'margin-bottom:12px' },
+      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')
+    ),
+    ...(run.items || []).map(it => itemNode(run, it, editable)),
+  ];
+
+  if (editable) {
+    nodes.push(h('button', {
+      class: 'btn btn-primary',
+      onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          const r = await api('POST', `/checklists/runs/${run.id}/complete`);
+          toast(`Завершён. Проблем: ${r?.flaggedCount ?? 0}`);
+          restoreChrome();
+          go(['mine','all'].includes(state.tab) ? state.tab : 'mine');
+        } catch (err) { toast(err.message, true); e.target.disabled = false; }
       },
-    }, 'Копировать как шаблон'));
+    }, 'Завершить'));
   }
 
   setView(nodes);
+
+  // When leaving via go(), chrome restores on next renderBottomNav/topbar title — hook restore into go wrapper once
+  openRun._restore = restoreChrome;
 }
 
 async function loadUsers() { try { return arr(await api('GET', '/users')); } catch { return []; } }
@@ -1114,7 +1181,7 @@ async function showAssign(t) {
   renderList();
 
   setView(
-    h('button', { class: 'float-back', onclick: () => go('tpl') }, '← Назад'),
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
     h('h1', {}, 'Назначить'),
     h('p', { class: 'page-desc' }, t.title),
     h('label', {}, 'Исполнители (можно несколько)'),
@@ -1176,7 +1243,7 @@ function showBuilder(draft) {
   });
 
   setView(
-    h('button', { class: 'float-back', onclick: () => go('tpl') }, '← Назад'),
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
     h('h1', {}, 'Новый шаблон'),
     h('label', {}, 'Название'), h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
     h('label', {}, 'Описание'), h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
