@@ -7,25 +7,39 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 16px; margin: 0; background: #f5f5f5; color: #222; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 16px; margin: 0; background: #f5f5f5; color: #222;
+        }
         #app { max-width: 480px; margin: 0 auto; }
         h1 { font-size: 20px; margin: 0 0 16px; display: flex; justify-content: space-between; align-items: center; }
         h2 { font-size: 18px; margin: 0 0 12px; }
         label { display: block; font-size: 13px; color: #555; margin: 12px 0 4px; }
-        input[type="text"], input[type="email"], input[type="password"], input[type="number"] { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
-        button { margin-top: 16px; padding: 12px; width: 100%; border-radius: 8px; background: #2481cc; color: #fff; border: none; font-weight: 600; font-size: 16px; cursor: pointer; }
+        input[type="text"], input[type="email"], input[type="password"], input[type="number"] {
+            width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; background: #fff;
+        }
+        button {
+            margin-top: 16px; padding: 12px; width: 100%; border-radius: 8px;
+            background: #2481cc; color: #fff; border: none; font-weight: 600; font-size: 16px; cursor: pointer;
+        }
         button:disabled { opacity: 0.6; cursor: default; }
         button.btn-gray { background: #888; }
         button.btn-small { padding: 8px; font-size: 14px; width: auto; }
-        .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px; }
+        .card {
+            background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 8px;
+        }
         .card.overdue { border-left: 4px solid #d32f2f; }
         .card-title { font-weight: 600; font-size: 16px; }
         .card-sub { font-size: 13px; color: #666; }
-        .item-card { background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 8px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 8px; }
+        .item-card {
+            background: #fff; border-radius: 8px; padding: 12px; margin-bottom: 8px;
+            border: 1px solid #eee; display: flex; flex-direction: column; gap: 8px;
+        }
         .item-card.flagged { border-color: #d32f2f; background: #fff4f4; }
         .item-label { font-size: 14px; font-weight: 500; }
         .hidden { display: none !important; }
-        .error { color: #c00; margin-top: 12px; font-size: 14px; text-align: center; }
+        .error { color: #c00; margin-top: 12px; font-size: 14px; text-align: center; background: #ffe6e6; padding: 8px; border-radius: 4px; }
         .success { color: #2e7d32; margin-top: 12px; font-size: 14px; text-align: center; }
     </style>
 </head>
@@ -42,10 +56,7 @@
         </div>
 
         <div id="main-screen" class="hidden">
-            <h1>
-                Чеклисты
-                <button id="logout-btn" class="btn-gray btn-small" style="margin:0;">Выйти</button>
-            </h1>
+            <h1>Чеклисты <button id="logout-btn" class="btn-gray btn-small" style="margin:0;">Выйти</button></h1>
             <div id="user-info" style="font-size:13px; color:#666; margin-bottom:16px;"></div>
             <div id="runs-list"></div>
             <div id="runs-error" class="error hidden"></div>
@@ -68,7 +79,7 @@
             if (tg) { tg.ready(); tg.expand(); }
 
             const $ = (id) => document.getElementById(id);
-            const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev'; // Убедитесь, что это ваш текущий адрес ngrok
+            const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev'; 
 
             let csrfToken = null;
             let currentWorkspaceId = null;
@@ -110,29 +121,17 @@
                 if (!email || !password) return showError('login-error', 'Заполните поля');
                 
                 $('login-btn').disabled = true;
-                $('login-btn').textContent = 'Загрузка...';
                 try {
-                    console.log('Отправка логина...');
                     const data = await api('POST', '/auth/login', { email, password });
-                    console.log('Ответ логина:', data);
-                    
                     if (data.twoFactorRequired) return showError('login-error', 'Включена 2FA');
                     csrfToken = data.csrfToken || null;
-                    
-                    if (data.token) {
-                        console.log('Токен сохранен!');
-                        localStorage.setItem('auth_token', data.token);
-                    } else {
-                        console.warn('ВНИМАНИЕ: Сервер не вернул token!');
-                    }
+                    if (data.token) localStorage.setItem('auth_token', data.token);
                     
                     await loadProfile();
                 } catch (e) {
-                    console.error('Ошибка логина:', e);
                     showError('login-error', e.message);
                 } finally {
                     $('login-btn').disabled = false;
-                    $('login-btn').textContent = 'Войти';
                 }
             });
 
@@ -144,23 +143,18 @@
 
             async function loadProfile() {
                 try {
-                    console.log('Запрос профиля...');
                     const me = await api('GET', '/auth/me');
-                    console.log('Профиль получен:', me);
-                    
                     csrfToken = me.csrfToken || csrfToken;
                     $('user-info').innerHTML = `Вы вошли как <b>${me.firstName || ''} ${me.lastName || ''}</b> (${me.email})`;
-                    
                     const workspaces = await api('GET', '/workspaces');
                     if (!workspaces || workspaces.length === 0) throw new Error('Нет рабочих пространств');
                     currentWorkspaceId = workspaces[0].id;
-                    
                     showScreen('main-screen');
                     await loadRuns();
                 } catch (e) {
-                    console.error('Ошибка загрузки профиля:', e);
                     showScreen('login-screen');
-                    showError('login-error', 'Сессия истекла, войдите снова');
+                    showError('login-error', 'Сессия истекла: ' + e.message);
+                    localStorage.removeItem('auth_token'); // Удаляем битый токен
                 }
             }
 
@@ -168,31 +162,24 @@
                 hideError('runs-error');
                 const list = $('runs-list');
                 list.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Загрузка...</div>';
-                
                 try {
                     const runs = await api('GET', `/checklists/runs?workspaceId=${currentWorkspaceId}`);
                     list.innerHTML = '';
-                    
                     if (runs.length === 0) {
                         list.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">У вас пока нет чеклистов</div>';
                         return;
                     }
-
                     runs.sort((a, b) => {
                         if (a.overdue && !b.overdue) return -1;
                         if (!a.overdue && b.overdue) return 1;
                         return new Date(b.createdAt) - new Date(a.createdAt);
                     });
-
                     runs.forEach(run => {
                         const div = document.createElement('div');
                         div.className = `card ${run.overdue ? 'overdue' : ''}`;
                         div.innerHTML = `
                             <div class="card-title">${run.template?.title || 'Чеклист'}</div>
-                            <div class="card-sub">
-                                Статус: <b>${run.status}</b> 
-                                ${run.overdue ? '<span style="color:#d32f2f;">(Просрочен)</span>' : ''}
-                            </div>
+                            <div class="card-sub">Статус: <b>${run.status}</b> ${run.overdue ? '<span style="color:#d32f2f;">(Просрочен)</span>' : ''}</div>
                             <button class="btn-small" onclick="openRun('${run.id}')">Открыть</button>
                         `;
                         list.appendChild(div);
@@ -208,25 +195,20 @@
                 hideError('run-success');
                 $('complete-btn').classList.remove('hidden');
                 showScreen('run-screen');
-                
                 const itemsList = $('items-list');
                 itemsList.innerHTML = '<div style="text-align:center;padding:20px;color:#888;">Загрузка...</div>';
-
                 try {
                     const run = await api('GET', `/checklists/runs/${runId}`);
                     $('run-title').textContent = run.template?.title || 'Чеклист';
                     $('run-meta').textContent = `Назначен: ${new Date(run.createdAt).toLocaleDateString()}`;
-                    
                     if (run.status === 'COMPLETED') {
                         $('complete-btn').classList.add('hidden');
                         $('run-meta').innerHTML += ' | <b style="color:#2e7d32;">Выполнен</b>';
                     }
-
                     itemsList.innerHTML = '';
                     run.items.forEach(item => {
                         const div = document.createElement('div');
                         div.className = `item-card ${item.flagged ? 'flagged' : ''}`;
-                        
                         let inputHtml = '';
                         if (item.type === 'CHECK') {
                             inputHtml = `<label style="display:flex;align-items:center;gap:8px;margin:0;cursor:pointer;">
@@ -239,7 +221,6 @@
                         } else if (item.type === 'TEXT') {
                             inputHtml = `<input type="text" value="${item.textValue || ''}" placeholder="Введите текст" ${run.status === 'COMPLETED' ? 'disabled' : ''} onchange="saveItem('${item.id}', 'TEXT', this.value)">`;
                         }
-
                         div.innerHTML = `
                             <div class="item-label">${item.title} ${item.required ? '<span style="color:#d32f2f;">*</span>' : ''}</div>
                             ${inputHtml}
@@ -247,7 +228,6 @@
                         `;
                         itemsList.appendChild(div);
                     });
-
                 } catch (e) {
                     showError('run-error', e.message);
                 }
@@ -260,7 +240,6 @@
                     if (type === 'CHECK') body.checked = value;
                     if (type === 'NUMBER') body.numberValue = parseFloat(value);
                     if (type === 'TEXT') body.textValue = value;
-                    
                     await api('PUT', `/checklists/runs/${currentRunId}/items/${itemId}`, body);
                     await openRun(currentRunId);
                 } catch (e) {
@@ -291,7 +270,8 @@
             });
 
             (async () => {
-                if (localStorage.getItem('auth_token')) {
+                const token = localStorage.getItem('auth_token');
+                if (token) {
                     await loadProfile();
                 } else {
                     showScreen('login-screen');
