@@ -6,80 +6,610 @@
 <title>Чеклисты</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-  * { box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 16px 16px 90px; background: #f5f5f5; color: #222; }
-  #app { max-width: 520px; margin: 0 auto; }
-  h1 { font-size: 22px; margin: 4px 0 14px; }
-  h2 { font-size: 17px; margin: 18px 0 8px; }
-  label { display: block; font-size: 13px; color: #555; margin: 12px 0 4px; }
-  input, button, select, textarea { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; background: #fff; font-family: inherit; }
-  input[type=checkbox] { width: auto; }
-  input:focus, textarea:focus, select:focus { outline: 2px solid #2481cc; border-color: transparent; }
-  button { margin-top: 12px; background: #2481cc; color: #fff; border: none; font-weight: 600; cursor: pointer; }
-  button:disabled { opacity: .5; cursor: default; }
-  .gray { background: #888; } .red { background: #c62828; }
-  .sm { width: auto; margin-top: 0; padding: 8px 12px; font-size: 14px; }
-  .card { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
-  .card.click { cursor: pointer; }
-  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
-  .gap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
-  .muted { color: #777; font-size: 14px; margin-top: 4px; } .small { font-size: 12px; }
-  .badge { background: #e3f2fd; color: #1565c0; border-radius: 12px; padding: 2px 10px; font-size: 12px; white-space: nowrap; }
-  .badge.bad { background: #ffebee; color: #c62828; }
-  .error { color: #c00; margin-top: 12px; font-size: 14px; background: #ffebee; padding: 10px; border-radius: 8px; }
-  .info { background: #fff8e1; color: #6d4c00; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
-  .ok { background: #e8f5e9; color: #1b5e20; padding: 10px; border-radius: 8px; margin-top: 12px; font-size: 14px; word-break: break-all; }
+  :root {
+    --bg: #f4f6f8;
+    --bg-card: #ffffff;
+    --bg-elevated: #ffffff;
+    --text: #1a1d21;
+    --text-secondary: #5f6b7a;
+    --text-muted: #8b95a5;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --primary: #2481cc;
+    --primary-hover: #1a6bb0;
+    --primary-soft: #e8f4fc;
+    --danger: #dc2626;
+    --danger-soft: #fef2f2;
+    --success: #16a34a;
+    --success-soft: #f0fdf4;
+    --warning: #d97706;
+    --warning-soft: #fffbeb;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,.1), 0 8px 10px -6px rgba(0,0,0,.05);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --nav-height: 64px;
+    --header-height: 56px;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0f1216;
+    --bg-card: #1a1f26;
+    --bg-elevated: #242b33;
+    --text: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: #2d3640;
+    --border-strong: #3d4854;
+    --primary: #3b9eef;
+    --primary-hover: #5cb0f5;
+    --primary-soft: #1a2d3d;
+    --danger: #f87171;
+    --danger-soft: #3b1c1c;
+    --success: #4ade80;
+    --success-soft: #14301f;
+    --warning: #fbbf24;
+    --warning-soft: #3b2e0e;
+    --shadow: 0 1px 3px rgba(0,0,0,.3);
+    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  #app { min-height: 100%; }
+
+  /* ---------- Login ---------- */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 28px 24px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+  }
+  .login-card h1 { font-size: 22px; margin-bottom: 6px; }
+  .login-card .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+  /* ---------- App shell ---------- */
+  #app-screen { display: flex; flex-direction: column; min-height: 100vh; }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    height: var(--header-height);
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .topbar-btn {
+    width: 40px; height: 40px;
+    border: none; background: transparent;
+    border-radius: 10px;
+    color: var(--text-secondary);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .topbar-btn:hover, .topbar-btn:active { background: var(--bg); color: var(--text); }
+  .topbar-btn svg { width: 22px; height: 22px; }
+  .topbar-title {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-actions { display: flex; align-items: center; gap: 2px; }
+
+  .ws-select {
+    max-width: 140px;
+    padding: 6px 10px;
+    font-size: 13px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: inherit;
+  }
+
+  /* ---------- Side menu ---------- */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.4);
+    z-index: 50;
+    opacity: 0; pointer-events: none;
+    transition: opacity .25s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+
+  .sidemenu {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: min(300px, 85vw);
+    background: var(--bg-card);
+    z-index: 60;
+    transform: translateX(-100%);
+    transition: transform .28s cubic-bezier(.4,0,.2,1);
+    display: flex; flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    border-right: 1px solid var(--border);
+  }
+  .sidemenu.open { transform: translateX(0); }
+
+  .sidemenu-header {
+    padding: 20px 16px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidemenu-user { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--primary);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px;
+    flex-shrink: 0;
+  }
+  .sidemenu-name { font-weight: 600; font-size: 15px; }
+  .sidemenu-email { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .sidemenu-nav { flex: 1; overflow-y: auto; padding: 12px 8px; }
+  .sidemenu-section {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--text-muted);
+    padding: 12px 12px 6px;
+  }
+  .sidemenu-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 12px;
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; background: none;
+    width: 100%; text-align: left;
+    font-family: inherit;
+  }
+  .sidemenu-item:hover, .sidemenu-item:active { background: var(--bg); }
+  .sidemenu-item.active { background: var(--primary-soft); color: var(--primary); }
+  .sidemenu-item svg { width: 20px; height: 20px; flex-shrink: 0; opacity: .85; }
+  .sidemenu-item .badge-count {
+    margin-left: auto;
+    background: var(--danger);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 1px 7px;
+    border-radius: 10px;
+  }
+  .sidemenu-footer {
+    padding: 12px 8px 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ---------- Content ---------- */
+  #view {
+    flex: 1;
+    padding: 16px 16px calc(var(--nav-height) + var(--safe-bottom) + 16px);
+    max-width: 640px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  /* ---------- Bottom nav ---------- */
+  .bottom-nav {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: calc(var(--nav-height) + var(--safe-bottom));
+    padding-bottom: var(--safe-bottom);
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    z-index: 30;
+  }
+  .bottom-nav button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    padding: 8px 2px 6px;
+  }
+  .bottom-nav button.active { color: var(--primary); font-weight: 600; }
+  .bottom-nav button svg { width: 22px; height: 22px; }
+  .bottom-nav button span { line-height: 1.1; }
+
+  /* ---------- Typography & forms ---------- */
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  h2 { font-size: 16px; font-weight: 600; margin: 20px 0 10px; }
+  .page-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 14px 0 6px;
+  }
+  input, select, textarea, button {
+    font-family: inherit;
+    font-size: 15px;
+  }
+  input[type="text"], input[type="email"], input[type="password"],
+  input[type="number"], input[type="datetime-local"], input[type="file"],
+  select, textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-card);
+    color: var(--text);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 25%, transparent);
+  }
+  input:disabled, select:disabled, textarea:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+  }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 18px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background .15s, opacity .15s;
+    width: 100%;
+    margin-top: 12px;
+  }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: var(--primary-hover); }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    width: auto;
+    padding: 8px 14px;
+    font-size: 13px;
+    margin-top: 0;
+  }
+  .btn-sm {
+    width: auto;
+    padding: 7px 12px;
+    font-size: 13px;
+    margin-top: 0;
+  }
+
+  /* ---------- Cards ---------- */
+  .card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .card.click { cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  .card.click:hover { border-color: var(--primary); box-shadow: var(--shadow-lg); }
+  .card.click:active { transform: scale(.995); }
+
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .gap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .stack { display: flex; flex-direction: column; gap: 8px; }
+
+  .muted { color: var(--text-secondary); font-size: 14px; }
+  .small { font-size: 12px; color: var(--text-muted); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--primary-soft);
+    color: var(--primary);
+    white-space: nowrap;
+  }
+  .badge.bad { background: var(--danger-soft); color: var(--danger); }
+  .badge.ok { background: var(--success-soft); color: var(--success); }
+  .badge.warn { background: var(--warning-soft); color: var(--warning); }
+
+  .alert {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .alert-info { background: var(--warning-soft); color: var(--warning); }
+  .alert-error { background: var(--danger-soft); color: var(--danger); }
+  .alert-success { background: var(--success-soft); color: var(--success); word-break: break-all; }
+
+  .empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+  .empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: .4; }
+
+  /* ---------- Checklist items ---------- */
   .choices { display: flex; gap: 8px; }
-  .choice { background: #fff; color: #222; border: 1px solid #ccc; margin-top: 6px; }
-  .choice.on.yes { background: #2e7d32; color: #fff; border-color: #2e7d32; }
-  .choice.on.no { background: #c62828; color: #fff; border-color: #c62828; }
-  .flag { color: #c62828; font-size: 13px; font-weight: 600; }
-  .photo { max-width: 100%; border-radius: 8px; margin-top: 8px; }
+  .choice {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-strong);
+    background: var(--bg-card);
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+  }
+  .choice.on.yes { background: var(--success); color: #fff; border-color: var(--success); }
+  .choice.on.no { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .choice:disabled { opacity: .5; cursor: default; }
+
+  .flag { color: var(--danger); font-size: 13px; font-weight: 600; margin-top: 8px; }
+  .photo { max-width: 100%; border-radius: 10px; margin-top: 10px; }
+  .itemrow {
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+
+  /* ---------- Chips / filters ---------- */
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+  .chip {
+    padding: 7px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .chip.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    left: 16px; right: 16px;
+    bottom: calc(var(--nav-height) + var(--safe-bottom) + 12px);
+    background: #1e293b;
+    color: #fff;
+    padding: 13px 16px;
+    border-radius: 10px;
+    z-index: 100;
+    font-size: 14px;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform .25s, opacity .25s;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.bad { background: var(--danger); }
+
+  /* ---------- Stub pages ---------- */
+  .stub-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 16px;
+    background: var(--primary-soft);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary);
+  }
+  .stub-icon svg { width: 32px; height: 32px; }
+
+  /* ---------- Misc ---------- */
   .hidden { display: none !important; }
-  .nav { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #fff; border-top: 1px solid #ddd; padding-bottom: env(safe-area-inset-bottom, 0px); }
-  .nav button { margin: 0; border-radius: 0; background: #fff; color: #555; font-size: 13px; padding: 14px 4px; font-weight: 500; }
-  .nav button.active { color: #2481cc; font-weight: 700; }
-  .toast { position: fixed; left: 16px; right: 16px; bottom: 80px; background: #323232; color: #fff; padding: 12px; border-radius: 8px; z-index: 10; font-size: 14px; }
-  .toast.bad { background: #c62828; }
-  .itemrow { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
+  .back-btn { margin-bottom: 12px; }
+  .divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+  /* Skeleton loading */
+  .skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, var(--bg) 50%, var(--border) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+    border-radius: 8px;
+    height: 16px;
+  }
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
 </style>
 </head>
 <body>
 <div id="app">
+  <!-- Login -->
   <div id="login-screen" class="hidden">
-    <h1>Вход в чеклисты</h1>
-    <label for="email">Email</label>
-    <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
-    <label for="password">Пароль</label>
-    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-    <button id="login-btn">Войти</button>
-    <div id="login-error" class="error hidden"></div>
+    <div class="login-card">
+      <h1>Чеклисты</h1>
+      <p class="subtitle">Войдите в свой аккаунт</p>
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
+      <label for="password">Пароль</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      <button class="btn btn-primary" id="login-btn">Войти</button>
+      <button class="btn btn-ghost" id="forgot-btn" style="width:100%;margin-top:10px;justify-content:center">Забыли пароль?</button>
+      <div id="login-error" class="alert alert-error hidden" style="margin-top:14px"></div>
+    </div>
   </div>
+
+  <!-- 2FA screen (stub-ready) -->
+  <div id="tfa-screen" class="hidden">
+    <div class="login-card">
+      <h1>Двухфакторная аутентификация</h1>
+      <p class="subtitle">Введите код из приложения-аутентификатора</p>
+      <label for="tfa-code">Код</label>
+      <input type="text" id="tfa-code" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="6">
+      <button class="btn btn-primary" id="tfa-btn">Подтвердить</button>
+      <button class="btn btn-ghost" id="tfa-back" style="width:100%;margin-top:10px;justify-content:center">← Назад</button>
+      <div id="tfa-error" class="alert alert-error hidden" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- Forgot password (stub) -->
+  <div id="forgot-screen" class="hidden">
+    <div class="login-card">
+      <h1>Восстановление пароля</h1>
+      <p class="subtitle">Укажите email — мы отправим ссылку для сброса</p>
+      <label for="forgot-email">Email</label>
+      <input type="email" id="forgot-email" placeholder="you@example.com">
+      <button class="btn btn-primary" id="forgot-submit">Отправить</button>
+      <button class="btn btn-ghost" id="forgot-back" style="width:100%;margin-top:10px;justify-content:center">← Назад</button>
+      <div id="forgot-msg" class="hidden" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <!-- Main app -->
   <div id="app-screen" class="hidden">
-    <div id="ws-bar"></div>
-    <div id="view"></div>
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="topbar-btn" id="menu-btn" aria-label="Меню">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="topbar-title" id="topbar-title">Чеклисты</div>
+      <div class="topbar-actions">
+        <select id="ws-select" class="ws-select hidden"></select>
+        <button class="topbar-btn" id="search-btn" aria-label="Поиск" title="Поиск">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+        <button class="topbar-btn" id="theme-btn" aria-label="Тема">
+          <svg id="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg id="theme-icon-moon" class="hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Side menu -->
+    <div class="overlay" id="overlay"></div>
+    <aside class="sidemenu" id="sidemenu">
+      <div class="sidemenu-header">
+        <div class="sidemenu-user">
+          <div class="avatar" id="side-avatar">?</div>
+          <div>
+            <div class="sidemenu-name" id="side-name">—</div>
+            <div class="sidemenu-email" id="side-email">—</div>
+          </div>
+        </div>
+      </div>
+      <nav class="sidemenu-nav" id="sidemenu-nav"></nav>
+      <div class="sidemenu-footer">
+        <button class="sidemenu-item" id="logout-side">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Выйти
+        </button>
+      </div>
+    </aside>
+
+    <!-- Content -->
+    <main id="view"></main>
+
+    <!-- Bottom nav -->
+    <nav class="bottom-nav" id="bottom-nav"></nav>
   </div>
 </div>
-<nav id="nav" class="nav hidden"></nav>
-<div id="toast" class="toast hidden"></div>
+
+<div id="toast" class="toast"></div>
 
 <script type="module">
-// Если страница лежит на GitHub Pages, запросы идут на ngrok. Иначе — на тот же адрес, откуда открыта страница.
+// ==================== Config ====================
 const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
 const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
 
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
+// ==================== State ====================
 const $ = (id) => document.getElementById(id);
 let csrfToken = null;
-const state = { me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null, tab: 'mine', filter: '' };
+const state = {
+  me: null,
+  workspaces: [],
+  wsId: localStorage.getItem('wsId') || null,
+  tab: 'mine',
+  filter: '',
+  theme: localStorage.getItem('theme') || 'light',
+};
 
-/* ---------- вспомогательное ---------- */
+// ==================== Icons (inline SVG helpers) ====================
+const icons = {
+  list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
+  all: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,
+  template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
+  people: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+  user: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  audit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`,
+};
+
+// ==================== Helpers ====================
 function h(tag, props, ...kids) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(props || {})) {
     if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
     else if (v !== false && v !== null && v !== undefined) e.setAttribute(k, v === true ? '' : v);
   }
@@ -89,20 +619,29 @@ function h(tag, props, ...kids) {
   }
   return e;
 }
+
 const arr = (d) => Array.isArray(d) ? d : (d && (d.items || d.data || d.runs || d.templates || d.users)) || [];
 const can = (p) => !!state.me?.permissions?.includes(p);
 const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
 const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
 const statusName = (s) => STATUS[s] || s || '';
 const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.email || '') : '';
-const setView = (...nodes) => $('view').replaceChildren(...nodes.flat(Infinity).filter((n) => n && n.nodeType));
+const initials = (u) => {
+  const n = personName(u);
+  if (!n) return '?';
+  return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+};
 
-function toast(msg, bad) {
+function setView(...nodes) {
+  $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
+}
+
+function toast(msg, bad = false) {
   const t = $('toast');
   t.textContent = msg;
-  t.className = 'toast' + (bad ? ' bad' : '');
-  clearTimeout(toast.t);
-  toast.t = setTimeout(() => { t.className = 'toast hidden'; }, 4500);
+  t.className = 'toast' + (bad ? ' bad' : '') + ' show';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.className = 'toast'; }, 4000);
 }
 
 function authHeaders() {
@@ -122,7 +661,7 @@ async function api(method, path, body) {
   try {
     res = await fetch(API_BASE + path, { method, headers, credentials: 'include', body: payload });
   } catch {
-    throw new Error('Нет связи с сервером. Проверьте, что приложение и ngrok запущены и адрес ngrok не изменился.');
+    throw new Error('Нет связи с сервером. Проверьте, что приложение и ngrok запущены.');
   }
   const text = await res.text();
   let data = null;
@@ -137,44 +676,94 @@ async function api(method, path, body) {
 }
 
 async function show(fn) {
-  setView(h('p', { class: 'muted' }, 'Загрузка…'));
+  setView(h('div', { class: 'stack', style: 'padding-top:8px' },
+    h('div', { class: 'skeleton', style: 'height:24px;width:60%' }),
+    h('div', { class: 'skeleton', style: 'height:80px;margin-top:12px' }),
+    h('div', { class: 'skeleton', style: 'height:80px' }),
+  ));
   try { await fn(); }
   catch (e) {
     if (e.status === 401) { toLogin('Сессия истекла, войдите снова'); return; }
-    setView(h('div', { class: 'error' }, e.message), h('button', { onclick: () => show(fn) }, 'Повторить'));
+    setView(
+      h('div', { class: 'alert alert-error' }, e.message),
+      h('button', { class: 'btn btn-secondary', onclick: () => show(fn) }, 'Повторить')
+    );
   }
 }
 
-/* ---------- вход / выход ---------- */
+// ==================== Theme ====================
+function applyTheme(theme) {
+  state.theme = theme;
+  document.documentElement.setAttribute('data-theme', theme === 'dark' ? 'dark' : 'light');
+  localStorage.setItem('theme', theme);
+  $('theme-icon-sun').classList.toggle('hidden', theme === 'dark');
+  $('theme-icon-moon').classList.toggle('hidden', theme !== 'dark');
+  if (tg?.setHeaderColor) {
+    try { tg.setHeaderColor(theme === 'dark' ? '#1a1f26' : '#ffffff'); } catch {}
+  }
+  if (tg?.setBackgroundColor) {
+    try { tg.setBackgroundColor(theme === 'dark' ? '#0f1216' : '#f4f6f8'); } catch {}
+  }
+}
+applyTheme(state.theme);
+
+$('theme-btn').onclick = () => applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+
+// ==================== Auth screens ====================
+function showScreen(id) {
+  ['login-screen', 'tfa-screen', 'forgot-screen', 'app-screen'].forEach(s => {
+    $(s).classList.toggle('hidden', s !== id);
+  });
+}
+
 function toLogin(msg) {
-  csrfToken = null; state.me = null;
+  csrfToken = null;
+  state.me = null;
   localStorage.removeItem('token');
-  $('app-screen').classList.add('hidden');
-  $('nav').classList.add('hidden');
-  $('login-screen').classList.remove('hidden');
+  showScreen('login-screen');
   const el = $('login-error');
-  if (msg) { el.textContent = msg; el.classList.remove('hidden'); } else el.classList.add('hidden');
+  if (msg) { el.textContent = msg; el.classList.remove('hidden'); }
+  else el.classList.add('hidden');
 }
 
 async function afterLogin() {
   state.me = await api('GET', '/auth/me');
   csrfToken = state.me.csrfToken || csrfToken;
   state.workspaces = arr(await api('GET', '/workspaces'));
-  if (!state.workspaces.find((w) => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
+  if (!state.workspaces.find(w => w.id === state.wsId)) {
+    state.wsId = state.workspaces[0]?.id || null;
+  }
   localStorage.setItem('wsId', state.wsId || '');
-  $('login-screen').classList.add('hidden');
-  $('app-screen').classList.remove('hidden');
-  $('nav').classList.remove('hidden');
-  renderWsBar();
+  showScreen('app-screen');
+  updateSideUser();
+  renderWsSelect();
+  renderSideMenu();
+  renderBottomNav();
   go(state.me.requirePasswordChange ? 'me' : 'mine');
 }
 
-function renderWsBar() {
-  const bar = $('ws-bar');
-  if (state.workspaces.length < 2) { bar.replaceChildren(); return; }
-  const sel = h('select', { onchange: (e) => { state.wsId = e.target.value; localStorage.setItem('wsId', state.wsId); go(state.tab); } },
-    state.workspaces.map((w) => h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)));
-  bar.replaceChildren(sel);
+function updateSideUser() {
+  const me = state.me;
+  $('side-avatar').textContent = initials(me);
+  $('side-name').textContent = personName(me) || 'Пользователь';
+  $('side-email').textContent = me?.email || '';
+}
+
+function renderWsSelect() {
+  const sel = $('ws-select');
+  if (state.workspaces.length < 2) {
+    sel.classList.add('hidden');
+    return;
+  }
+  sel.classList.remove('hidden');
+  sel.replaceChildren(...state.workspaces.map(w =>
+    h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)
+  ));
+  sel.onchange = () => {
+    state.wsId = sel.value;
+    localStorage.setItem('wsId', state.wsId);
+    go(state.tab);
+  };
 }
 
 $('login-btn').onclick = async () => {
@@ -185,46 +774,207 @@ $('login-btn').onclick = async () => {
   $('login-btn').disabled = true;
   try {
     const data = await api('POST', '/auth/login', { email, password });
-    if (data.twoFactorRequired) { toLogin('Включена 2FA. Пока не поддержано.'); return; }
+    if (data.twoFactorRequired) {
+      // Show 2FA screen (UI ready, backend may not fully support yet)
+      showScreen('tfa-screen');
+      $('tfa-code').value = '';
+      $('tfa-error').classList.add('hidden');
+      $('tfa-code').focus();
+      // Store temporary session if provided
+      if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
+      csrfToken = data.csrfToken || null;
+      return;
+    }
     if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
     csrfToken = data.csrfToken || null;
     $('password').value = '';
     await afterLogin();
-  } catch (e) { toLogin(e.message); }
-  finally { $('login-btn').disabled = false; }
+  } catch (e) {
+    toLogin(e.message);
+  } finally {
+    $('login-btn').disabled = false;
+  }
 };
 
-/* ---------- навигация ---------- */
-function renderNav() {
-  const tabs = [['mine', 'Мои']];
-  if (can('checklists.runs.read_all')) tabs.push(['all', 'Все']);
-  if (can('checklists.templates.read')) tabs.push(['tpl', 'Шаблоны']);
-  if (can('users.create') || can('users.read')) tabs.push(['people', 'Люди']);
-  tabs.push(['me', 'Профиль']);
-  $('nav').replaceChildren(...tabs.map(([k, t]) => h('button', { class: state.tab === k ? 'active' : '', onclick: () => go(k) }, t)));
+$('tfa-btn').onclick = async () => {
+  const code = $('tfa-code').value.trim();
+  if (!code) {
+    $('tfa-error').textContent = 'Введите код';
+    $('tfa-error').classList.remove('hidden');
+    return;
+  }
+  $('tfa-btn').disabled = true;
+  try {
+    // Attempt common 2FA endpoints — will show error if not supported
+    const data = await api('POST', '/auth/2fa/verify', { code });
+    if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
+    csrfToken = data.csrfToken || csrfToken;
+    await afterLogin();
+  } catch (e) {
+    $('tfa-error').textContent = e.message || '2FA пока не полностью поддержана на сервере';
+    $('tfa-error').classList.remove('hidden');
+  } finally {
+    $('tfa-btn').disabled = false;
+  }
+};
+$('tfa-back').onclick = () => toLogin();
+
+$('forgot-btn').onclick = () => {
+  showScreen('forgot-screen');
+  $('forgot-email').value = $('email').value;
+  $('forgot-msg').classList.add('hidden');
+};
+$('forgot-back').onclick = () => toLogin();
+$('forgot-submit').onclick = async () => {
+  const email = $('forgot-email').value.trim();
+  if (!email) return;
+  $('forgot-submit').disabled = true;
+  const msg = $('forgot-msg');
+  try {
+    // Stub: try endpoint, show friendly message either way
+    await api('POST', '/auth/password/forgot', { email });
+    msg.className = 'alert alert-success';
+    msg.textContent = 'Если аккаунт существует, письмо со ссылкой отправлено.';
+  } catch (e) {
+    // Even on error show soft message (security) or the real one
+    msg.className = 'alert alert-info';
+    msg.textContent = e.status === 404
+      ? 'Функция восстановления пароля пока не реализована на сервере. Обратитесь к администратору.'
+      : (e.message || 'Не удалось отправить письмо.');
+  }
+  msg.classList.remove('hidden');
+  $('forgot-submit').disabled = false;
+};
+
+// ==================== Side menu ====================
+function closeMenu() {
+  $('sidemenu').classList.remove('open');
+  $('overlay').classList.remove('open');
 }
-function go(tab) {
-  state.tab = tab;
-  renderNav();
-  const screens = { mine: renderMine, all: renderAll, tpl: renderTemplates, people: renderPeople, me: renderProfile };
-  show(screens[tab]);
+function openMenu() {
+  $('sidemenu').classList.add('open');
+  $('overlay').classList.add('open');
+  renderSideMenu();
+}
+$('menu-btn').onclick = openMenu;
+$('overlay').onclick = closeMenu;
+
+function renderSideMenu() {
+  const nav = $('sidemenu-nav');
+  const items = [];
+
+  items.push(h('div', { class: 'sidemenu-section' }, 'Основное'));
+  items.push(sideItem('mine', icons.list, 'Мои чеклисты'));
+  if (can('checklists.runs.read_all')) items.push(sideItem('all', icons.all, 'Все чеклисты'));
+  if (can('checklists.templates.read')) items.push(sideItem('tpl', icons.template, 'Шаблоны'));
+
+  items.push(h('div', { class: 'sidemenu-section' }, 'Управление'));
+  if (can('users.create') || can('users.read')) {
+    items.push(sideItem('people', icons.people, 'Сотрудники'));
+  }
+  items.push(sideItem('audit', icons.audit, 'Журнал аудита', true));
+  items.push(sideItem('notifications', icons.bell, 'Уведомления', true));
+
+  items.push(h('div', { class: 'sidemenu-section' }, 'Система'));
+  items.push(sideItem('settings', icons.settings, 'Настройки', true));
+  items.push(sideItem('me', icons.user, 'Профиль'));
+
+  nav.replaceChildren(...items);
 }
 
-/* ---------- списки чеклистов ---------- */
+function sideItem(tab, iconHtml, label, isStub = false) {
+  return h('button', {
+    class: 'sidemenu-item' + (state.tab === tab ? ' active' : ''),
+    onclick: () => { closeMenu(); go(tab); },
+  },
+    h('span', { html: iconHtml }),
+    label,
+    isStub && h('span', { class: 'small', style: 'margin-left:auto;opacity:.6' }, 'скоро')
+  );
+}
+
+$('logout-side').onclick = async () => {
+  closeMenu();
+  try { await api('POST', '/auth/logout'); } catch {}
+  toLogin();
+};
+
+// ==================== Bottom nav ====================
+function renderBottomNav() {
+  const tabs = [
+    { k: 'mine', t: 'Мои', icon: icons.list },
+  ];
+  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все', icon: icons.all });
+  if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны', icon: icons.template });
+  if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Люди', icon: icons.people });
+  tabs.push({ k: 'me', t: 'Профиль', icon: icons.user });
+
+  $('bottom-nav').replaceChildren(...tabs.map(({ k, t, icon }) =>
+    h('button', {
+      class: state.tab === k ? 'active' : '',
+      onclick: () => go(k),
+    }, h('span', { html: icon }), h('span', {}, t))
+  ));
+}
+
+function go(tab) {
+  state.tab = tab;
+  const titles = {
+    mine: 'Мои чеклисты',
+    all: 'Все чеклисты',
+    tpl: 'Шаблоны',
+    people: 'Сотрудники',
+    me: 'Профиль',
+    audit: 'Журнал аудита',
+    notifications: 'Уведомления',
+    settings: 'Настройки',
+    search: 'Поиск',
+  };
+  $('topbar-title').textContent = titles[tab] || 'Чеклисты';
+  renderBottomNav();
+  renderSideMenu();
+
+  const screens = {
+    mine: renderMine,
+    all: renderAll,
+    tpl: renderTemplates,
+    people: renderPeople,
+    me: renderProfile,
+    audit: renderAuditStub,
+    notifications: renderNotificationsStub,
+    settings: renderSettings,
+    search: renderSearchStub,
+  };
+  show(screens[tab] || renderMine);
+}
+
+// ==================== Search button ====================
+$('search-btn').onclick = () => go('search');
+
+// ==================== Runs ====================
 function runCard(r, withWho) {
   const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
   const who = personName(r.assignee);
   return h('div', { class: 'card click', onclick: () => show(() => openRun(r.id)) },
-    h('div', { class: 'row' }, h('strong', {}, title),
-      h('span', { class: 'badge' + (r.overdue ? ' bad' : '') }, r.overdue ? 'Просрочен' : statusName(r.status))),
-    r.dueAt && h('div', { class: 'muted' }, 'Срок: ' + fmt(r.dueAt)),
-    withWho && who && h('div', { class: 'muted' }, who));
+    h('div', { class: 'row' },
+      h('strong', {}, title),
+      h('span', { class: 'badge' + (r.overdue ? ' bad' : '') }, r.overdue ? 'Просрочен' : statusName(r.status))
+    ),
+    r.dueAt && h('div', { class: 'muted', style: 'margin-top:4px' }, 'Срок: ' + fmt(r.dueAt)),
+    withWho && who && h('div', { class: 'muted', style: 'margin-top:2px' }, who)
+  );
 }
 
 async function renderMine() {
   const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  setView(h('h1', {}, 'Мои чеклисты'),
-    d.length ? d.map((r) => runCard(r)) : h('p', { class: 'muted' }, 'Пока нет назначенных чеклистов.'));
+  setView(
+    d.length
+      ? d.map(r => runCard(r))
+      : h('div', { class: 'empty' },
+          h('div', { html: icons.empty }),
+          h('div', {}, 'Пока нет назначенных чеклистов')
+        )
+  );
 }
 
 async function renderAll() {
@@ -232,13 +982,27 @@ async function renderAll() {
   if (state.filter === 'overdue') q += '&overdue=true';
   if (state.filter === 'done') q += '&status=COMPLETED';
   const d = arr(await api('GET', q));
-  const chip = (k, t) => h('button', { class: 'sm' + (state.filter === k ? '' : ' gray'), onclick: () => { state.filter = k; go('all'); } }, t);
-  setView(h('h1', {}, 'Все чеклисты'),
-    h('div', { class: 'gap' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')),
-    h('div', { style: 'margin-top:12px' }, d.length ? d.map((r) => runCard(r, true)) : h('p', { class: 'muted' }, 'Ничего не найдено.')));
+
+  setView(
+    h('div', { class: 'chips' },
+      chip('', 'Все'),
+      chip('overdue', 'Просроченные'),
+      chip('done', 'Выполненные')
+    ),
+    d.length
+      ? d.map(r => runCard(r, true))
+      : h('div', { class: 'empty' }, h('div', {}, 'Ничего не найдено'))
+  );
 }
 
-/* ---------- прохождение чеклиста ---------- */
+function chip(k, label) {
+  return h('button', {
+    class: 'chip' + (state.filter === k ? ' active' : ''),
+    onclick: () => { state.filter = k; go('all'); },
+  }, label);
+}
+
+// ==================== Open run ====================
 async function photoURL(id) {
   const r = await fetch(API_BASE + '/files/' + id, { headers: authHeaders(), credentials: 'include' });
   if (!r.ok) throw new Error('Не удалось загрузить фото');
@@ -246,10 +1010,11 @@ async function photoURL(id) {
 }
 
 function itemNode(run, it, editable) {
-  const status = h('div', { class: 'muted small' });
+  const status = h('div', { class: 'small', style: 'margin-top:6px' });
   const flag = h('div', { class: 'flag' });
   const mark = () => { flag.textContent = it.flagged ? '⚠ Отмечено как проблема' : ''; };
   mark();
+
   const save = async (body) => {
     try {
       status.textContent = 'Сохраняю…';
@@ -259,13 +1024,21 @@ function itemNode(run, it, editable) {
       status.textContent = 'Сохранено ✓';
       mark();
       return true;
-    } catch (e) { status.textContent = ''; toast(e.message, true); return false; }
+    } catch (e) {
+      status.textContent = '';
+      toast(e.message, true);
+      return false;
+    }
   };
+
   let control;
   if (it.type === 'CHECK') {
     const yes = h('button', { class: 'choice yes', disabled: !editable }, 'Да');
     const no = h('button', { class: 'choice no', disabled: !editable }, 'Нет');
-    const upd = () => { yes.classList.toggle('on', it.checked === true); no.classList.toggle('on', it.checked === false); };
+    const upd = () => {
+      yes.classList.toggle('on', it.checked === true);
+      no.classList.toggle('on', it.checked === false);
+    };
     yes.onclick = async () => { if (await save({ checked: true })) upd(); };
     no.onclick = async () => { if (await save({ checked: false })) upd(); };
     upd();
@@ -283,9 +1056,12 @@ function itemNode(run, it, editable) {
     com.addEventListener('change', send);
     const hasRange = it.minValue != null || it.maxValue != null;
     control = h('div', {},
-      (hasRange || it.unit) && h('div', { class: 'muted small' },
+      (hasRange || it.unit) && h('div', { class: 'small', style: 'margin-bottom:6px' },
         (hasRange ? `Норма: ${it.minValue ?? '…'} – ${it.maxValue ?? '…'} ` : '') + (it.unit || '')),
-      num, h('div', { style: 'height:6px' }), com);
+      num,
+      h('div', { style: 'height:8px' }),
+      com
+    );
   } else if (it.type === 'TEXT') {
     const ta = h('textarea', { rows: 3, disabled: !editable }, it.textValue || '');
     ta.addEventListener('change', () => save({ textValue: ta.value }));
@@ -293,7 +1069,7 @@ function itemNode(run, it, editable) {
   } else if (it.type === 'PHOTO') {
     const img = h('img', { class: 'photo hidden' });
     const fid = it.fileId || it.file?.id;
-    if (fid) photoURL(fid).then((u) => { img.src = u; img.classList.remove('hidden'); }).catch(() => {});
+    if (fid) photoURL(fid).then(u => { img.src = u; img.classList.remove('hidden'); }).catch(() => {});
     const inp = h('input', { type: 'file', accept: 'image/*', disabled: !editable });
     inp.onchange = async () => {
       const f = inp.files[0];
@@ -304,15 +1080,29 @@ function itemNode(run, it, editable) {
         fd.append('workspaceId', run.workspaceId || state.wsId);
         fd.append('file', f);
         const up = await api('POST', '/files', fd);
-        if (await save({ fileId: up.id })) { img.src = URL.createObjectURL(f); img.classList.remove('hidden'); }
-      } catch (e) { status.textContent = ''; toast(e.message, true); }
+        if (await save({ fileId: up.id })) {
+          img.src = URL.createObjectURL(f);
+          img.classList.remove('hidden');
+        }
+      } catch (e) {
+        status.textContent = '';
+        toast(e.message, true);
+      }
     };
     control = h('div', {}, inp, img);
-  } else control = h('div', { class: 'muted' }, 'Тип пункта не поддерживается: ' + it.type);
+  } else {
+    control = h('div', { class: 'muted' }, 'Тип пункта не поддерживается: ' + it.type);
+  }
 
   return h('div', { class: 'card' },
-    h('div', { class: 'row' }, h('strong', {}, it.title), it.required && h('span', { class: 'badge' }, 'обязательно')),
-    h('div', { style: 'margin-top:8px' }, control), flag, status);
+    h('div', { class: 'row' },
+      h('strong', {}, it.title),
+      it.required && h('span', { class: 'badge' }, 'обязательно')
+    ),
+    h('div', { style: 'margin-top:10px' }, control),
+    flag,
+    status
+  );
 }
 
 async function openRun(id) {
@@ -321,162 +1111,311 @@ async function openRun(id) {
   const mine = !run.assigneeId || run.assigneeId === state.me.id || run.assignee?.id === state.me.id;
   const editable = !closed && mine;
   const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
+
   const nodes = [
-    h('button', { class: 'sm gray', onclick: () => go(state.tab) }, '← Назад'),
-    h('h1', { style: 'margin-top:12px' }, title),
-    h('div', { class: 'muted' }, statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')),
-    h('div', { style: 'height:12px' }),
-    (run.items || []).map((it) => itemNode(run, it, editable)),
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go(state.tab) }, '← Назад'),
+    h('h1', {}, title),
+    h('div', { class: 'muted', style: 'margin-bottom:16px' },
+      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')
+    ),
+    ...(run.items || []).map(it => itemNode(run, it, editable)),
   ];
+
   if (editable) {
     nodes.push(h('button', {
+      class: 'btn btn-primary',
       onclick: async (e) => {
         e.target.disabled = true;
         try {
           const r = await api('POST', `/checklists/runs/${run.id}/complete`);
           toast(`Чеклист завершён. Проблемных пунктов: ${r?.flaggedCount ?? 0}`);
           go(state.tab);
-        } catch (err) { toast(err.message, true); e.target.disabled = false; }
+        } catch (err) {
+          toast(err.message, true);
+          e.target.disabled = false;
+        }
       },
     }, 'Завершить чеклист'));
   }
+
   if (!closed && can('checklists.assign')) {
     nodes.push(h('button', {
-      class: 'gray',
+      class: 'btn btn-secondary',
+      style: 'margin-top:8px',
       onclick: async () => {
         if (!confirm('Отменить этот чеклист?')) return;
-        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go(state.tab); } catch (err) { toast(err.message, true); }
+        try {
+          await api('POST', `/checklists/runs/${run.id}/cancel`);
+          go(state.tab);
+        } catch (err) {
+          toast(err.message, true);
+        }
       },
     }, 'Отменить чеклист'));
   }
+
   setView(nodes);
 }
 
-/* ---------- шаблоны ---------- */
+// ==================== Templates ====================
 async function loadUsers() {
   try { return arr(await api('GET', '/users')); } catch { return []; }
 }
 
 async function renderTemplates() {
   let list;
-  try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
-  catch (e) { if (e.status === 400) list = arr(await api('GET', '/checklists/templates')); else throw e; }
+  try {
+    list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
+  } catch (e) {
+    if (e.status === 400) list = arr(await api('GET', '/checklists/templates'));
+    else throw e;
+  }
   const manage = can('checklists.templates.manage');
-  setView(h('h1', {}, 'Шаблоны'),
-    manage && h('button', { onclick: () => showBuilder() }, '+ Новый шаблон'),
-    h('div', { style: 'height:12px' }),
-    list.length ? list.map((t) => h('div', { class: 'card' },
-      h('strong', {}, t.title),
-      t.description && h('div', { class: 'muted' }, t.description),
-      h('div', { class: 'muted small' }, 'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—')),
-      h('div', { class: 'gap' },
-        can('checklists.assign') && h('button', { class: 'sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'),
-        manage && h('button', { class: 'sm red', onclick: async () => {
-          if (!confirm('Архивировать шаблон «' + t.title + '»?')) return;
-          try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); } catch (e) { toast(e.message, true); }
-        } }, 'Архивировать'))))
-      : h('p', { class: 'muted' }, 'Шаблонов пока нет.'));
+
+  setView(
+    manage && h('button', { class: 'btn btn-primary', style: 'margin-bottom:16px', onclick: () => showBuilder() }, '+ Новый шаблон'),
+    list.length
+      ? list.map(t => h('div', { class: 'card' },
+          h('strong', {}, t.title),
+          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
+          h('div', { class: 'small', style: 'margin-top:6px' }, 'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—')),
+          h('div', { class: 'gap' },
+            can('checklists.assign') && h('button', {
+              class: 'btn btn-primary btn-sm',
+              onclick: () => show(() => showAssign(t)),
+            }, 'Назначить'),
+            manage && h('button', {
+              class: 'btn btn-danger btn-sm',
+              onclick: async () => {
+                if (!confirm('Архивировать шаблон «' + t.title + '»?')) return;
+                try {
+                  await api('DELETE', `/checklists/templates/${t.id}`);
+                  go('tpl');
+                } catch (e) { toast(e.message, true); }
+              },
+            }, 'Архивировать')
+          )
+        ))
+      : h('div', { class: 'empty' }, h('div', {}, 'Шаблонов пока нет'))
+  );
 }
 
 async function showAssign(t) {
   const users = await loadUsers();
-  const sel = h('select', {}, users.map((u) => h('option', { value: u.id }, personName(u) + (u.email ? ` (${u.email})` : ''))));
+  const sel = h('select', {},
+    users.map(u => h('option', { value: u.id }, personName(u) + (u.email ? ` (${u.email})` : '')))
+  );
   const due = h('input', { type: 'datetime-local' });
+
   setView(
-    h('button', { class: 'sm gray', onclick: () => go('tpl') }, '← Назад'),
-    h('h1', { style: 'margin-top:12px' }, 'Назначить: ' + t.title),
-    users.length ? [h('label', {}, 'Сотрудник'), sel] : h('div', { class: 'error' }, 'Не удалось получить список сотрудников.'),
-    h('label', {}, 'Срок выполнения (необязательно)'), due,
-    h('button', { onclick: async (e) => {
-      const body = { templateId: t.id, assigneeId: sel.value };
-      if (due.value) body.dueAt = new Date(due.value).toISOString();
-      e.target.disabled = true;
-      try { await api('POST', '/checklists/runs', body); toast('Чеклист назначен'); go('tpl'); }
-      catch (err) { toast(err.message, true); e.target.disabled = false; }
-    } }, 'Назначить'));
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← Назад'),
+    h('h1', {}, 'Назначить'),
+    h('p', { class: 'page-desc' }, t.title),
+    users.length
+      ? [h('label', {}, 'Сотрудник'), sel]
+      : h('div', { class: 'alert alert-error' }, 'Не удалось получить список сотрудников.'),
+    h('label', {}, 'Срок выполнения (необязательно)'),
+    due,
+    h('button', {
+      class: 'btn btn-primary',
+      onclick: async (e) => {
+        const body = { templateId: t.id, assigneeId: sel.value };
+        if (due.value) body.dueAt = new Date(due.value).toISOString();
+        e.target.disabled = true;
+        try {
+          await api('POST', '/checklists/runs', body);
+          toast('Чеклист назначен');
+          go('tpl');
+        } catch (err) {
+          toast(err.message, true);
+          e.target.disabled = false;
+        }
+      },
+    }, 'Назначить')
+  );
 }
 
 function showBuilder(draft) {
   draft = draft || { title: '', description: '', items: [{ title: '', type: 'CHECK', required: true }] };
   const again = () => showBuilder(draft);
   const typeNames = { CHECK: 'Да / нет', NUMBER: 'Число', TEXT: 'Текст', PHOTO: 'Фото' };
+
   const rows = draft.items.map((it, i) => h('div', { class: 'itemrow' },
-    h('input', { type: 'text', placeholder: 'Название пункта', value: it.title, oninput: (e) => { it.title = e.target.value; } }),
-    h('select', { onchange: (e) => { it.type = e.target.value; again(); } },
-      Object.entries(typeNames).map(([k, v]) => h('option', { value: k, selected: it.type === k }, v))),
-    it.type === 'NUMBER' && h('div', { class: 'gap' },
-      h('input', { type: 'text', placeholder: 'Единица (°C)', value: it.unit || '', style: 'flex:1', oninput: (e) => { it.unit = e.target.value; } }),
-      h('input', { type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '', style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; } }),
-      h('input', { type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '', style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; } })),
-    h('div', { class: 'row', style: 'margin-top:8px' },
-      h('label', { style: 'margin:0;display:flex;gap:6px;align-items:center' },
-        h('input', { type: 'checkbox', checked: it.required, onchange: (e) => { it.required = e.target.checked; } }), 'Обязательный'),
-      draft.items.length > 1 && h('button', { class: 'sm red', onclick: () => { draft.items.splice(i, 1); again(); } }, 'Удалить'))));
+    h('input', {
+      type: 'text',
+      placeholder: 'Название пункта',
+      value: it.title,
+      oninput: (e) => { it.title = e.target.value; },
+    }),
+    h('select', {
+      style: 'margin-top:8px',
+      onchange: (e) => { it.type = e.target.value; again(); },
+    }, Object.entries(typeNames).map(([k, v]) =>
+      h('option', { value: k, selected: it.type === k }, v)
+    )),
+    it.type === 'NUMBER' && h('div', { class: 'gap', style: 'margin-top:8px' },
+      h('input', {
+        type: 'text', placeholder: 'Единица (°C)', value: it.unit || '',
+        style: 'flex:1', oninput: (e) => { it.unit = e.target.value; },
+      }),
+      h('input', {
+        type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '',
+        style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; },
+      }),
+      h('input', {
+        type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '',
+        style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; },
+      })
+    ),
+    h('div', { class: 'row', style: 'margin-top:10px' },
+      h('label', { style: 'margin:0;display:flex;gap:8px;align-items:center;font-weight:400' },
+        h('input', {
+          type: 'checkbox',
+          checked: it.required,
+          onchange: (e) => { it.required = e.target.checked; },
+        }),
+        'Обязательный'
+      ),
+      draft.items.length > 1 && h('button', {
+        class: 'btn btn-danger btn-sm',
+        onclick: () => { draft.items.splice(i, 1); again(); },
+      }, 'Удалить')
+    )
+  ));
+
   setView(
-    h('button', { class: 'sm gray', onclick: () => go('tpl') }, '← Назад'),
-    h('h1', { style: 'margin-top:12px' }, 'Новый шаблон'),
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← Назад'),
+    h('h1', {}, 'Новый шаблон'),
     h('label', {}, 'Название'),
     h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
     h('label', {}, 'Описание (необязательно)'),
     h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
-    h('h2', {}, 'Пункты'), rows,
-    h('button', { class: 'gray', onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false }); again(); } }, '+ Добавить пункт'),
-    h('button', { onclick: async (e) => {
-      if (!draft.title.trim()) return toast('Введите название шаблона', true);
-      if (draft.items.some((it) => !it.title.trim())) return toast('У каждого пункта должно быть название', true);
-      const items = draft.items.map((it) => {
-        const o = { title: it.title.trim(), type: it.type, required: !!it.required };
-        if (it.type === 'NUMBER') {
-          if (it.unit && it.unit.trim()) o.unit = it.unit.trim();
-          if (it.minValue !== undefined && it.minValue !== '') o.minValue = Number(it.minValue);
-          if (it.maxValue !== undefined && it.maxValue !== '') o.maxValue = Number(it.maxValue);
+    h('h2', {}, 'Пункты'),
+    ...rows,
+    h('button', {
+      class: 'btn btn-secondary',
+      onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false }); again(); },
+    }, '+ Добавить пункт'),
+    h('button', {
+      class: 'btn btn-primary',
+      onclick: async (e) => {
+        if (!draft.title.trim()) return toast('Введите название шаблона', true);
+        if (draft.items.some(it => !it.title.trim())) return toast('У каждого пункта должно быть название', true);
+        const items = draft.items.map(it => {
+          const o = { title: it.title.trim(), type: it.type, required: !!it.required };
+          if (it.type === 'NUMBER') {
+            if (it.unit?.trim()) o.unit = it.unit.trim();
+            if (it.minValue !== undefined && it.minValue !== '') o.minValue = Number(it.minValue);
+            if (it.maxValue !== undefined && it.maxValue !== '') o.maxValue = Number(it.maxValue);
+          }
+          return o;
+        });
+        const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
+        if (draft.description.trim()) body.description = draft.description.trim();
+        e.target.disabled = true;
+        try {
+          await api('POST', '/checklists/templates', body);
+          toast('Шаблон создан');
+          go('tpl');
+        } catch (err) {
+          toast(err.message, true);
+          e.target.disabled = false;
         }
-        return o;
-      });
-      const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
-      if (draft.description.trim()) body.description = draft.description.trim();
-      e.target.disabled = true;
-      try { await api('POST', '/checklists/templates', body); toast('Шаблон создан'); go('tpl'); }
-      catch (err) { toast(err.message, true); e.target.disabled = false; }
-    } }, 'Сохранить шаблон'));
+      },
+    }, 'Сохранить шаблон')
+  );
 }
 
-/* ---------- сотрудники ---------- */
+// ==================== People ====================
 async function renderPeople() {
   const users = can('users.read') ? await loadUsers() : [];
   const out = h('div');
-  const nodes = [h('h1', {}, 'Сотрудники')];
+  const nodes = [];
+
   if (can('users.create')) {
-    const f = { email: h('input', { type: 'email', placeholder: 'email' }), first: h('input', { type: 'text', placeholder: 'Имя' }),
+    const f = {
+      email: h('input', { type: 'email', placeholder: 'email@company.com' }),
+      first: h('input', { type: 'text', placeholder: 'Имя' }),
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
-      role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель')) };
-    nodes.push(h('div', { class: 'card' }, h('strong', {}, 'Добавить сотрудника'),
-      h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
-      h('button', { onclick: async (e) => {
-        e.target.disabled = true;
-        try {
-          const r = await api('POST', '/users', { email: f.email.value.trim(), firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId });
-          out.replaceChildren(h('div', { class: 'ok' }, `Сотрудник создан. Временный пароль (показывается один раз): ${r.temporaryPassword}`));
-          f.email.value = f.first.value = f.last.value = '';
-        } catch (err) { toast(err.message, true); }
-        e.target.disabled = false;
-      } }, 'Создать'), out));
+      role: h('select', {},
+        h('option', { value: 'MEMBER' }, 'Исполнитель'),
+        h('option', { value: 'MANAGER' }, 'Руководитель'),
+        h('option', { value: 'VIEWER' }, 'Наблюдатель')
+      ),
+    };
+    nodes.push(h('div', { class: 'card' },
+      h('strong', {}, 'Добавить сотрудника'),
+      h('label', {}, 'Email'), f.email,
+      h('label', {}, 'Имя'), f.first,
+      h('label', {}, 'Фамилия'), f.last,
+      h('label', {}, 'Роль'), f.role,
+      h('button', {
+        class: 'btn btn-primary',
+        onclick: async (e) => {
+          e.target.disabled = true;
+          try {
+            const r = await api('POST', '/users', {
+              email: f.email.value.trim(),
+              firstName: f.first.value.trim(),
+              lastName: f.last.value.trim(),
+              roleCode: f.role.value,
+              workspaceId: state.wsId,
+            });
+            out.replaceChildren(h('div', { class: 'alert alert-success' },
+              `Сотрудник создан. Временный пароль (показывается один раз): ${r.temporaryPassword}`
+            ));
+            f.email.value = f.first.value = f.last.value = '';
+          } catch (err) {
+            toast(err.message, true);
+          }
+          e.target.disabled = false;
+        },
+      }, 'Создать'),
+      out
+    ));
   }
+
   if (can('users.read')) {
-    nodes.push(h('h2', {}, 'Список'), users.length ? users.map((u) => h('div', { class: 'card' }, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email || ''))) : h('p', { class: 'muted' }, 'Пусто.'));
+    nodes.push(h('h2', {}, 'Список сотрудников'));
+    if (users.length) {
+      users.forEach(u => {
+        nodes.push(h('div', { class: 'card' },
+          h('div', { class: 'row' },
+            h('div', {},
+              h('strong', {}, personName(u)),
+              h('div', { class: 'muted' }, u.email || '')
+            ),
+            h('span', { class: 'badge' }, u.roleCode || u.role || '—')
+          )
+        ));
+      });
+    } else {
+      nodes.push(h('div', { class: 'empty' }, h('div', {}, 'Список пуст')));
+    }
   }
+
+  if (!nodes.length) {
+    nodes.push(h('div', { class: 'empty' }, h('div', {}, 'Недостаточно прав')));
+  }
+
   setView(nodes);
 }
 
-/* ---------- профиль и смена пароля ---------- */
+// ==================== Profile ====================
 async function changePassword(current, next) {
-  const variants = [{ currentPassword: current, newPassword: next }, { oldPassword: current, newPassword: next }, { password: current, newPassword: next }];
+  const variants = [
+    { currentPassword: current, newPassword: next },
+    { oldPassword: current, newPassword: next },
+    { password: current, newPassword: next },
+  ];
   let last;
   for (const body of variants) {
-    try { return await api('POST', '/auth/password/change', body); }
-    catch (e) {
+    try {
+      return await api('POST', '/auth/password/change', body);
+    } catch (e) {
       last = e;
-      if (e.status === 400 && /should not exist|should not be empty|must be a string|must be longer/i.test(e.message) && /property|must be a string|should not be empty/i.test(e.message)) continue;
+      if (e.status === 400 && /should not exist|should not be empty|must be a string|must be longer/i.test(e.message) &&
+          /property|must be a string|should not be empty/i.test(e.message)) continue;
       throw e;
     }
   }
@@ -488,31 +1427,138 @@ async function renderProfile() {
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
   const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
-  setView(h('h1', {}, 'Профиль'),
-    me.requirePasswordChange && h('div', { class: 'info' }, 'Сервер просит сменить пароль. Сделайте это ниже.'),
-    h('div', { class: 'card' }, h('strong', {}, personName(me)), h('div', { class: 'muted' }, me.email)),
+
+  setView(
+    me.requirePasswordChange && h('div', { class: 'alert alert-info' },
+      'Сервер просит сменить пароль. Сделайте это ниже.'
+    ),
+    h('div', { class: 'card' },
+      h('div', { class: 'row' },
+        h('div', { class: 'avatar', style: 'width:52px;height:52px;font-size:18px' }, initials(me)),
+        h('div', { style: 'flex:1' },
+          h('strong', { style: 'font-size:17px' }, personName(me)),
+          h('div', { class: 'muted' }, me.email)
+        )
+      )
+    ),
     h('h2', {}, 'Смена пароля'),
-    h('label', {}, 'Текущий пароль'), cur, h('label', {}, 'Новый пароль'), n1, h('label', {}, 'Повторите новый пароль'), n2,
-    h('button', { onclick: async (e) => {
-      if (!cur.value || !n1.value) return toast('Заполните все поля', true);
-      if (n1.value !== n2.value) return toast('Новые пароли не совпадают', true);
-      e.target.disabled = true;
-      try {
-        await changePassword(cur.value, n1.value);
-        toast('Пароль изменён');
-        try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; go('me'); }
-        catch { toLogin('Пароль изменён. Войдите с новым паролем.'); }
-      } catch (err) { toast(err.message, true); e.target.disabled = false; }
-    } }, 'Сменить пароль'),
-    h('button', { class: 'gray', style: 'margin-top:28px', onclick: async () => {
-      try { await api('POST', '/auth/logout'); } catch {}
-      toLogin();
-    } }, 'Выйти'));
+    h('label', {}, 'Текущий пароль'), cur,
+    h('label', {}, 'Новый пароль'), n1,
+    h('label', {}, 'Повторите новый пароль'), n2,
+    h('button', {
+      class: 'btn btn-primary',
+      onclick: async (e) => {
+        if (!cur.value || !n1.value) return toast('Заполните все поля', true);
+        if (n1.value !== n2.value) return toast('Новые пароли не совпадают', true);
+        e.target.disabled = true;
+        try {
+          await changePassword(cur.value, n1.value);
+          toast('Пароль изменён');
+          try {
+            state.me = await api('GET', '/auth/me');
+            csrfToken = state.me.csrfToken || csrfToken;
+            go('me');
+          } catch {
+            toLogin('Пароль изменён. Войдите с новым паролем.');
+          }
+        } catch (err) {
+          toast(err.message, true);
+          e.target.disabled = false;
+        }
+      },
+    }, 'Сменить пароль'),
+    h('div', { class: 'divider' }),
+    h('button', {
+      class: 'btn btn-secondary',
+      onclick: async () => {
+        try { await api('POST', '/auth/logout'); } catch {}
+        toLogin();
+      },
+    }, 'Выйти из аккаунта')
+  );
 }
 
-/* ---------- запуск ---------- */
+// ==================== Stubs ====================
+function renderStub(title, description, iconHtml) {
+  setView(
+    h('div', { class: 'empty', style: 'padding-top:48px' },
+      h('div', { class: 'stub-icon', html: iconHtml }),
+      h('h2', { style: 'margin:0 0 8px;font-size:18px' }, title),
+      h('p', { class: 'muted', style: 'max-width:280px;margin:0 auto' }, description),
+      h('p', { class: 'small', style: 'margin-top:16px' }, 'Раздел подготовлен. API пока не подключено.')
+    )
+  );
+}
+
+function renderAuditStub() {
+  renderStub('Журнал аудита', 'Здесь будет история действий пользователей: входы, изменения, назначения чеклистов и т.д.', icons.audit);
+}
+
+function renderNotificationsStub() {
+  renderStub('Уведомления', 'Пуш-уведомления и лента событий появятся после подключения соответствующего API.', icons.bell);
+}
+
+function renderSearchStub() {
+  const input = h('input', { type: 'search', placeholder: 'Поиск по чеклистам, шаблонам, людям…' });
+  setView(
+    input,
+    h('div', { class: 'empty', style: 'padding-top:32px' },
+      h('div', { class: 'stub-icon', html: icons.search }),
+      h('p', { class: 'muted' }, 'Глобальный поиск будет доступен после реализации на сервере.')
+    )
+  );
+  input.focus();
+}
+
+function renderSettings() {
+  setView(
+    h('div', { class: 'card' },
+      h('strong', {}, 'Оформление'),
+      h('div', { class: 'row', style: 'margin-top:12px' },
+        h('span', {}, 'Тёмная тема'),
+        h('button', {
+          class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'),
+          onclick: () => {
+            applyTheme(state.theme === 'dark' ? 'light' : 'dark');
+            go('settings');
+          },
+        }, state.theme === 'dark' ? 'Включена' : 'Выключена')
+      )
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Язык'),
+      h('div', { class: 'muted', style: 'margin-top:8px' }, 'Сейчас доступен только русский. Подготовка к мультиязычности сделана (можно добавлять локали).'),
+      h('select', { style: 'margin-top:10px', disabled: true },
+        h('option', { selected: true }, 'Русский'),
+        h('option', {}, 'English (скоро)'),
+        h('option', {}, 'Қазақша (скоро)')
+      )
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'О приложении'),
+      h('div', { class: 'muted', style: 'margin-top:8px' }, 'Чеклисты · Telegram Web App'),
+      h('div', { class: 'small', style: 'margin-top:4px' }, 'Версия интерфейса: 2.0 (гибридная навигация)')
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Скоро'),
+      h('ul', { class: 'muted', style: 'margin:10px 0 0 18px;font-size:14px' },
+        h('li', {}, 'Уведомления'),
+        h('li', {}, 'Журнал аудита'),
+        h('li', {}, 'Глобальный поиск'),
+        h('li', {}, 'Расширенное управление пользователями'),
+        h('li', {}, 'Полная поддержка 2FA')
+      )
+    )
+  );
+}
+
+// ==================== Boot ====================
 (async () => {
-  try { await afterLogin(); } catch { toLogin(); }
+  try {
+    await afterLogin();
+  } catch {
+    toLogin();
+  }
 })();
 </script>
 </body>
