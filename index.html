@@ -1038,6 +1038,44 @@
   .lay-sw.on i { transform: translateX(22px); }
   .lay-sw.on:active i { transform: translateX(14px); }
   .lay-sw:disabled { opacity: .45; }
+
+  /* ===== v3: bigger dock (up to 5), round buttons, grow animations, menu fix ===== */
+  .dock { gap: 8px; padding: 0 10px; bottom: calc(16px + var(--safe-bottom)); }
+  .bottom-nav { height: 66px; border-radius: 33px; padding: 4px; max-width: calc(100% - 76px); }
+  .dock:has(.plus-orb:not(.hidden)) .bottom-nav { max-width: calc(100% - 144px); }
+  .bottom-nav button { flex: 1 1 64px; min-width: 38px; max-width: 68px; border-radius: 50%; }
+  .bottom-nav button svg { width: 27px; height: 27px; }
+  .search-orb { width: 60px; height: 60px; }
+  .search-orb svg { width: 26px; height: 26px; }
+  #view { padding-bottom: calc(96px + var(--safe-bottom) + 24px); }
+  .fab { bottom: calc(66px + var(--safe-bottom) + 34px); }
+  .toast { bottom: calc(66px + var(--safe-bottom) + 30px); }
+
+  /* round buttons everywhere */
+  .btn, .btn-sm, .btn-ghost, .chip, .choice, .icon-btn, .star-btn, .float-back, .lay-mv, .emoji-grid button { border-radius: 999px; }
+  .choice-opt { border-radius: 26px; }
+  .icon-btn, .star-btn { width: 40px; height: 40px; padding: 0; border-radius: 50%; }
+  .emoji-grid button { border-radius: 50%; }
+  .menu-pop button { border-radius: 999px; }
+
+  /* search-like pulse ring on every press */
+  .lq-ring { animation: lqRing .6s ease-out; }
+  @keyframes lqRing { 0% { box-shadow: 0 0 0 0 var(--accent-glow); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  /* sub-items grow where they appear */
+  @keyframes popGrow { 0% { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); } }
+  .menu-pop, .emoji-grid button, .choice-opt, .option-row, .alert, .lay-row { animation: popGrow .42s cubic-bezier(.34,1.4,.5,1) both; }
+  .menu-pop { transform-origin: top right; min-width: 200px; padding: 8px; border-radius: 26px; background: var(--lg-bg), var(--surface);
+    background-color: rgba(255,255,255,.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--lg-bd); z-index: 80; }
+  [data-theme="dark"] .menu-pop { background-color: rgba(24,28,36,.94); }
+  .menu-pop button { transform-origin: top right; animation: popGrow .42s cubic-bezier(.34,1.4,.5,1) both; margin-bottom: 2px; }
+  .menu-pop button:nth-child(2) { animation-delay: .06s; } .menu-pop button:nth-child(3) { animation-delay: .12s; }
+  .menu-pop button:hover, .menu-pop button:active { background: var(--accent-soft); }
+
+  /* menu no longer slides under the next card */
+  .card, .list-group { overflow: visible; }
+  .card:has(.menu-pop) { position: relative; z-index: 60; }
+  .card-head { position: relative; }
 </style>
 </head>
 <body>
@@ -1528,7 +1566,7 @@ function closeSheet() {
 lqBackdrop.onclick = closeSheet;
 $('plus-orb').onclick = () => { if (window.__addForm) openSheet(window.__addForm); };
 // liquid press: squish + glint on every button
-const LQ = '.btn,.chip,.choice,.choice-opt,.icon-btn,.topbar-btn,.fab,.float-back,.search-orb,.bottom-nav button,.folder,.lay-mv,.swatch';
+const LQ = '.menu-pop button,.star-btn,.emoji-grid button,.btn,.chip,.choice,.choice-opt,.icon-btn,.topbar-btn,.fab,.float-back,.search-orb,.bottom-nav button,.folder,.lay-mv,.swatch';
 document.addEventListener('pointerdown', (e) => {
   const el = e.target.closest(LQ); if (!el || el.disabled) return;
   el.dataset.lq = '1';
@@ -1536,6 +1574,8 @@ document.addEventListener('pointerdown', (e) => {
   const r = el.getBoundingClientRect(), g = document.createElement('span');
   g.className = 'lq-glint'; g.style.left = (e.clientX - r.left) + 'px'; g.style.top = (e.clientY - r.top) + 'px';
   el.append(g); setTimeout(() => g.remove(), 650);
+  el.classList.remove('lq-ring'); void el.offsetWidth; el.classList.add('lq-ring');
+  el.addEventListener('animationend', (ev) => { if (ev.animationName === 'lqRing') el.classList.remove('lq-ring'); });
   el.classList.add('lq-down');
   const up = () => { el.classList.remove('lq-down'); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
   addEventListener('pointerup', up); addEventListener('pointercancel', up);
@@ -1560,7 +1600,7 @@ function renderLayout() {
     return [h('h2', {}, title), h('div', { class: 'hint' }, hint), h('div', { class: 'card' }, ...cur.map(k => row(k, true)), ...rest.map(k => row(k, false)))];
   };
   setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. «Избранное» — шаблоны со звездой.'),
-    ...block('dock', 'Нижняя консоль', 'До 4 разделов, «Кабинет» всегда остаётся.', 4),
+    ...block('dock', 'Нижняя консоль', 'До 5 разделов, «Кабинет» всегда остаётся.', 5),
     h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
 }
 async function renderFav() {
