@@ -1,156 +1,519 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>Чеклисты</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 20px; margin: 0; background: #f5f5f5; color: #222; }
-        #app { max-width: 480px; margin: 0 auto; }
-        h1 { font-size: 22px; margin: 0 0 16px; }
-        label { display: block; font-size: 13px; color: #555; margin: 12px 0 4px; }
-        input, button { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; background: #fff; }
-        input:focus { outline: 2px solid #2481cc; border-color: transparent; }
-        button { margin-top: 16px; background: #2481cc; color: #fff; border: none; font-weight: 600; cursor: pointer; }
-        button:disabled { opacity: 0.6; cursor: default; }
-        pre { background: #1e1e1e; color: #d4d4d4; padding: 12px; border-radius: 8px; font-size: 12px; overflow: auto; max-height: 240px; margin-top: 16px; white-space: pre-wrap; word-break: break-word; }
-        .error { color: #c00; margin-top: 12px; font-size: 14px; background: #ffebee; padding: 10px; border-radius: 8px; }
-        .hidden { display: none; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Чеклисты</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 16px 16px 90px; background: #f5f5f5; color: #222; }
+  #app { max-width: 520px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 4px 0 14px; }
+  h2 { font-size: 17px; margin: 18px 0 8px; }
+  label { display: block; font-size: 13px; color: #555; margin: 12px 0 4px; }
+  input, button, select, textarea { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ccc; background: #fff; font-family: inherit; }
+  input[type=checkbox] { width: auto; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid #2481cc; border-color: transparent; }
+  button { margin-top: 12px; background: #2481cc; color: #fff; border: none; font-weight: 600; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  .gray { background: #888; } .red { background: #c62828; }
+  .sm { width: auto; margin-top: 0; padding: 8px 12px; font-size: 14px; }
+  .card { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .card.click { cursor: pointer; }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .gap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .muted { color: #777; font-size: 14px; margin-top: 4px; } .small { font-size: 12px; }
+  .badge { background: #e3f2fd; color: #1565c0; border-radius: 12px; padding: 2px 10px; font-size: 12px; white-space: nowrap; }
+  .badge.bad { background: #ffebee; color: #c62828; }
+  .error { color: #c00; margin-top: 12px; font-size: 14px; background: #ffebee; padding: 10px; border-radius: 8px; }
+  .info { background: #fff8e1; color: #6d4c00; padding: 10px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
+  .ok { background: #e8f5e9; color: #1b5e20; padding: 10px; border-radius: 8px; margin-top: 12px; font-size: 14px; word-break: break-all; }
+  .choices { display: flex; gap: 8px; }
+  .choice { background: #fff; color: #222; border: 1px solid #ccc; margin-top: 6px; }
+  .choice.on.yes { background: #2e7d32; color: #fff; border-color: #2e7d32; }
+  .choice.on.no { background: #c62828; color: #fff; border-color: #c62828; }
+  .flag { color: #c62828; font-size: 13px; font-weight: 600; }
+  .photo { max-width: 100%; border-radius: 8px; margin-top: 8px; }
+  .hidden { display: none !important; }
+  .nav { position: fixed; left: 0; right: 0; bottom: 0; display: flex; background: #fff; border-top: 1px solid #ddd; padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .nav button { margin: 0; border-radius: 0; background: #fff; color: #555; font-size: 13px; padding: 14px 4px; font-weight: 500; }
+  .nav button.active { color: #2481cc; font-weight: 700; }
+  .toast { position: fixed; left: 16px; right: 16px; bottom: 80px; background: #323232; color: #fff; padding: 12px; border-radius: 8px; z-index: 10; font-size: 14px; }
+  .toast.bad { background: #c62828; }
+  .itemrow { border-top: 1px solid #eee; padding-top: 10px; margin-top: 10px; }
+</style>
 </head>
 <body>
-    <div id="app">
-        <!-- Экран входа -->
-        <div id="login-screen">
-            <h1>Вход в чеклисты</h1>
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
-            <label for="password">Пароль</label>
-            <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
-            <button id="login-btn">Войти</button>
-            <div id="login-error" class="error hidden"></div>
-        </div>
+<div id="app">
+  <div id="login-screen" class="hidden">
+    <h1>Вход в чеклисты</h1>
+    <label for="email">Email</label>
+    <input type="email" id="email" placeholder="you@example.com" autocomplete="username">
+    <label for="password">Пароль</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    <button id="login-btn">Войти</button>
+    <div id="login-error" class="error hidden"></div>
+  </div>
+  <div id="app-screen" class="hidden">
+    <div id="ws-bar"></div>
+    <div id="view"></div>
+  </div>
+</div>
+<nav id="nav" class="nav hidden"></nav>
+<div id="toast" class="toast hidden"></div>
 
-        <!-- Экран «Мои чеклисты» -->
-        <div id="main-screen" class="hidden">
-            <h1>Мои чеклисты</h1>
-            <p>Вы вошли как <strong id="user-email"></strong>.</p>
-            <pre id="user-json"></pre>
-            <button id="logout-btn" style="background:#888;">Выйти</button>
-        </div>
-    </div>
+<script type="module">
+// Если страница лежит на GitHub Pages, запросы идут на ngrok. Иначе — на тот же адрес, откуда открыта страница.
+const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
+const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
 
-    <script type="module">
-        // Адрес сервера. Если страница открыта с самого сервера (localhost или ngrok),
-        // запросы идут на тот же адрес. Если страница лежит на GitHub Pages,
-        // используется адрес ngrok. Замените его, если ngrok выдал новый.
-        const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
-        const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
+const tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
 
-        const tg = window.Telegram?.WebApp;
-        if (tg) { tg.ready(); tg.expand(); }
+const $ = (id) => document.getElementById(id);
+let csrfToken = null;
+const state = { me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null, tab: 'mine', filter: '' };
 
-        const $ = (id) => document.getElementById(id);
-        let csrfToken = null;
+/* ---------- вспомогательное ---------- */
+function h(tag, props, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v !== false && v !== null && v !== undefined) e.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) {
+    if (c === null || c === undefined || c === false) continue;
+    e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return e;
+}
+const arr = (d) => Array.isArray(d) ? d : (d && (d.items || d.data || d.runs || d.templates || d.users)) || [];
+const can = (p) => !!state.me?.permissions?.includes(p);
+const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
+const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
+const statusName = (s) => STATUS[s] || s || '';
+const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.email || '') : '';
+const setView = (...nodes) => $('view').replaceChildren(...nodes.flat());
 
-        function showError(msg) {
-            const el = $('login-error');
-            el.textContent = msg;
-            el.classList.remove('hidden');
+function toast(msg, bad) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (bad ? ' bad' : '');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => { t.className = 'toast hidden'; }, 4500);
+}
+
+function authHeaders() {
+  const headers = { 'ngrok-skip-browser-warning': '1' };
+  const token = localStorage.getItem('token');
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+  if (csrfToken) headers['x-csrf-token'] = csrfToken;
+  return headers;
+}
+
+async function api(method, path, body) {
+  const headers = authHeaders();
+  let payload;
+  if (body instanceof FormData) payload = body;
+  else if (body !== undefined) { headers['content-type'] = 'application/json'; payload = JSON.stringify(body); }
+  let res;
+  try {
+    res = await fetch(API_BASE + path, { method, headers, credentials: 'include', body: payload });
+  } catch {
+    throw new Error('Нет связи с сервером. Проверьте, что приложение и ngrok запущены и адрес ngrok не изменился.');
+  }
+  const text = await res.text();
+  let data = null;
+  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+  if (!res.ok) {
+    const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
+    const err = new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+async function show(fn) {
+  setView(h('p', { class: 'muted' }, 'Загрузка…'));
+  try { await fn(); }
+  catch (e) {
+    if (e.status === 401) { toLogin('Сессия истекла, войдите снова'); return; }
+    setView(h('div', { class: 'error' }, e.message), h('button', { onclick: () => show(fn) }, 'Повторить'));
+  }
+}
+
+/* ---------- вход / выход ---------- */
+function toLogin(msg) {
+  csrfToken = null; state.me = null;
+  localStorage.removeItem('token');
+  $('app-screen').classList.add('hidden');
+  $('nav').classList.add('hidden');
+  $('login-screen').classList.remove('hidden');
+  const el = $('login-error');
+  if (msg) { el.textContent = msg; el.classList.remove('hidden'); } else el.classList.add('hidden');
+}
+
+async function afterLogin() {
+  state.me = await api('GET', '/auth/me');
+  csrfToken = state.me.csrfToken || csrfToken;
+  state.workspaces = arr(await api('GET', '/workspaces'));
+  if (!state.workspaces.find((w) => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
+  localStorage.setItem('wsId', state.wsId || '');
+  $('login-screen').classList.add('hidden');
+  $('app-screen').classList.remove('hidden');
+  $('nav').classList.remove('hidden');
+  renderWsBar();
+  go(state.me.requirePasswordChange ? 'me' : 'mine');
+}
+
+function renderWsBar() {
+  const bar = $('ws-bar');
+  if (state.workspaces.length < 2) { bar.replaceChildren(); return; }
+  const sel = h('select', { onchange: (e) => { state.wsId = e.target.value; localStorage.setItem('wsId', state.wsId); go(state.tab); } },
+    state.workspaces.map((w) => h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)));
+  bar.replaceChildren(sel);
+}
+
+$('login-btn').onclick = async () => {
+  $('login-error').classList.add('hidden');
+  const email = $('email').value.trim();
+  const password = $('password').value;
+  if (!email || !password) { toLogin('Заполните email и пароль'); return; }
+  $('login-btn').disabled = true;
+  try {
+    const data = await api('POST', '/auth/login', { email, password });
+    if (data.twoFactorRequired) { toLogin('Включена 2FA. Пока не поддержано.'); return; }
+    if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
+    csrfToken = data.csrfToken || null;
+    $('password').value = '';
+    await afterLogin();
+  } catch (e) { toLogin(e.message); }
+  finally { $('login-btn').disabled = false; }
+};
+
+/* ---------- навигация ---------- */
+function renderNav() {
+  const tabs = [['mine', 'Мои']];
+  if (can('checklists.runs.read_all')) tabs.push(['all', 'Все']);
+  if (can('checklists.templates.read')) tabs.push(['tpl', 'Шаблоны']);
+  if (can('users.create') || can('users.read')) tabs.push(['people', 'Люди']);
+  tabs.push(['me', 'Профиль']);
+  $('nav').replaceChildren(...tabs.map(([k, t]) => h('button', { class: state.tab === k ? 'active' : '', onclick: () => go(k) }, t)));
+}
+function go(tab) {
+  state.tab = tab;
+  renderNav();
+  const screens = { mine: renderMine, all: renderAll, tpl: renderTemplates, people: renderPeople, me: renderProfile };
+  show(screens[tab]);
+}
+
+/* ---------- списки чеклистов ---------- */
+function runCard(r, withWho) {
+  const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
+  const who = personName(r.assignee);
+  return h('div', { class: 'card click', onclick: () => show(() => openRun(r.id)) },
+    h('div', { class: 'row' }, h('strong', {}, title),
+      h('span', { class: 'badge' + (r.overdue ? ' bad' : '') }, r.overdue ? 'Просрочен' : statusName(r.status))),
+    r.dueAt && h('div', { class: 'muted' }, 'Срок: ' + fmt(r.dueAt)),
+    withWho && who && h('div', { class: 'muted' }, who));
+}
+
+async function renderMine() {
+  const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
+  setView(h('h1', {}, 'Мои чеклисты'),
+    d.length ? d.map((r) => runCard(r)) : h('p', { class: 'muted' }, 'Пока нет назначенных чеклистов.'));
+}
+
+async function renderAll() {
+  let q = `/checklists/runs?workspaceId=${state.wsId}&scope=all`;
+  if (state.filter === 'overdue') q += '&overdue=true';
+  if (state.filter === 'done') q += '&status=COMPLETED';
+  const d = arr(await api('GET', q));
+  const chip = (k, t) => h('button', { class: 'sm' + (state.filter === k ? '' : ' gray'), onclick: () => { state.filter = k; go('all'); } }, t);
+  setView(h('h1', {}, 'Все чеклисты'),
+    h('div', { class: 'gap' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')),
+    h('div', { style: 'margin-top:12px' }, d.length ? d.map((r) => runCard(r, true)) : h('p', { class: 'muted' }, 'Ничего не найдено.')));
+}
+
+/* ---------- прохождение чеклиста ---------- */
+async function photoURL(id) {
+  const r = await fetch(API_BASE + '/files/' + id, { headers: authHeaders(), credentials: 'include' });
+  if (!r.ok) throw new Error('Не удалось загрузить фото');
+  return URL.createObjectURL(await r.blob());
+}
+
+function itemNode(run, it, editable) {
+  const status = h('div', { class: 'muted small' });
+  const flag = h('div', { class: 'flag' });
+  const mark = () => { flag.textContent = it.flagged ? '⚠ Отмечено как проблема' : ''; };
+  mark();
+  const save = async (body) => {
+    try {
+      status.textContent = 'Сохраняю…';
+      const r = await api('PUT', `/checklists/runs/${run.id}/items/${it.id}`, body);
+      if (r && typeof r === 'object' && 'flagged' in r) it.flagged = r.flagged;
+      Object.assign(it, body);
+      status.textContent = 'Сохранено ✓';
+      mark();
+      return true;
+    } catch (e) { status.textContent = ''; toast(e.message, true); return false; }
+  };
+  let control;
+  if (it.type === 'CHECK') {
+    const yes = h('button', { class: 'choice yes', disabled: !editable }, 'Да');
+    const no = h('button', { class: 'choice no', disabled: !editable }, 'Нет');
+    const upd = () => { yes.classList.toggle('on', it.checked === true); no.classList.toggle('on', it.checked === false); };
+    yes.onclick = async () => { if (await save({ checked: true })) upd(); };
+    no.onclick = async () => { if (await save({ checked: false })) upd(); };
+    upd();
+    control = h('div', { class: 'choices' }, yes, no);
+  } else if (it.type === 'NUMBER') {
+    const num = h('input', { type: 'number', step: 'any', inputmode: 'decimal', value: it.numberValue ?? '', disabled: !editable });
+    const com = h('input', { type: 'text', placeholder: 'Комментарий (необязательно)', value: it.comment ?? '', disabled: !editable });
+    const send = () => {
+      if (num.value === '') return;
+      const b = { numberValue: Number(num.value) };
+      if (com.value.trim()) b.comment = com.value.trim();
+      save(b);
+    };
+    num.addEventListener('change', send);
+    com.addEventListener('change', send);
+    const hasRange = it.minValue != null || it.maxValue != null;
+    control = h('div', {},
+      (hasRange || it.unit) && h('div', { class: 'muted small' },
+        (hasRange ? `Норма: ${it.minValue ?? '…'} – ${it.maxValue ?? '…'} ` : '') + (it.unit || '')),
+      num, h('div', { style: 'height:6px' }), com);
+  } else if (it.type === 'TEXT') {
+    const ta = h('textarea', { rows: 3, disabled: !editable }, it.textValue || '');
+    ta.addEventListener('change', () => save({ textValue: ta.value }));
+    control = ta;
+  } else if (it.type === 'PHOTO') {
+    const img = h('img', { class: 'photo hidden' });
+    const fid = it.fileId || it.file?.id;
+    if (fid) photoURL(fid).then((u) => { img.src = u; img.classList.remove('hidden'); }).catch(() => {});
+    const inp = h('input', { type: 'file', accept: 'image/*', disabled: !editable });
+    inp.onchange = async () => {
+      const f = inp.files[0];
+      if (!f) return;
+      try {
+        status.textContent = 'Загружаю фото…';
+        const fd = new FormData();
+        fd.append('workspaceId', run.workspaceId || state.wsId);
+        fd.append('file', f);
+        const up = await api('POST', '/files', fd);
+        if (await save({ fileId: up.id })) { img.src = URL.createObjectURL(f); img.classList.remove('hidden'); }
+      } catch (e) { status.textContent = ''; toast(e.message, true); }
+    };
+    control = h('div', {}, inp, img);
+  } else control = h('div', { class: 'muted' }, 'Тип пункта не поддерживается: ' + it.type);
+
+  return h('div', { class: 'card' },
+    h('div', { class: 'row' }, h('strong', {}, it.title), it.required && h('span', { class: 'badge' }, 'обязательно')),
+    h('div', { style: 'margin-top:8px' }, control), flag, status);
+}
+
+async function openRun(id) {
+  const run = await api('GET', `/checklists/runs/${id}`);
+  const closed = ['COMPLETED', 'CANCELLED', 'CANCELED'].includes(run.status);
+  const mine = !run.assigneeId || run.assigneeId === state.me.id || run.assignee?.id === state.me.id;
+  const editable = !closed && mine;
+  const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
+  const nodes = [
+    h('button', { class: 'sm gray', onclick: () => go(state.tab) }, '← Назад'),
+    h('h1', { style: 'margin-top:12px' }, title),
+    h('div', { class: 'muted' }, statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')),
+    h('div', { style: 'height:12px' }),
+    (run.items || []).map((it) => itemNode(run, it, editable)),
+  ];
+  if (editable) {
+    nodes.push(h('button', {
+      onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          const r = await api('POST', `/checklists/runs/${run.id}/complete`);
+          toast(`Чеклист завершён. Проблемных пунктов: ${r?.flaggedCount ?? 0}`);
+          go(state.tab);
+        } catch (err) { toast(err.message, true); e.target.disabled = false; }
+      },
+    }, 'Завершить чеклист'));
+  }
+  if (!closed && can('checklists.assign')) {
+    nodes.push(h('button', {
+      class: 'gray',
+      onclick: async () => {
+        if (!confirm('Отменить этот чеклист?')) return;
+        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go(state.tab); } catch (err) { toast(err.message, true); }
+      },
+    }, 'Отменить чеклист'));
+  }
+  setView(nodes);
+}
+
+/* ---------- шаблоны ---------- */
+async function loadUsers() {
+  try { return arr(await api('GET', '/users')); } catch { return []; }
+}
+
+async function renderTemplates() {
+  let list;
+  try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
+  catch (e) { if (e.status === 400) list = arr(await api('GET', '/checklists/templates')); else throw e; }
+  const manage = can('checklists.templates.manage');
+  setView(h('h1', {}, 'Шаблоны'),
+    manage && h('button', { onclick: () => showBuilder() }, '+ Новый шаблон'),
+    h('div', { style: 'height:12px' }),
+    list.length ? list.map((t) => h('div', { class: 'card' },
+      h('strong', {}, t.title),
+      t.description && h('div', { class: 'muted' }, t.description),
+      h('div', { class: 'muted small' }, 'Пунктов: ' + (t.items?.length ?? t._count?.items ?? '—')),
+      h('div', { class: 'gap' },
+        can('checklists.assign') && h('button', { class: 'sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'),
+        manage && h('button', { class: 'sm red', onclick: async () => {
+          if (!confirm('Архивировать шаблон «' + t.title + '»?')) return;
+          try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); } catch (e) { toast(e.message, true); }
+        } }, 'Архивировать'))))
+      : h('p', { class: 'muted' }, 'Шаблонов пока нет.'));
+}
+
+async function showAssign(t) {
+  const users = await loadUsers();
+  const sel = h('select', {}, users.map((u) => h('option', { value: u.id }, personName(u) + (u.email ? ` (${u.email})` : ''))));
+  const due = h('input', { type: 'datetime-local' });
+  setView(
+    h('button', { class: 'sm gray', onclick: () => go('tpl') }, '← Назад'),
+    h('h1', { style: 'margin-top:12px' }, 'Назначить: ' + t.title),
+    users.length ? [h('label', {}, 'Сотрудник'), sel] : h('div', { class: 'error' }, 'Не удалось получить список сотрудников.'),
+    h('label', {}, 'Срок выполнения (необязательно)'), due,
+    h('button', { onclick: async (e) => {
+      const body = { templateId: t.id, assigneeId: sel.value };
+      if (due.value) body.dueAt = new Date(due.value).toISOString();
+      e.target.disabled = true;
+      try { await api('POST', '/checklists/runs', body); toast('Чеклист назначен'); go('tpl'); }
+      catch (err) { toast(err.message, true); e.target.disabled = false; }
+    } }, 'Назначить'));
+}
+
+function showBuilder(draft) {
+  draft = draft || { title: '', description: '', items: [{ title: '', type: 'CHECK', required: true }] };
+  const again = () => showBuilder(draft);
+  const typeNames = { CHECK: 'Да / нет', NUMBER: 'Число', TEXT: 'Текст', PHOTO: 'Фото' };
+  const rows = draft.items.map((it, i) => h('div', { class: 'itemrow' },
+    h('input', { type: 'text', placeholder: 'Название пункта', value: it.title, oninput: (e) => { it.title = e.target.value; } }),
+    h('select', { onchange: (e) => { it.type = e.target.value; again(); } },
+      Object.entries(typeNames).map(([k, v]) => h('option', { value: k, selected: it.type === k }, v))),
+    it.type === 'NUMBER' && h('div', { class: 'gap' },
+      h('input', { type: 'text', placeholder: 'Единица (°C)', value: it.unit || '', style: 'flex:1', oninput: (e) => { it.unit = e.target.value; } }),
+      h('input', { type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '', style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; } }),
+      h('input', { type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '', style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; } })),
+    h('div', { class: 'row', style: 'margin-top:8px' },
+      h('label', { style: 'margin:0;display:flex;gap:6px;align-items:center' },
+        h('input', { type: 'checkbox', checked: it.required, onchange: (e) => { it.required = e.target.checked; } }), 'Обязательный'),
+      draft.items.length > 1 && h('button', { class: 'sm red', onclick: () => { draft.items.splice(i, 1); again(); } }, 'Удалить'))));
+  setView(
+    h('button', { class: 'sm gray', onclick: () => go('tpl') }, '← Назад'),
+    h('h1', { style: 'margin-top:12px' }, 'Новый шаблон'),
+    h('label', {}, 'Название'),
+    h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
+    h('label', {}, 'Описание (необязательно)'),
+    h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
+    h('h2', {}, 'Пункты'), rows,
+    h('button', { class: 'gray', onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false }); again(); } }, '+ Добавить пункт'),
+    h('button', { onclick: async (e) => {
+      if (!draft.title.trim()) return toast('Введите название шаблона', true);
+      if (draft.items.some((it) => !it.title.trim())) return toast('У каждого пункта должно быть название', true);
+      const items = draft.items.map((it) => {
+        const o = { title: it.title.trim(), type: it.type, required: !!it.required };
+        if (it.type === 'NUMBER') {
+          if (it.unit && it.unit.trim()) o.unit = it.unit.trim();
+          if (it.minValue !== undefined && it.minValue !== '') o.minValue = Number(it.minValue);
+          if (it.maxValue !== undefined && it.maxValue !== '') o.maxValue = Number(it.maxValue);
         }
-        function hideError() { $('login-error').classList.add('hidden'); }
+        return o;
+      });
+      const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
+      if (draft.description.trim()) body.description = draft.description.trim();
+      e.target.disabled = true;
+      try { await api('POST', '/checklists/templates', body); toast('Шаблон создан'); go('tpl'); }
+      catch (err) { toast(err.message, true); e.target.disabled = false; }
+    } }, 'Сохранить шаблон'));
+}
 
-        function showMain(user) {
-            $('login-screen').classList.add('hidden');
-            $('main-screen').classList.remove('hidden');
-            $('user-email').textContent = user.email;
-            $('user-json').textContent = JSON.stringify(user, null, 2);
-        }
-        function showLogin() {
-            $('main-screen').classList.add('hidden');
-            $('login-screen').classList.remove('hidden');
-            csrfToken = null;
-        }
+/* ---------- сотрудники ---------- */
+async function renderPeople() {
+  const users = can('users.read') ? await loadUsers() : [];
+  const out = h('div');
+  const nodes = [h('h1', {}, 'Сотрудники')];
+  if (can('users.create')) {
+    const f = { email: h('input', { type: 'email', placeholder: 'email' }), first: h('input', { type: 'text', placeholder: 'Имя' }),
+      last: h('input', { type: 'text', placeholder: 'Фамилия' }),
+      role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель')) };
+    nodes.push(h('div', { class: 'card' }, h('strong', {}, 'Добавить сотрудника'),
+      h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+      h('button', { onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          const r = await api('POST', '/users', { email: f.email.value.trim(), firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId });
+          out.replaceChildren(h('div', { class: 'ok' }, `Сотрудник создан. Временный пароль (показывается один раз): ${r.temporaryPassword}`));
+          f.email.value = f.first.value = f.last.value = '';
+        } catch (err) { toast(err.message, true); }
+        e.target.disabled = false;
+      } }, 'Создать'), out));
+  }
+  if (can('users.read')) {
+    nodes.push(h('h2', {}, 'Список'), users.length ? users.map((u) => h('div', { class: 'card' }, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email || ''))) : h('p', { class: 'muted' }, 'Пусто.'));
+  }
+  setView(nodes);
+}
 
-        async function api(method, path, body) {
-            const headers = { 'ngrok-skip-browser-warning': '1' };
-            const token = localStorage.getItem('token');
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-            if (csrfToken) headers['x-csrf-token'] = csrfToken;
-            if (body !== undefined) headers['content-type'] = 'application/json';
+/* ---------- профиль и смена пароля ---------- */
+async function changePassword(current, next) {
+  const variants = [{ currentPassword: current, newPassword: next }, { oldPassword: current, newPassword: next }, { password: current, newPassword: next }];
+  let last;
+  for (const body of variants) {
+    try { return await api('POST', '/auth/password/change', body); }
+    catch (e) {
+      last = e;
+      if (e.status === 400 && /should not exist|should not be empty|must be a string|must be longer/i.test(e.message) && /property|must be a string|should not be empty/i.test(e.message)) continue;
+      throw e;
+    }
+  }
+  throw last;
+}
 
-            let res;
-            try {
-                res = await fetch(API_BASE + path, {
-                    method,
-                    headers,
-                    credentials: 'include',
-                    body: body === undefined ? undefined : JSON.stringify(body),
-                });
-            } catch (e) {
-                throw new Error('Нет связи с сервером. Проверьте, что приложение и ngrok запущены, и что адрес ngrok не изменился.');
-            }
+async function renderProfile() {
+  const me = state.me;
+  const cur = h('input', { type: 'password', autocomplete: 'current-password' });
+  const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
+  const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
+  setView(h('h1', {}, 'Профиль'),
+    me.requirePasswordChange && h('div', { class: 'info' }, 'Сервер просит сменить пароль. Сделайте это ниже.'),
+    h('div', { class: 'card' }, h('strong', {}, personName(me)), h('div', { class: 'muted' }, me.email)),
+    h('h2', {}, 'Смена пароля'),
+    h('label', {}, 'Текущий пароль'), cur, h('label', {}, 'Новый пароль'), n1, h('label', {}, 'Повторите новый пароль'), n2,
+    h('button', { onclick: async (e) => {
+      if (!cur.value || !n1.value) return toast('Заполните все поля', true);
+      if (n1.value !== n2.value) return toast('Новые пароли не совпадают', true);
+      e.target.disabled = true;
+      try {
+        await changePassword(cur.value, n1.value);
+        toast('Пароль изменён');
+        try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; go('me'); }
+        catch { toLogin('Пароль изменён. Войдите с новым паролем.'); }
+      } catch (err) { toast(err.message, true); e.target.disabled = false; }
+    } }, 'Сменить пароль'),
+    h('button', { class: 'gray', style: 'margin-top:28px', onclick: async () => {
+      try { await api('POST', '/auth/logout'); } catch {}
+      toLogin();
+    } }, 'Выйти'));
+}
 
-            const text = await res.text();
-            let data = null;
-            try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-
-            if (!res.ok) {
-                const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
-                throw new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
-            }
-            return data;
-        }
-
-        // Вход
-        $('login-btn').onclick = async () => {
-            hideError();
-            const email = $('email').value.trim();
-            const password = $('password').value;
-            if (!email || !password) { showError('Заполните email и пароль'); return; }
-            $('login-btn').disabled = true;
-            try {
-                const data = await api('POST', '/auth/login', { email, password });
-                if (data.twoFactorRequired) {
-                    showError('Включена 2FA. Пока не поддержано.');
-                    return;
-                }
-                // Сохраняем токен (если сервер его отдаёт)
-                if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-                csrfToken = data.csrfToken || null;
-
-                const me = await api('GET', '/auth/me');
-                csrfToken = me.csrfToken || csrfToken;
-                showMain(me);
-            } catch (e) {
-                showError(e.message);
-            } finally {
-                $('login-btn').disabled = false;
-            }
-        };
-
-        // Выход
-        $('logout-btn').onclick = async () => {
-            try { await api('POST', '/auth/logout'); } catch {}
-            localStorage.removeItem('token');
-            showLogin();
-        };
-
-        // Автологин при загрузке, если токен уже есть
-        (async () => {
-            const token = localStorage.getItem('token');
-            if (!token) { showLogin(); return; }
-            try {
-                const me = await api('GET', '/auth/me');
-                csrfToken = me.csrfToken || null;
-                showMain(me);
-            } catch {
-                localStorage.removeItem('token');
-                showLogin();
-            }
-        })();
-    </script>
+/* ---------- запуск ---------- */
+(async () => {
+  try { await afterLogin(); } catch { toLogin(); }
+})();
+</script>
 </body>
 </html>
