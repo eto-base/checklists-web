@@ -43,8 +43,11 @@
     </div>
 
     <script type="module">
-        // ВАЖНО: Замените этот адрес, если ngrok выдал новый!
-        const API_BASE = 'https://dullness-playpen-starlet.ngrok-free.dev'; 
+        // Адрес сервера. Если страница открыта с самого сервера (localhost или ngrok),
+        // запросы идут на тот же адрес. Если страница лежит на GitHub Pages,
+        // используется адрес ngrok. Замените его, если ngrok выдал новый.
+        const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
+        const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
 
         const tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); }
@@ -72,22 +75,28 @@
         }
 
         async function api(method, path, body) {
-            const headers = {};
+            const headers = { 'ngrok-skip-browser-warning': '1' };
             const token = localStorage.getItem('token');
             if (token) headers['Authorization'] = `Bearer ${token}`;
             if (csrfToken) headers['x-csrf-token'] = csrfToken;
             if (body !== undefined) headers['content-type'] = 'application/json';
-            
-            const res = await fetch(API_BASE + path, {
-                method,
-                headers,
-                body: body === undefined ? undefined : JSON.stringify(body),
-            });
-            
+
+            let res;
+            try {
+                res = await fetch(API_BASE + path, {
+                    method,
+                    headers,
+                    credentials: 'include',
+                    body: body === undefined ? undefined : JSON.stringify(body),
+                });
+            } catch (e) {
+                throw new Error('Нет связи с сервером. Проверьте, что приложение и ngrok запущены, и что адрес ngrok не изменился.');
+            }
+
             const text = await res.text();
             let data = null;
             try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-            
+
             if (!res.ok) {
                 const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
                 throw new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
@@ -108,10 +117,10 @@
                     showError('Включена 2FA. Пока не поддержано.');
                     return;
                 }
-                // СОХРАНЯЕМ ТОКЕН
-                localStorage.setItem('token', data.sessionToken);
+                // Сохраняем токен (если сервер его отдаёт)
+                if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
                 csrfToken = data.csrfToken || null;
-                
+
                 const me = await api('GET', '/auth/me');
                 csrfToken = me.csrfToken || csrfToken;
                 showMain(me);
