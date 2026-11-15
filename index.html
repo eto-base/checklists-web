@@ -1326,7 +1326,6 @@ const statusName = (s) => STATUS[s] || s || '';
 const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || '') : '';
 const atNick = (u) => u?.nickname ? '@' + u.nickname : '';
 const NICK_RE = /^[A-Za-z0-9._-]{3,32}$/;
-const INTERNAL_EMAIL_DOMAIN = 'users.local'; // техническое поле для старого API; пользователю нигде не показывается
 const initials = (u) => { const n = personName(u); if (!n) return '?'; return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); };
 function setView(...nodes) { $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType)); }
 function toast(msg, bad = false) {
@@ -2510,7 +2509,7 @@ async function renderPeople() {
         if (!NICK_RE.test(nickname)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
         if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
         btn.disabled = true;
-        const base = { nickname, email: `${nickname.toLowerCase()}@${INTERNAL_EMAIL_DOMAIN}`, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
+        const base = { nickname, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
         const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
         try {
           let r, last;
@@ -2636,7 +2635,7 @@ async function renderProfile() {
         btn.disabled = true;
         try {
           let onServer = true;
-          try { await api('PATCH', `/users/${me.id}`, body); }
+          try { await api('PATCH', '/users/me', body); }
           catch (err) {
             const msg = String(err.message || '');
             if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) onServer = false;
