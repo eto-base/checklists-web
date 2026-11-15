@@ -529,6 +529,93 @@
     bottom: calc(64px + var(--safe-bottom) + 24px);
   }
 
+
+  /* Translucent surfaces */
+  .topbar {
+    background: rgba(255,255,255,.78);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border-bottom: 0.5px solid var(--border);
+  }
+  [data-theme="dark"] .topbar {
+    background: rgba(20,24,31,.82);
+  }
+  .folders {
+    background: transparent;
+    padding: 8px 12px 6px;
+  }
+  .folder {
+    border-radius: 999px;
+    background: rgba(255,255,255,.55);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  }
+  [data-theme="dark"] .folder {
+    background: rgba(40,48,60,.55);
+  }
+  .folder.active {
+    background: var(--accent);
+    color: #fff;
+  }
+  .bottom-nav {
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    border-radius: 28px;
+    border: 0.5px solid rgba(255,255,255,.4);
+  }
+  [data-theme="dark"] .bottom-nav {
+    background: rgba(28,34,44,.78);
+    border-color: rgba(255,255,255,.08);
+  }
+  .btn, .btn-primary, .btn-secondary, .btn-danger {
+    border-radius: 999px;
+  }
+  .btn-sm { border-radius: 999px; }
+  .btn-ghost { border-radius: 999px; }
+  .card {
+    border-radius: 20px;
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 0.5px solid rgba(0,0,0,.06);
+  }
+  [data-theme="dark"] .card {
+    background: rgba(28,34,44,.72);
+    border-color: rgba(255,255,255,.06);
+  }
+  input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+  input[type="datetime-local"], input[type="search"], select, textarea {
+    border-radius: 16px;
+    background: rgba(255,255,255,.7);
+  }
+  [data-theme="dark"] input[type="text"],
+  [data-theme="dark"] input[type="email"],
+  [data-theme="dark"] input[type="password"],
+  [data-theme="dark"] input[type="number"],
+  [data-theme="dark"] input[type="datetime-local"],
+  [data-theme="dark"] input[type="search"],
+  [data-theme="dark"] select,
+  [data-theme="dark"] textarea {
+    background: rgba(28,34,44,.7);
+  }
+  .choice, .choice-opt, .chip, .list-group {
+    border-radius: 16px;
+  }
+  .list-group {
+    background: rgba(255,255,255,.72);
+    backdrop-filter: blur(12px);
+  }
+  [data-theme="dark"] .list-group { background: rgba(28,34,44,.72); }
+  .login-card {
+    border-radius: 28px;
+    background: rgba(255,255,255,.8);
+    backdrop-filter: blur(20px);
+  }
+  [data-theme="dark"] .login-card { background: rgba(28,34,44,.85); }
+  .fab { border-radius: 50%; }
+  .menu-pop { border-radius: 18px; }
+  .toast { border-radius: 18px; }
+  .badge { border-radius: 999px; }
+  /* hide legacy side menu chrome if present */
+  .sidemenu, .overlay, #sidemenu, #overlay, #menu-btn { display: none !important; }
+
 </style>
 </head>
 <body>
@@ -630,15 +717,19 @@ const state = {
 };
 const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
 const icons = {
-  list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>`,
-  all: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>`,
-  template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-  people: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
-  audit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,
-  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
-  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
-  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>`,
-  empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`,
+  // Простые «линейные» иконки — читаются в 24px, без мелкой детали
+  list: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h10M4 18h14"/></svg>`,
+  all: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="7" r="2.5"/><circle cx="7" cy="17" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg>`,
+  template: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>`,
+  people: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><path d="M3 19c0-2.5 2.5-4.5 6-4.5S15 16.5 15 19"/><circle cx="17" cy="9" r="2.5"/><path d="M21 19c0-2-1.5-3.5-4-3.8"/></svg>`,
+  audit: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg>`,
+  settings: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>`,
+  bell: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9a6 6 0 0 1 12 0c0 7 3 7 3 7H3s3 0 3-7"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>`,
+  search: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-3.5-3.5"/></svg>`,
+  empty: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 13h6M9 17h3"/></svg>`,
+  more: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="6" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="18" cy="12" r="1.8"/></svg>`,
+  home: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 11.5L12 5l8 6.5"/><path d="M7 10.5V19h10v-8.5"/></svg>`,
+  msg: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H9l-4 3v-3H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/></svg>`,
 };
 function h(tag, props, ...kids) {
   const e = document.createElement(tag);
@@ -789,42 +880,24 @@ $('forgot-submit').onclick = async () => {
   catch (e) { msg.className = 'alert alert-info'; msg.textContent = e.status === 404 ? 'Восстановление пока не на сервере.' : (e.message || 'Ошибка'); }
   msg.classList.remove('hidden'); $('forgot-submit').disabled = false;
 };
-function closeMenu() { $('sidemenu').classList.remove('open'); $('overlay').classList.remove('open'); }
-function openMenu() { $('sidemenu').classList.add('open'); $('overlay').classList.add('open'); renderSideMenu(); }
-$('menu-btn').onclick = openMenu; $('overlay').onclick = closeMenu; $('side-close').onclick = closeMenu;
-$('side-profile').onclick = () => { closeMenu(); go('me'); };
-function renderSideMenu() {
-  const items = [];
-  items.push(h('div', { class: 'sidemenu-section' }, 'Работа'));
-  items.push(sideItem('mine', icons.list, 'Мои чеклисты'));
-  if (can('checklists.runs.read_all')) items.push(sideItem('all', icons.all, 'Все чеклисты'));
-  if (can('checklists.templates.read')) items.push(sideItem('tpl', icons.template, 'Шаблоны'));
-  if (can('users.create') || can('users.read')) {
-    items.push(h('div', { class: 'sidemenu-section' }, 'Управление'));
-    items.push(sideItem('people', icons.people, 'Сотрудники'));
-  }
-  items.push(h('div', { class: 'sidemenu-section' }, 'Система'));
-  items.push(sideItem('settings', icons.settings, 'Настройки'));
-  // заглушки — в конце, тише
-  items.push(sideItem('audit', icons.audit, 'Журнал аудита', true));
-  items.push(sideItem('notifications', icons.bell, 'Уведомления', true));
-  $('sidemenu-nav').replaceChildren(...items);
-}
+function closeMenu() { /* side menu removed */ }
+function openMenu() { go('settings'); }
+$('menu-btn').onclick = () => go('settings'); if ($('overlay')) $('overlay').onclick = closeMenu; if ($('side-close')) $('side-close').onclick = closeMenu;
+if ($('side-profile')) $('side-profile').onclick = () => go('me');
+function renderSideMenu() { /* боковая панель отключена — всё в Кабинете */ }
 function sideItem(tab, iconHtml, label, isStub = false) {
   return h('button', { class: 'sidemenu-item' + (state.tab === tab ? ' active' : ''), onclick: () => { closeMenu(); go(tab); } },
     h('span', { html: iconHtml }), label, isStub ? h('span', { class: 'soon' }, 'скоро') : h('span', { class: 'chev' }, '›'));
 }
-$('logout-side').onclick = async () => { closeMenu(); try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
+if ($('logout-side')) $('logout-side').onclick = async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
 function renderFolders() {
   const el = $('folders');
   if (!el) return;
-  const tabs = [{ k: 'mine', t: 'Мои' }];
-  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все' });
+  const tabs = [{ k: 'mine', t: 'Мои задачи' }];
+  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все задачи' });
   if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны' });
-  if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Люди' });
-  tabs.push({ k: 'settings', t: 'Ещё' });
-  // hide folders on pure utility screens
-  const hide = ['search', 'me', 'audit', 'notifications'].includes(state.tab);
+  if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Команда' });
+  const hide = ['search', 'me', 'audit', 'notifications', 'settings'].includes(state.tab);
   el.style.display = hide ? 'none' : 'flex';
   el.replaceChildren(...tabs.map(({ k, t }) =>
     h('button', {
@@ -835,24 +908,18 @@ function renderFolders() {
   ));
 }
 function renderBottomNav() {
-  // Плавающее облако: главные сценарии
   const tabs = [
-    { k: 'mine', t: 'Мои', icon: icons.list },
+    { k: 'mine', t: 'Задачи', icon: icons.list },
   ];
   if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все', icon: icons.all });
   tabs.push({ k: 'search', t: 'Поиск', icon: icons.search });
-  tabs.push({ k: 'more', t: 'Меню', icon: icons.settings });
+  tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
   $('bottom-nav').replaceChildren(...tabs.map(({ k, t, icon }) => {
-    const active = k === 'more'
-      ? !['mine', 'all', 'search'].includes(state.tab)
-      : state.tab === k;
+    const active = state.tab === k || (k === 'settings' && ['settings','me','audit','notifications'].includes(state.tab));
     return h('button', {
       class: active ? 'active' : '',
       type: 'button',
-      onclick: () => {
-        if (k === 'more') openMenu();
-        else go(k);
-      },
+      onclick: () => go(k),
     }, h('span', { html: icon }), h('span', {}, t));
   }));
 }
@@ -876,7 +943,7 @@ function go(tab) {
   if (typeof openRun !== 'undefined' && openRun._restore) { try { openRun._restore(); } catch {} openRun._restore = null; }
   if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
   state.tab = tab;
-  const titles = { mine:'Мои чеклисты', all:'Все чеклисты', tpl:'Шаблоны', people:'Сотрудники', me:'Профиль', audit:'Журнал аудита', notifications:'Уведомления', settings:'Настройки', search:'Поиск' };
+  const titles = { mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск' };
   $('topbar-title').textContent = titles[tab] || 'Чеклисты';
   renderBottomNav(); renderFolders(); renderSideMenu();
   const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAuditStub, notifications:renderNotificationsStub, settings:renderSettings, search:renderSearch };
@@ -895,6 +962,12 @@ function runCard(r, withWho) {
   const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
   const who = personName(r.assignee);
   const overdue = !!r.overdue;
+  const total = r.itemsCount ?? r.items?.length ?? r._count?.items ?? r.template?.items?.length ?? r.template?._count?.items;
+  const done = r.completedItemsCount ?? r.items?.filter?.(i => i.checked === true || i.textValue || i.numberValue != null || i.fileId)?.length;
+  let countLabel = '';
+  if (total != null && total !== '') {
+    countLabel = (done != null ? `${done}/${total}` : `${total}`) + ' пт';
+  }
   return h('div', {
     class: 'card click' + (overdue ? ' run-row-overdue' : ''),
     onclick: () => show(() => openRun(r.id)),
@@ -903,8 +976,13 @@ function runCard(r, withWho) {
       h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, title),
       statusBadge(r)
     ),
-    r.dueAt && h('div', { class: 'muted', style: 'margin-top:5px' }, 'Срок: ' + fmt(r.dueAt)),
-    withWho && who && h('div', { class: 'muted', style: 'margin-top:2px' }, who)
+    h('div', { class: 'row', style: 'margin-top:6px' },
+      h('div', { class: 'muted' },
+        (r.dueAt ? 'Срок: ' + fmt(r.dueAt) : '') +
+        (withWho && who ? ((r.dueAt ? ' · ' : '') + who) : '')
+      ),
+      countLabel && h('span', { class: 'badge neutral' }, countLabel)
+    )
   );
 }
 function emptyState(title, desc) {
@@ -912,7 +990,7 @@ function emptyState(title, desc) {
 }
 async function renderMine() {
   const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  setView(d.length ? d.map(r => runCard(r)) : emptyState('Нет чеклистов', 'Вам пока ничего не назначили'));
+  setView(d.length ? d.map(r => runCard(r)) : emptyState('Нет задач', 'Вам пока ничего не назначили'));
 }
 async function renderAll() {
   let q = `/checklists/runs?workspaceId=${state.wsId}&scope=all`;
@@ -1133,26 +1211,33 @@ async function openRun(id) {
     if (!acc.contains(search)) acc.append(search);
   };
 
+  const commentField = h('textarea', { rows: 2, placeholder: 'Комментарий к сдаче (необязательно)' });
+  const itemTotal = (run.items || []).length;
   const nodes = [
     h('div', { class: 'muted', style: 'margin-bottom:12px' },
-      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '')
+      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '') +
+      (itemTotal ? ` · пунктов: ${itemTotal}` : '')
     ),
     ...(run.items || []).map(it => itemNode(run, it, editable)),
   ];
 
   if (editable) {
+    nodes.push(h('div', { class: 'card' }, h('label', { style: 'margin-top:0' }, 'Комментарий'), commentField));
     nodes.push(h('button', {
       class: 'btn btn-primary',
       onclick: async (e) => {
         e.target.disabled = true;
         try {
-          const r = await api('POST', `/checklists/runs/${run.id}/complete`);
-          toast(`Завершён. Проблем: ${r?.flaggedCount ?? 0}`);
+          const body = {};
+          const c = commentField.value.trim();
+          if (c) body.comment = c;
+          const r = await api('POST', `/checklists/runs/${run.id}/complete`, Object.keys(body).length ? body : undefined);
+          toast(`Сдано. Проблем: ${r?.flaggedCount ?? 0}`);
           restoreChrome();
           go(['mine','all'].includes(state.tab) ? state.tab : 'mine');
         } catch (err) { toast(err.message, true); e.target.disabled = false; }
       },
-    }, 'Завершить'));
+    }, 'Сдать чеклист'));
   }
 
   setView(nodes);
@@ -1540,27 +1625,78 @@ async function renderProfile() {
   );
 }
 function renderSettings() {
+  const me = state.me;
   const accents = [
     { id: 'blue', color: '#2AABEE' }, { id: 'violet', color: '#8b5cf6' }, { id: 'teal', color: '#14b8a6' },
     { id: 'orange', color: '#f97316' }, { id: 'pink', color: '#ec4899' }, { id: 'green', color: '#22c55e' },
   ];
   setView(
-    h('div', { class: 'card' }, h('strong', {}, 'Тема'), h('div', { class: 'gap', style: 'margin-top:12px' },
-      h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'light'; applyAppearance(); go('settings'); } }, 'Светлая'),
-      h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'dark'; applyAppearance(); go('settings'); } }, 'Тёмная')
-    )),
-    h('div', { class: 'card' }, h('strong', {}, 'Цвет акцента'), h('div', { class: 'swatches' },
-      ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: () => { state.accent = a.id; applyAppearance(); go('settings'); } }))
-    )),
-    h('div', { class: 'card' }, h('strong', {}, 'Контрастность'), h('div', { class: 'gap', style: 'margin-top:12px' },
-      h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'normal'; applyAppearance(); go('settings'); } }, 'Обычная'),
-      h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'high'; applyAppearance(); go('settings'); } }, 'Высокая')
-    ), h('div', { class: 'small', style: 'margin-top:10px' }, 'Высокая — лучше читаемость текста')),
-    h('div', { class: 'card' }, h('strong', {}, 'Профиль'), h('div', { class: 'muted', style: 'margin-top:8px;font-size:14px' }, 'Откройте профиль из бокового меню — нажмите на свою карточку сверху.'),
-      h('button', { class: 'btn btn-secondary', style: 'margin-top:12px', onclick: () => go('me') }, 'Открыть профиль')),
-    h('div', { class: 'card' }, h('strong', {}, 'О приложении'), h('div', { class: 'muted', style: 'margin-top:8px' }, 'Чеклисты · Telegram Web App'), h('div', { class: 'small', style: 'margin-top:4px' }, 'UI 3.0 · glass + themes'))
+    h('div', { class: 'card click', onclick: () => go('me') },
+      h('div', { class: 'row' },
+        h('div', { style: 'display:flex;gap:12px;align-items:center;min-width:0' },
+          h('div', { class: 'avatar-lg', style: 'width:48px;height:48px;font-size:16px' },
+            state.avatarEmoji || initials(me)
+          ),
+          h('div', { style: 'min-width:0' },
+            h('strong', { style: 'font-size:16px' }, personName(me) || 'Профиль'),
+            h('div', { class: 'muted' }, me?.email || ''),
+            h('div', { class: 'small' }, 'Открыть профиль')
+          )
+        ),
+        h('span', { class: 'muted' }, '›')
+      )
+    ),
+    h('h2', {}, 'Разделы'),
+    h('div', { class: 'list-group' },
+      h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner card click', style: 'border:none;margin:0;box-shadow:none;background:transparent', onclick: () => go('notifications') },
+        h('span', { html: icons.msg, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+        h('div', { style: 'flex:1' }, h('strong', {}, 'Сообщения'), h('div', { class: 'small' }, 'Уведомления и комментарии')),
+        h('span', { class: 'muted' }, '›')
+      )),
+      h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('audit') },
+        h('span', { html: icons.audit, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+        h('div', { style: 'flex:1' }, h('strong', {}, 'Журнал аудита'), h('div', { class: 'small' }, 'История действий')),
+        h('span', { class: 'muted' }, '›')
+      )),
+      can('checklists.templates.read') && h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('tpl') },
+        h('span', { html: icons.template, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+        h('div', { style: 'flex:1' }, h('strong', {}, 'Шаблоны'), h('div', { class: 'small' }, 'Создание и назначение')),
+        h('span', { class: 'muted' }, '›')
+      )),
+      (can('users.create') || can('users.read')) && h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('people') },
+        h('span', { html: icons.people, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+        h('div', { style: 'flex:1' }, h('strong', {}, 'Команда'), h('div', { class: 'small' }, 'Сотрудники')),
+        h('span', { class: 'muted' }, '›')
+      ))
+    ),
+    h('h2', {}, 'Оформление'),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Тема'),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'light'; applyAppearance(); go('settings'); } }, 'Светлая'),
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'dark'; applyAppearance(); go('settings'); } }, 'Тёмная')
+      )
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Цвет'),
+      h('div', { class: 'swatches' },
+        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: () => { state.accent = a.id; applyAppearance(); go('settings'); } }))
+      )
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Контраст'),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'normal'; applyAppearance(); go('settings'); } }, 'Обычный'),
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'high'; applyAppearance(); go('settings'); } }, 'Высокий')
+      )
+    ),
+    h('button', {
+      class: 'btn btn-secondary', style: 'margin-top:20px',
+      onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); },
+    }, 'Выйти из аккаунта')
   );
 }
+
 async function renderSearch() {
   const inputWrap = h('div', { style: 'position:relative;margin-bottom:14px' });
   const input = h('input', {
@@ -1667,7 +1803,20 @@ function renderStub(title, description, iconHtml) {
   setView(h('div', { class: 'empty', style: 'padding-top:56px' }, h('div', { class: 'stub-icon', html: iconHtml }), h('div', { class: 'empty-title' }, title), h('div', { class: 'empty-desc' }, description), h('p', { class: 'small', style: 'margin-top:18px' }, 'Раздел подготовлен')));
 }
 function renderAuditStub() { renderStub('Журнал аудита', 'История действий', icons.audit); }
-function renderNotificationsStub() { renderStub('Уведомления', 'Лента событий позже', icons.bell); }
+function renderNotificationsStub() {
+  setView(
+    h('div', { class: 'empty', style: 'padding-top:40px' },
+      h('div', { class: 'stub-icon', html: icons.msg }),
+      h('div', { class: 'empty-title' }, 'Сообщения'),
+      h('div', { class: 'empty-desc' }, 'Здесь будут уведомления и комментарии к выполненным чеклистам')
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Комментарии'),
+      h('div', { class: 'muted', style: 'margin-top:8px;font-size:14px' },
+        'После сдачи чеклиста можно оставить комментарий для руководителя. Лента сообщений появится, когда на сервере будет API уведомлений.')
+    )
+  );
+}
 (async () => { try { await afterLogin(); } catch { toLogin(); } })();
 </script>
 </body>
