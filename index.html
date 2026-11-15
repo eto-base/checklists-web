@@ -1076,6 +1076,13 @@
   .card, .list-group { overflow: visible; }
   .card:has(.menu-pop) { position: relative; z-index: 60; }
   .card-head { position: relative; }
+
+  /* v4: perfectly round dock buttons */
+  .bottom-nav { --d: min(58px, calc((100vw - 28px - 68px) / var(--n, 3))); height: calc(var(--d) + 8px); width: auto !important; max-width: none; padding: 4px; }
+  .dock:has(.plus-orb:not(.hidden)) .bottom-nav { --d: min(58px, calc((100vw - 28px - 136px) / var(--n, 3))); max-width: none; }
+  .bottom-nav button { flex: 0 0 var(--d); width: var(--d); height: var(--d); min-width: 0; max-width: none; padding: 0; border-radius: 50%; }
+  .bottom-nav button svg { width: calc(var(--d) * .46); height: calc(var(--d) * .46); }
+  .nav-blob { border-radius: 50%; }
 </style>
 </head>
 <body>
@@ -1472,6 +1479,7 @@ function renderBottomNav() {
     return b;
   });
   nav.replaceChildren(blob, ...btns);
+  nav.style.setProperty('--n', tabs.length);
 
   const orb = $('search-orb');
   if (orb) {
@@ -1485,7 +1493,7 @@ function renderBottomNav() {
     if (!activeBtn) return;
     const navRect = nav.getBoundingClientRect();
     const br = activeBtn.getBoundingClientRect();
-    const pad = 3;
+    const pad = 4;
     const toLeft = br.left - navRect.left;
     const toWidth = br.width;
     blob.style.top = pad + 'px';
@@ -2306,34 +2314,12 @@ function renderSettings() {
         h('span', { class: 'muted' }, '›')
       )
     ),
-    h('h2', {}, 'Разделы'),
-    h('div', { class: 'list-group' },
-      h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('layout') },
-        h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
-        h('div', { style: 'flex:1' }, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль')),
-        h('span', { class: 'muted' }, '›')
-      )),
-      h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner card click', style: 'border:none;margin:0;box-shadow:none;background:transparent', onclick: () => go('notifications') },
-        h('span', { html: icons.msg, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
-        h('div', { style: 'flex:1' }, h('strong', {}, 'Сообщения'), h('div', { class: 'small' }, 'Уведомления и комментарии')),
-        h('span', { class: 'muted' }, '›')
-      )),
-      h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('audit') },
-        h('span', { html: icons.audit, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
-        h('div', { style: 'flex:1' }, h('strong', {}, 'Журнал аудита'), h('div', { class: 'small' }, 'История действий')),
-        h('span', { class: 'muted' }, '›')
-      )),
-      can('checklists.templates.read') && h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('tpl') },
-        h('span', { html: icons.template, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
-        h('div', { style: 'flex:1' }, h('strong', {}, 'Шаблоны'), h('div', { class: 'small' }, 'Создание и назначение')),
-        h('span', { class: 'muted' }, '›')
-      )),
-      (can('users.create') || can('users.read')) && h('div', { class: 'list-row' }, h('div', { class: 'list-row-inner', style: 'cursor:pointer', onclick: () => go('people') },
-        h('span', { html: icons.people, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
-        h('div', { style: 'flex:1' }, h('strong', {}, 'Команда'), h('div', { class: 'small' }, 'Сотрудники')),
-        h('span', { class: 'muted' }, '›')
-      ))
-    ),
+    h('div', { class: 'card click', style: 'margin-top:12px', onclick: () => go('layout') },
+      h('div', { class: 'row' },
+        h('div', { style: 'display:flex;gap:12px;align-items:center' },
+          h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+          h('div', {}, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль'))),
+        h('span', { class: 'muted' }, '›'))),
     h('h2', {}, 'Оформление'),
     h('div', { class: 'card' },
       h('strong', {}, 'Тема'),
