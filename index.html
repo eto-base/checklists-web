@@ -467,6 +467,68 @@
     background: var(--danger-soft);
   }
 
+
+  /* Telegram-like top folders */
+  .folders {
+    position: sticky; top: var(--header-height); z-index: 35;
+    background: var(--bg);
+    padding: 8px 12px 10px;
+    display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .folders::-webkit-scrollbar { display: none; }
+  .folder {
+    flex: 0 0 auto; border: none; cursor: pointer; font-family: inherit;
+    padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
+    background: var(--surface); color: var(--text-secondary);
+    border: 0.5px solid var(--border); min-height: 36px;
+    box-shadow: var(--shadow);
+  }
+  .folder.active {
+    background: var(--accent); color: #fff; border-color: var(--accent);
+  }
+  .folder:active { transform: scale(.97); }
+
+  /* Floating cloud bottom console */
+  .bottom-nav {
+    position: fixed; left: 50%; right: auto; bottom: calc(12px + var(--safe-bottom));
+    transform: translateX(-50%);
+    width: min(420px, calc(100% - 24px));
+    height: 64px; padding: 0; padding-bottom: 0;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(0,0,0,.06);
+    display: flex; align-items: center; z-index: 30;
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  }
+  [data-theme="dark"] .bottom-nav {
+    box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.3);
+    background: rgba(28, 34, 44, 0.92);
+  }
+  .bottom-nav button {
+    flex: 1; border: none; background: transparent; color: var(--text-muted);
+    font-size: 10px; font-weight: 600; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px; cursor: pointer;
+    font-family: inherit; padding: 8px 4px; min-height: 52px; border-radius: 16px;
+    margin: 0 4px;
+  }
+  .bottom-nav button.active {
+    color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .bottom-nav button svg { width: 24px; height: 24px; }
+
+  #view {
+    padding-bottom: calc(64px + var(--safe-bottom) + 28px);
+  }
+  .fab {
+    bottom: calc(64px + var(--safe-bottom) + 28px);
+  }
+  .toast {
+    bottom: calc(64px + var(--safe-bottom) + 24px);
+  }
+
 </style>
 </head>
 <body>
@@ -522,6 +584,7 @@
         </button>
       </div>
     </header>
+    <div class="folders" id="folders"></div>
     <div class="overlay" id="overlay"></div>
     <aside class="sidemenu" id="sidemenu">
       <button class="side-close" id="side-close" aria-label="Закрыть">
@@ -667,7 +730,7 @@ async function afterLogin() {
   state.workspaces = arr(await api('GET', '/workspaces'));
   if (!state.workspaces.find(w => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
   localStorage.setItem('wsId', state.wsId || '');
-  showScreen('app-screen'); updateSideUser(); renderWsSelect(); renderSideMenu(); renderBottomNav();
+  showScreen('app-screen'); updateSideUser(); renderWsSelect(); renderSideMenu(); renderBottomNav(); renderFolders();
   go(state.me.requirePasswordChange ? 'me' : 'mine');
 }
 function updateSideUser() {
@@ -752,17 +815,40 @@ function sideItem(tab, iconHtml, label, isStub = false) {
     h('span', { html: iconHtml }), label, isStub ? h('span', { class: 'soon' }, 'скоро') : h('span', { class: 'chev' }, '›'));
 }
 $('logout-side').onclick = async () => { closeMenu(); try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
+function renderFolders() {
+  const el = $('folders');
+  if (!el) return;
+  const tabs = [{ k: 'mine', t: 'Мои' }];
+  if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все' });
+  if (can('checklists.templates.read')) tabs.push({ k: 'tpl', t: 'Шаблоны' });
+  if (can('users.create') || can('users.read')) tabs.push({ k: 'people', t: 'Люди' });
+  tabs.push({ k: 'settings', t: 'Ещё' });
+  // hide folders on pure utility screens
+  const hide = ['search', 'me', 'audit', 'notifications'].includes(state.tab);
+  el.style.display = hide ? 'none' : 'flex';
+  el.replaceChildren(...tabs.map(({ k, t }) =>
+    h('button', {
+      class: 'folder' + (state.tab === k ? ' active' : ''),
+      type: 'button',
+      onclick: () => go(k),
+    }, t)
+  ));
+}
 function renderBottomNav() {
-  const tabs = [{ k: 'mine', t: 'Мои', icon: icons.list }];
+  // Плавающее облако: главные сценарии
+  const tabs = [
+    { k: 'mine', t: 'Мои', icon: icons.list },
+  ];
   if (can('checklists.runs.read_all')) tabs.push({ k: 'all', t: 'Все', icon: icons.all });
-  // Ещё = открыть боковое меню (второй этаж: шаблоны, люди, настройки)
-  tabs.push({ k: 'more', t: 'Ещё', icon: icons.settings });
+  tabs.push({ k: 'search', t: 'Поиск', icon: icons.search });
+  tabs.push({ k: 'more', t: 'Меню', icon: icons.settings });
   $('bottom-nav').replaceChildren(...tabs.map(({ k, t, icon }) => {
     const active = k === 'more'
       ? !['mine', 'all', 'search'].includes(state.tab)
       : state.tab === k;
     return h('button', {
       class: active ? 'active' : '',
+      type: 'button',
       onclick: () => {
         if (k === 'more') openMenu();
         else go(k);
@@ -792,7 +878,7 @@ function go(tab) {
   state.tab = tab;
   const titles = { mine:'Мои чеклисты', all:'Все чеклисты', tpl:'Шаблоны', people:'Сотрудники', me:'Профиль', audit:'Журнал аудита', notifications:'Уведомления', settings:'Настройки', search:'Поиск' };
   $('topbar-title').textContent = titles[tab] || 'Чеклисты';
-  renderBottomNav(); renderSideMenu();
+  renderBottomNav(); renderFolders(); renderSideMenu();
   const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAuditStub, notifications:renderNotificationsStub, settings:renderSettings, search:renderSearch };
   show(screens[tab] || renderMine);
 }
