@@ -272,7 +272,7 @@
 </head>
 <body>
 <div id="app">
-  <div id="login-screen" class="hidden">
+  <div id="login-screen">
     <div class="login-card">
       <div class="login-logo">✓</div>
       <h1>Чеклисты</h1>
@@ -981,7 +981,7 @@ async function renderSearch() {
       const users = results.filter(r => r.type === 'user');
       if (runs.length) { nodes.push(h('div', { class: 'section-label' }, 'Чеклисты')); runs.forEach(({ data: r }) => nodes.push(runCard(r, true))); }
       if (tpls.length) { nodes.push(h('div', { class: 'section-label' }, 'Шаблоны')); tpls.forEach(({ data: t }) => nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) }, h('strong', {}, t.title), t.description && h('div', { class: 'muted' }, t.description)))); }
-      if (users.length) { nodes.push(h('div', { class: 'section-label' }, 'Сотрудники')); users.forEach(({ data: u }) => nodes.push(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { style: 'display:flex;gap:12px;align-items:center' }, h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)), h('div', {}, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email || '')))))); }
+      if (users.length) { nodes.push(h('div', { class: 'section-label' }, 'Сотрудники')); users.forEach(({ data: u }) => nodes.push(h('div', { class: 'card' }, h('div', { class: 'row' }, h('div', { style: 'display:flex;gap:12px;align-items:center' }, h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)), h('div', {}, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email || ''))))))); }
     }
     setView(nodes); input.focus();
     try { const len = input.value.length; input.setSelectionRange(len, len); } catch {}
