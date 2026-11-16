@@ -1116,6 +1116,35 @@
   .sort-dir { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
   .sort-dir svg { width: 16px; height: 16px; }
   input[type="datetime-local"] { width: auto; min-width: 200px; max-width: 100%; height: 40px; min-height: 40px; padding: 6px 14px; font-size: 14px; border-radius: 999px; display: block; }
+
+  /* ===== Liquid Glass motion ===== */
+  :root { --flow: cubic-bezier(.22, 1, .36, 1); --gel: cubic-bezier(.34, 1.4, .64, 1); }
+  @keyframes lgIn { from { opacity: 0; transform: translateY(16px) scale(.985); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lgBack { from { opacity: 0; transform: translateX(-18px) scale(.985); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lgPop { from { opacity: 0; transform: scale(.82, .7); filter: blur(6px); } 60% { transform: scale(1.03, 1.05); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lgSkeleton { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  #view.lg-in > * { animation: lgIn .6s var(--flow) backwards; }
+  #view.lg-back > * { animation: lgBack .55s var(--flow) backwards; }
+  #view > *:nth-child(2) { animation-delay: .04s; } #view > *:nth-child(3) { animation-delay: .08s; }
+  #view > *:nth-child(4) { animation-delay: .12s; } #view > *:nth-child(5) { animation-delay: .16s; }
+  #view > *:nth-child(6) { animation-delay: .2s; }  #view > *:nth-child(n+7) { animation-delay: .24s; }
+  .skeleton { animation: lgSkeleton 1.6s ease-in-out infinite; }
+  .card, .btn, .chip, .choice-opt, .list-row-inner, .topbar-btn, .folder, .lay-sw, .badge {
+    transition: transform .5s var(--gel), background-color .35s var(--flow), box-shadow .45s var(--flow), border-color .35s var(--flow), opacity .3s var(--flow), color .3s var(--flow);
+  }
+  .card.click:active, .btn:active, .chip:active, .choice-opt:active, .list-row-inner:active { transform: scale(.972, .955); transition-duration: .15s; }
+  .menu-pop { transform-origin: top right; animation: lgPop .5s var(--gel) both; backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5); }
+  .toast { transition: transform .55s var(--gel), opacity .4s var(--flow); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
+  .topbar { backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5); }
+  .card { backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); }
+  .chip.active, .choice-opt.on { box-shadow: 0 6px 22px var(--accent-glow); }
+  .lay-sw i { transition: transform .5s var(--gel), background-color .3s var(--flow); }
+  .trash-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+  .trash-btn:active { background: rgba(239,68,68,.16); color: #ef4444; }
+  .trash-btn svg { width: 19px; height: 19px; }
+  #register-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); }
+  .code-chip { font: 600 17px ui-monospace, Menlo, monospace; letter-spacing: .04em; user-select: all; }
+  @media (prefers-reduced-motion: reduce) { #view > *, .menu-pop, .skeleton { animation: none !important; } * { transition-duration: .01s !important; } }
 </style>
 </head>
 <body>
@@ -1125,12 +1154,13 @@
       <div class="login-logo">✓</div>
       <h1>Чеклисты</h1>
       <p class="subtitle">Войдите в аккаунт</p>
-      <label for="login-id">Email или никнейм</label>
-      <input type="text" id="login-id" placeholder="you@example.com или nickname" autocomplete="username">
+      <label for="login-id">Никнейм</label>
+      <input type="text" id="login-id" placeholder="nickname" autocomplete="username" autocapitalize="none" autocorrect="off">
       <label for="password">Пароль</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       <button class="btn btn-primary" id="login-btn">Войти</button>
       <button class="btn btn-ghost" id="forgot-btn" style="width:100%;margin-top:12px;justify-content:center">Забыли пароль?</button>
+      <button class="btn btn-ghost" id="reg-open" style="width:100%;margin-top:4px;justify-content:center">Регистрация по коду</button>
       <div id="login-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
@@ -1156,6 +1186,26 @@
       <button class="btn btn-primary" id="forgot-submit">Отправить</button>
       <button class="btn btn-ghost" id="forgot-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
       <div id="forgot-msg" class="hidden" style="margin-top:16px"></div>
+    </div>
+  </div>
+  <div id="register-screen" class="hidden">
+    <div class="login-card">
+      <div class="login-logo">＋</div>
+      <h1>Регистрация</h1>
+      <p class="subtitle">Код выдаёт администратор</p>
+      <label for="reg-code">Код организации</label>
+      <input type="text" id="reg-code" placeholder="COFFEE-2026" autocomplete="off" autocapitalize="characters">
+      <label for="reg-nick">Никнейм (уникальный)</label>
+      <input type="text" id="reg-nick" placeholder="nickname" autocomplete="username" autocapitalize="none">
+      <label for="reg-first">Имя</label>
+      <input type="text" id="reg-first" autocomplete="given-name">
+      <label for="reg-last">Фамилия</label>
+      <input type="text" id="reg-last" autocomplete="family-name">
+      <label for="reg-pass">Пароль (от 8 символов, буквы и цифры)</label>
+      <input type="password" id="reg-pass" autocomplete="new-password">
+      <button class="btn btn-primary" id="reg-btn">Зарегистрироваться</button>
+      <button class="btn btn-ghost" id="reg-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
+      <div id="reg-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
   <div id="app-screen" class="hidden">
@@ -1203,7 +1253,7 @@ const $ = (id) => document.getElementById(id);
 let csrfToken = null;
 const state = {
   me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null,
-  tab: 'mine', filter: '', searchQuery: '', searchPrevTab: 'mine', stack: [], cur: null,
+  tab: 'mine', filter: '', searchQuery: '', searchPrevTab: 'mine', stack: [], cur: null, cat: 'all', dir: 'fwd',
   theme: localStorage.getItem('theme') || 'light',
   accent: localStorage.getItem('accent') || 'blue',
   contrast: localStorage.getItem('contrast') || 'normal',
@@ -1228,6 +1278,7 @@ const icons = {
   back: S('<path d="M15 5l-7 7 7 7"/>'),
   bell: S('<path d="M6 16v-5a6 6 0 1112 0v5l1.5 2h-15z"/><path d="M10 21h4"/>'),
   plus: S('<path d="M12 5v14M5 12h14"/>'),
+  trash: S('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/>'),
   tune: S('<rect x="3.5" y="4" width="17" height="6" rx="2.5"/><rect x="3.5" y="14" width="10" height="6" rx="2.5"/><path d="M17.5 17h3M19 15.5v3"/>'),
   star: S('<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9-4.3-4.1 5.9-.8z"/>'),
   up: S('<path d="M6 14l6-6 6 6"/>'),
@@ -1273,7 +1324,12 @@ const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_P
 const statusName = (s) => STATUS[s] || s || '';
 const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || u.email || '') : '';
 const initials = (u) => { const n = personName(u); if (!n) return '?'; return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); };
-function setView(...nodes) { $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType)); }
+function setView(...nodes) {
+  const v = $('view');
+  v.replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
+  v.classList.remove('lg-in', 'lg-back'); void v.offsetWidth;
+  v.classList.add(state.dir === 'back' ? 'lg-back' : 'lg-in');
+}
 function toast(msg, bad = false) {
   const t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : '') + ' show';
   clearTimeout(toast._t); toast._t = setTimeout(() => { t.className = 'toast'; }, 3800);
@@ -1322,7 +1378,7 @@ function applyAppearance() {
   try { tg?.setBackgroundColor?.(state.theme === 'dark' ? '#0a0c10' : '#eef1f5'); } catch {}
 }
 applyAppearance();
-function showScreen(id) { ['login-screen','tfa-screen','forgot-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
+function showScreen(id) { ['login-screen','tfa-screen','forgot-screen','register-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
 function toLogin(msg) {
   csrfToken = null; state.me = null; state.stack = []; state.cur = null; localStorage.removeItem('token'); showScreen('login-screen');
   const el = $('login-error');
@@ -1368,7 +1424,7 @@ $('login-btn').onclick = async () => {
   if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
   $('login-btn').disabled = true;
   try {
-    const payload = id.includes('@') ? { email: id, password } : { email: id, password, nickname: id };
+    const nick = id.replace(/^@/, ''); const payload = (id.includes('@') && !id.startsWith('@')) ? { email: id, password } : { email: nick, password, nickname: nick };
     const data = await api('POST', '/auth/login', payload);
     if (data.twoFactorRequired) {
       showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
@@ -1392,6 +1448,26 @@ $('tfa-btn').onclick = async () => {
   finally { $('tfa-btn').disabled = false; }
 };
 $('tfa-back').onclick = () => toLogin();
+$('reg-open').onclick = () => { $('reg-error').classList.add('hidden'); showScreen('register-screen'); };
+$('reg-back').onclick = () => toLogin();
+$('reg-btn').onclick = async () => {
+  const err = (m) => { $('reg-error').textContent = m; $('reg-error').classList.remove('hidden'); };
+  $('reg-error').classList.add('hidden');
+  const code = $('reg-code').value.trim(), nick = $('reg-nick').value.trim().replace(/^@/, '');
+  const firstName = $('reg-first').value.trim(), lastName = $('reg-last').value.trim(), password = $('reg-pass').value;
+  if (!code) return err('Введите код организации');
+  if (!/^[A-Za-z0-9_.]{3,32}$/.test(nick)) return err('Никнейм: 3–32 символа, латиница, цифры, _ и .');
+  if (password.length < 8 || !/\d/.test(password) || !/[A-Za-zА-Яа-я]/.test(password)) return err('Пароль: от 8 символов, буквы и цифры');
+  $('reg-btn').disabled = true;
+  try {
+    await api('POST', '/auth/register', { code, inviteCode: code, nickname: nick, firstName, lastName, password });
+    $('login-id').value = nick; $('password').value = password;
+    $('reg-pass').value = '';
+    await $('login-btn').onclick();
+  } catch (e) {
+    err(e.status === 409 ? 'Этот никнейм уже занят' : e.status === 404 ? 'Регистрация пока не поддерживается сервером' : (e.message || 'Не удалось зарегистрироваться'));
+  } finally { $('reg-btn').disabled = false; }
+};
 $('forgot-btn').onclick = () => { showScreen('forgot-screen'); $('forgot-email').value = $('login-id').value.includes('@') ? $('login-id').value : ''; $('forgot-msg').classList.add('hidden'); };
 $('forgot-back').onclick = () => toLogin();
 $('forgot-submit').onclick = async () => {
@@ -1496,7 +1572,7 @@ function renderBottomNav() {
   if (!blob) blob = h('div', { class: 'nav-blob' });
 
   const btns = tabs.map(({ k, t, icon }) => {
-    const active = state.tab === k || (k === 'settings' && (['settings','me','layout'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
+    const active = state.tab === k || (k === 'settings' && (['settings','me','layout','codes'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
     const b = h('button', {
       class: active ? 'active' : '',
       type: 'button',
@@ -1554,9 +1630,10 @@ function parseChoiceUnit(unit) {
   if (parts.length < 3) return null;
   return { mode: parts[1], options: parts.slice(2).join(':').split('|').filter(Boolean) };
 }
-const TITLES = { mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
+const TITLES = { codes:'Коды регистрации', mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
 function sameView(a, b) { return !!(a && b && a.tab === b.tab && !a.sub && !b.sub); }
 function navigate(desc, opts = {}) {
+  state.dir = opts.back ? 'back' : 'fwd';
   const prev = state.cur;
   if (prev && !opts.replace) {
     const top = state.stack[state.stack.length - 1];
@@ -1571,7 +1648,7 @@ function go(tab, opts) { navigate({ tab }, opts); }
 function push(render, extra) { navigate({ tab: state.tab, sub: true, render, ...(extra || {}) }); }
 function goBack() {
   const prev = state.stack.pop();
-  navigate(prev || { tab: 'mine' }, { replace: true });
+  navigate(prev || { tab: 'mine' }, { replace: true, back: true });
 }
 function openRunNav(id) { push(() => openRun(id), { runId: id }); }
 function openUserNav(id) { push(() => openUser(id), { userId: id }); }
@@ -1602,7 +1679,7 @@ function setTopMore(items) {
 }
 function renderCur() {
   const d = state.cur, tab = d.tab;
-  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
+  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout, codes:renderCodes };
   state.tab = tab;
   document.querySelectorAll('.menu-pop').forEach(m => m.remove());
   setTopMore(null);
@@ -1777,7 +1854,7 @@ function statusBadge(r) {
   if (r.status === 'CANCELLED' || r.status === 'CANCELED') return h('span', { class: 'badge neutral' }, 'Отменён');
   return h('span', { class: 'badge' }, statusName(r.status));
 }
-function runCard(r, withWho) {
+function runCard(r, withWho, onDeleted) {
   const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
   const who = personName(r.assignee);
   const overdue = !!r.overdue;
@@ -1793,7 +1870,8 @@ function runCard(r, withWho) {
   },
     h('div', { class: 'row' },
       h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, title),
-      statusBadge(r)
+      statusBadge(r),
+      canDeleteRun() && h('button', { class: 'trash-btn', type: 'button', title: 'Удалить', html: icons.trash, onclick: (e) => { e.stopPropagation(); deleteRun(r, onDeleted); } })
     ),
     h('div', { class: 'row', style: 'margin-top:6px' },
       h('div', { class: 'muted' },
@@ -1831,22 +1909,41 @@ function sortBar(redraw) {
     h('button', { class: 'chip sort-dir', type: 'button', title: 'Направление', html: runSort.dir === 'asc' ? icons.up : icons.down, onclick: () => { runSort.dir = runSort.dir === 'asc' ? 'desc' : 'asc'; save(); } }),
     ...Object.entries(SORTS).map(([k, v]) => h('button', { class: 'chip' + (runSort.key === k ? ' active' : ''), type: 'button', onclick: () => { runSort.key = k; save(); } }, v)));
 }
+const CLOSED = ['COMPLETED', 'CANCELLED', 'CANCELED', 'REJECTED', 'DECLINED'];
+const RUN_CATS = [
+  ['all', 'Все', () => true],
+  ['assigned', 'Назначенные', r => ['ASSIGNED', 'PENDING'].includes(r.status)],
+  ['notdone', 'Непройденные', r => !CLOSED.includes(r.status)],
+  ['done', 'Пройденные', r => r.status === 'COMPLETED'],
+  ['rejected', 'Отклонённые', r => ['REJECTED', 'DECLINED', 'CANCELLED', 'CANCELED'].includes(r.status)],
+  ['overdue', 'Просроченные', r => !CLOSED.includes(r.status) && (!!r.overdue || (r.dueAt && new Date(r.dueAt) < new Date()))],
+];
+const canDeleteRun = () => can('checklists.assign') || can('checklists.templates.manage');
+async function deleteRun(r, after) {
+  const t = r.title || r.template?.title || r.templateTitle || 'Чеклист';
+  if (!confirm(`Удалить чеклист «${t}»? Это действие нельзя отменить.`)) return false;
+  try { await api('DELETE', `/checklists/runs/${r.id}`); toast('Чеклист удалён'); if (after) after(r); return true; }
+  catch (e) { toast(e.status === 404 || e.status === 405 ? 'Удаление чеклистов пока недоступно на сервере' : e.status === 403 ? 'Недостаточно прав' : (e.message || 'Ошибка'), true); return false; }
+}
 function runsScreen(d, withWho, head, emptyNode) {
-  const box = h('div');
-  const draw = () => { const sorted = sortRuns(d); box.replaceChildren(sortBar(draw), ...(sorted.length ? sorted.map(r => runCard(r, withWho)) : [emptyNode])); };
+  const box = h('div'), catBar = h('div', { class: 'chips sortbar' });
+  const removed = (r) => { d = d.filter(x => x.id !== r.id); draw(); };
+  const draw = () => {
+    const cat = RUN_CATS.find(c => c[0] === state.cat) || RUN_CATS[0];
+    catBar.replaceChildren(...RUN_CATS.map(([k, t, f]) => h('button', { class: 'chip' + (cat[0] === k ? ' active' : ''), type: 'button', onclick: () => { state.cat = k; draw(); } }, `${t} · ${d.filter(f).length}`)));
+    const sorted = sortRuns(d.filter(cat[2]));
+    box.replaceChildren(sortBar(draw), ...(sorted.length ? sorted.map(r => runCard(r, withWho, removed)) : [emptyNode]));
+  };
   draw();
-  setView(head, box);
+  setView(head, catBar, box);
 }
 async function renderMine() {
   const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
   runsScreen(d, false, null, emptyState('Нет задач', 'Вам пока ничего не назначили'));
 }
 async function renderAll() {
-  let q = `/checklists/runs?workspaceId=${state.wsId}&scope=all`;
-  if (state.filter === 'overdue') q += '&overdue=true';
-  if (state.filter === 'done') q += '&status=COMPLETED';
-  const d = arr(await api('GET', q));
-  runsScreen(d, true, h('div', { class: 'chips' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')), emptyState('Ничего не найдено'));
+  const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
+  runsScreen(d, true, null, emptyState('Ничего не найдено', 'В этой категории чеклистов нет'));
 }
 function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
 async function photoURL(id) {
@@ -2003,6 +2100,9 @@ async function openRun(id) {
         });
       } catch (err) { toast(err.message, true); }
     } });
+  }
+  if (canDeleteRun()) {
+    moreItems.push({ label: 'Удалить чеклист', danger: true, run: async () => { if (await deleteRun(run)) goBack(); } });
   }
   // «⋯» показываем только если в нём есть действия
   setTopMore(moreItems);
@@ -2204,10 +2304,10 @@ async function renderTemplates() {
               } }, 'Копировать'),
               h('button', { type: 'button', class: 'danger', onclick: async () => {
                 openMenuId = null;
-                if (!confirm('Архивировать «' + t.title + '»?')) return;
-                try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); }
+                if (!confirm('Удалить шаблон «' + t.title + '»? Это действие нельзя отменить.')) return;
+                try { await api('DELETE', `/checklists/templates/${t.id}`); toast('Шаблон удалён'); go('tpl'); }
                 catch (err) { toast(err.message, true); }
-              } }, 'Архивировать')
+              } }, 'Удалить')
             );
             head.append(pop);
           },
@@ -2240,26 +2340,38 @@ async function showAssign(t) {
   const listBox = h('div', { class: 'stack', style: 'margin-top:8px' });
   const due = h('input', { type: 'datetime-local' });
 
+  let q = '';
+  const counter = h('div', { class: 'small', style: 'margin-top:6px' });
+  const visible = () => users.filter(u => !q || [personName(u), u.nickname, u.email].join(' ').toLowerCase().includes(q));
   const renderList = () => {
-    listBox.replaceChildren(...(users.length ? users.map(u => {
-      const id = u.id;
-      const on = selected.has(id);
-      return h('div', {
-        class: 'choice-opt' + (on ? ' on' : ''),
-        onclick: () => { if (selected.has(id)) selected.delete(id); else selected.add(id); renderList(); },
-      }, (on ? '✓ ' : '') + personName(u) + (u.email ? ` (${u.email})` : ''));
-    }) : [h('div', { class: 'alert alert-error' }, 'Нет сотрудников')]));
+    const list = visible();
+    listBox.replaceChildren(...(list.length ? list.map(u => {
+      const on = selected.has(u.id);
+      return h('div', { class: 'choice-opt' + (on ? ' on' : ''), onclick: () => { if (selected.has(u.id)) selected.delete(u.id); else selected.add(u.id); renderList(); } },
+        (on ? '✓ ' : '') + personName(u) + (u.nickname ? ` @${u.nickname}` : (u.email ? ` (${u.email})` : '')));
+    }) : [h('div', { class: 'alert alert-error' }, users.length ? 'Никого не найдено' : 'Нет сотрудников')]));
+    counter.textContent = `Выбрано: ${selected.size} из ${users.length}`;
   };
+  const toolsBar = h('div', {},
+    h('input', { type: 'search', placeholder: 'Поиск по имени или нику', oninput: (e) => { q = e.target.value.trim().toLowerCase(); renderList(); } }),
+    h('div', { class: 'chips', style: 'margin-top:8px' },
+      h('button', { class: 'chip', type: 'button', onclick: () => { visible().forEach(u => selected.add(u.id)); renderList(); } }, 'Выбрать всех'),
+      h('button', { class: 'chip', type: 'button', onclick: () => { selected.clear(); renderList(); } }, 'Снять выбор'),
+      ...Object.entries(ROLE_RU).filter(([c]) => users.some(u => userRoleCode(u).toUpperCase() === c)).map(([c, t]) =>
+        h('button', { class: 'chip', type: 'button', onclick: () => { users.filter(u => userRoleCode(u).toUpperCase() === c).forEach(u => selected.add(u.id)); renderList(); } }, '+ ' + t))),
+    counter);
   renderList();
 
   setView(
     h('h1', {}, 'Назначить'),
     h('p', { class: 'page-desc' }, t.title),
     h('label', {}, 'Исполнители (можно несколько)'),
+    toolsBar,
     listBox,
     h('label', {}, 'Срок'), due,
     h('button', { class: 'btn btn-primary', onclick: async (e) => {
       if (!selected.size) return toast('Выберите хотя бы одного', true);
+      if (selected.size > 1 && !confirm(`Назначить «${t.title}» выбранным сотрудникам (${selected.size})?`)) return;
       e.target.disabled = true;
       let ok = 0, fail = 0;
       for (const assigneeId of selected) {
@@ -2395,6 +2507,25 @@ async function updateUserRole(u, code) {
   }
   throw last;
 }
+const PERMS = [
+  ['checklists.runs.read_all', 'Видеть все чеклисты'], ['checklists.templates.read', 'Видеть шаблоны'],
+  ['checklists.templates.manage', 'Управлять шаблонами'], ['checklists.assign', 'Назначать чеклисты'],
+  ['users.read', 'Видеть сотрудников'], ['users.create', 'Добавлять сотрудников'],
+  ['users.update', 'Изменять сотрудников'], ['users.delete', 'Удалять сотрудников'], ['users.manage', 'Управлять доступом'],
+];
+async function tryApi(tries) {
+  let last;
+  for (const [m, p, b] of tries) {
+    try { return await api(m, p, b); }
+    catch (e) { last = e; if (e.status === 401 || e.status === 403) throw e; }
+  }
+  throw last;
+}
+const updateUserPerms = (u, permissions) => tryApi([['PATCH', `/users/${u.id}`, { permissions }], ['PUT', `/users/${u.id}/permissions`, { permissions }], ['PATCH', `/users/${u.id}/permissions`, { permissions }]]);
+const sendMessage = (u, text) => tryApi([
+  ['POST', '/messages', { recipientId: u.id, text, workspaceId: state.wsId }],
+  ['POST', '/notifications', { userId: u.id, title: 'Сообщение от ' + (personName(state.me) || 'руководителя'), body: text }],
+]);
 async function openUser(id) {
   const users = await loadUsers();
   if (state.cur?.userId !== id) return;
@@ -2405,6 +2536,16 @@ async function openUser(id) {
   const canDel = !isMe && (can('users.delete') || can('users.manage') || can('users.update') || can('users.create'));
   const canAssign = can('checklists.assign');
   const role = userRoleCode(u).toUpperCase();
+
+  // права доступа
+  const canPerm = !isMe && can('users.manage');
+  const perms = new Set(Array.isArray(u.permissions) ? u.permissions : []);
+  const permBox = h('div');
+  const drawPerms = () => permBox.replaceChildren(...PERMS.map(([k, t]) => h('div', { class: 'lay-row' },
+    h('span', { class: 'lay-t' }, t),
+    h('button', { class: 'lay-sw' + (perms.has(k) ? ' on' : ''), type: 'button', onclick: () => { if (perms.has(k)) perms.delete(k); else perms.add(k); drawPerms(); } }, h('i')))));
+  drawPerms();
+  const msgField = h('textarea', { rows: 3, placeholder: 'Сообщение сотруднику…' });
 
   // полномочия
   let newRole = ROLE_RU[role] ? role : '';
@@ -2483,6 +2624,31 @@ async function openUser(id) {
         } }, 'Сохранить роль'),
       ] : h('div', { class: 'muted' }, isMe ? 'Это ваш аккаунт — свою роль менять нельзя.' : 'Менять роли может только руководитель или администратор.' + (role ? ' Сейчас: ' + roleRu(role) : ''))),
 
+    canPerm && h('h2', {}, 'Права доступа'),
+    canPerm && h('div', { class: 'card' },
+      !Array.isArray(u.permissions) && h('div', { class: 'small', style: 'margin-bottom:8px' }, 'Сервер не отдал текущие права — сохранятся только отмеченные.'),
+      permBox,
+      h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
+        const btn = e.currentTarget; btn.disabled = true;
+        try { await updateUserPerms(u, [...perms]); toast('Права обновлены'); show(() => openUser(id)); }
+        catch (err) { toast(err.status === 403 ? 'Недостаточно прав' : (err.status === 404 || err.status === 405) ? 'Управление правами пока недоступно на сервере' : (err.message || 'Ошибка'), true); btn.disabled = false; }
+      } }, 'Сохранить права')),
+
+    !isMe && h('h2', {}, 'Написать сотруднику'),
+    !isMe && h('div', { class: 'card' }, msgField,
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: async (e) => {
+          const text = msgField.value.trim(); if (!text) return toast('Введите текст сообщения', true);
+          const btn = e.currentTarget; btn.disabled = true;
+          try { await sendMessage(u, text); msgField.value = ''; toast('Сообщение отправлено'); }
+          catch (err) { toast(err.status === 404 || err.status === 405 ? 'Сообщения пока недоступны на сервере' : (err.message || 'Не удалось отправить'), true); }
+          btn.disabled = false;
+        } }, 'Отправить'),
+        (u.telegramUsername || u.telegram) && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => {
+          const link = 'https://t.me/' + String(u.telegramUsername || u.telegram).replace(/^@/, '');
+          if (tg?.openTelegramLink) tg.openTelegramLink(link); else window.open(link, '_blank');
+        } }, 'Открыть в Telegram'))),
+
     runs.length > 0 && h('h2', {}, `Чеклисты сотрудника · ${runs.length}`),
     runs.length > 0 && sortRuns(runs).slice(0, 10).map(r => runCard(r, false)),
 
@@ -2492,11 +2658,69 @@ async function openUser(id) {
     } }, 'Удалить сотрудника')
   );
 }
+
+async function codesApi(method, suffix, body) {
+  let last;
+  for (const p of ['/org/invite-codes', '/invite-codes', '/auth/invite-codes']) {
+    try { return await api(method, p + suffix, body); }
+    catch (e) { last = e; if (e.status !== 404 && e.status !== 405) throw e; }
+  }
+  throw last;
+}
+async function renderCodes() {
+  let list;
+  try { const r = await codesApi('GET', ''); list = Array.isArray(r) ? r : (r?.codes || arr(r)); }
+  catch (e) { return loadFail(e, 'Коды регистрации', () => show(renderCodes)); }
+  const genCode = () => 'ORG-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  let editId = null;
+  const code = h('input', { type: 'text', placeholder: 'Например: COFFEE-2026', autocomplete: 'off', autocapitalize: 'characters' });
+  const roleSel = h('select', {}, ...['MEMBER', 'MANAGER', 'VIEWER'].map(c => h('option', { value: c }, ROLE_RU[c])));
+  const maxUses = h('input', { type: 'number', min: '1', placeholder: 'Без ограничения' });
+  const saveBtn = h('button', { class: 'btn btn-primary', style: 'margin-top:14px', type: 'button' }, 'Создать код');
+  const cancelEdit = h('button', { class: 'btn btn-ghost hidden', type: 'button' }, 'Отменить изменение');
+  const reset = () => { editId = null; code.value = ''; maxUses.value = ''; roleSel.value = 'MEMBER'; saveBtn.textContent = 'Создать код'; cancelEdit.classList.add('hidden'); };
+  cancelEdit.onclick = reset;
+  saveBtn.onclick = async () => {
+    const value = code.value.trim();
+    if (!/^[A-Za-z0-9_-]{4,32}$/.test(value)) return toast('Код: 4–32 символа, латиница, цифры, - и _', true);
+    const body = { code: value, roleCode: roleSel.value, maxUses: maxUses.value ? Number(maxUses.value) : null, workspaceId: state.wsId };
+    saveBtn.disabled = true;
+    try { if (editId) await codesApi('PATCH', '/' + editId, body); else await codesApi('POST', '', body); toast(editId ? 'Код изменён' : 'Код создан'); show(renderCodes); }
+    catch (e) { toast(e.status === 409 ? 'Такой код уже есть' : e.status === 404 ? 'Коды пока недоступны на сервере' : (e.message || 'Ошибка'), true); saveBtn.disabled = false; }
+  };
+  const row = (c) => {
+    const active = c.active !== false && !c.disabled;
+    return h('div', { class: 'card' },
+      h('div', { class: 'row' }, h('span', { class: 'code-chip' }, c.code),
+        h('span', { class: 'badge ' + (active ? 'ok' : 'neutral') }, active ? 'Активен' : 'Выключен')),
+      h('div', { class: 'muted', style: 'margin-top:6px' }, `${roleRu(c.roleCode || c.role || 'MEMBER')} · использован ${c.usedCount ?? c.uses ?? 0}${c.maxUses ? ' из ' + c.maxUses : ' раз'}`),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => { editId = c.id; code.value = c.code; roleSel.value = ['MEMBER', 'MANAGER', 'VIEWER'].includes(String(c.roleCode || c.role).toUpperCase()) ? String(c.roleCode || c.role).toUpperCase() : 'MEMBER'; maxUses.value = c.maxUses || ''; saveBtn.textContent = 'Сохранить изменения'; cancelEdit.classList.remove('hidden'); window.scrollTo(0, 0); } }, 'Изменить'),
+        h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: async () => { try { await codesApi('PATCH', '/' + c.id, { active: !active }); show(renderCodes); } catch (e) { toast(e.message, true); } } }, active ? 'Выключить' : 'Включить'),
+        h('button', { class: 'btn btn-danger btn-sm', type: 'button', onclick: async () => {
+          if (!confirm(`Удалить код «${c.code}»? Регистрация по нему станет невозможна.`)) return;
+          try { await codesApi('DELETE', '/' + c.id); toast('Код удалён'); show(renderCodes); } catch (e) { toast(e.message, true); }
+        } }, 'Удалить')));
+  };
+  setView(
+    h('div', { class: 'card' },
+      h('strong', {}, 'Код регистрации'),
+      h('div', { class: 'small', style: 'margin-top:4px' }, 'Многоразовый. Его можно менять и выключать. Код не даёт прав администратора — только выбранную роль.'),
+      h('label', {}, 'Код'), code,
+      h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { code.value = genCode(); } }, 'Сгенерировать'),
+      h('label', {}, 'Роль новых сотрудников'), roleSel,
+      h('label', {}, 'Сколько раз можно использовать'), maxUses,
+      saveBtn, cancelEdit),
+    h('h2', {}, 'Действующие коды'),
+    ...(list.length ? list.map(row) : [emptyState('Кодов пока нет', 'Создайте первый код выше')])
+  );
+}
 async function renderPeople() {
   const users = can('users.read') ? await loadUsers() : [];
   const out = h('div'); const nodes = [];
   if (can('users.create')) {
     const f = {
+      nick: h('input', { type: 'text', placeholder: 'Никнейм (уникальный)', autocomplete: 'off', autocapitalize: 'none' }),
       email: h('input', { type: 'email', placeholder: 'email@company.com' }),
       first: h('input', { type: 'text', placeholder: 'Имя' }),
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
@@ -2508,14 +2732,17 @@ async function renderPeople() {
       h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { manual.value = genPassword(); } }, 'Сгенерировать'));
     mode.onchange = () => { manualRow.classList.toggle('hidden', mode.value !== 'manual'); if (mode.value === 'manual' && !manual.value) manual.value = genPassword(); };
     window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
-      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Никнейм'), f.nick, h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
       h('label', {}, 'Пароль'), mode, manualRow,
       h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
         const btn = e.currentTarget, email = f.email.value.trim(), pw = mode.value === 'manual' ? manual.value.trim() : '';
+        const nickname = f.nick.value.trim().replace(/^@/, '');
+        if (!/^[A-Za-z0-9_.]{3,32}$/.test(nickname)) return toast('Никнейм: 3–32 символа, латиница, цифры, _ и .', true);
+        if (users.some(x => String(x.nickname || '').toLowerCase() === nickname.toLowerCase())) return toast('Этот никнейм уже занят', true);
         if (!email) return toast('Укажите email', true);
         if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
         btn.disabled = true;
-        const base = { email, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
+        const base = { email, nickname, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
         const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
         try {
           let r, last;
@@ -2528,7 +2755,7 @@ async function renderPeople() {
             h('div', { class: 'small', style: 'margin-top:6px' }, 'Временный пароль: при первом входе сотрудник задаст свой'));
           else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Сотрудник может нажать «Забыли пароль?» при входе'));
           out.replaceChildren(box);
-          f.email.value = f.first.value = f.last.value = manual.value = '';
+          f.email.value = f.nick.value = f.first.value = f.last.value = manual.value = '';
         } catch (err) { toast(err.message || 'Не удалось создать сотрудника', true); }
         btn.disabled = false;
       } }, 'Создать'), out));
@@ -2636,7 +2863,11 @@ async function renderProfile() {
       h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм'), nick, h('label', {}, 'Email'), email,
       h('button', { class: 'btn btn-primary', onclick: async (e) => {
         const body = { firstName: first.value.trim(), lastName: last.value.trim() };
-        if (nick.value.trim()) body.nickname = nick.value.trim();
+        if (nick.value.trim()) body.nickname = nick.value.trim().replace(/^@/, '');
+        if (body.nickname) {
+          const others = await loadUsers();
+          if (others.some(x => x.id !== me.id && String(x.nickname || '').toLowerCase() === body.nickname.toLowerCase())) return toast('Этот никнейм уже занят', true);
+        }
         if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
         e.target.disabled = true;
         try {
@@ -2698,6 +2929,12 @@ function renderSettings() {
         h('div', { style: 'display:flex;gap:12px;align-items:center' },
           h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
           h('div', {}, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль'))),
+        h('span', { class: 'muted' }, '›'))),
+    (can('users.manage') || can('users.create')) && h('div', { class: 'card click', style: 'margin-top:12px', onclick: () => go('codes') },
+      h('div', { class: 'row' },
+        h('div', { style: 'display:flex;gap:12px;align-items:center' },
+          h('span', { html: icons.people, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+          h('div', {}, h('strong', {}, 'Коды регистрации'), h('div', { class: 'small' }, 'Вход новых сотрудников по коду'))),
         h('span', { class: 'muted' }, '›'))),
     h('h2', {}, 'Оформление'),
     h('div', { class: 'card' },
