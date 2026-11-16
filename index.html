@@ -7,2863 +7,339 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
   :root {
-    --bg: #EEF1F5;
-    --surface: #FFFFFF;
-    --surface-2: #F4F6F8;
-    --text: #0B141A;
-    --text-secondary: #4A5568;
-    --text-muted: #718096;
-    --border: #D8DEE6;
-    --border-strong: #C5CED8;
-    --accent: #2AABEE;
-    --accent-hover: #1E9AD8;
-    --accent-soft: rgba(42, 171, 238, 0.14);
-    --accent-glow: rgba(42, 171, 238, 0.28);
-    --success: #34C759;
-    --success-soft: rgba(52, 199, 89, 0.14);
-    --danger: #FF3B30;
-    --danger-soft: rgba(255, 59, 48, 0.12);
-    --warning: #FF9F0A;
-    --warning-soft: rgba(255, 159, 10, 0.14);
-    --shadow: 0 1px 2px rgba(0,0,0,.05);
-    --shadow-md: 0 4px 14px rgba(0,0,0,.07);
-    --shadow-lg: 0 12px 36px rgba(0,0,0,.12);
-    --r-sm: 10px;
-    --r-md: 12px;
-    --r-lg: 16px;
-    --r-pill: 999px;
-    --nav-height: 56px;
-    --header-height: 52px;
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    --ease: cubic-bezier(.25, .1, .25, 1);
-    /* aliases used by existing markup */
-    --bg-card: var(--surface);
-    --bg-input: var(--surface);
-    --primary: var(--accent);
-    --primary-soft: var(--accent-soft);
-    --glass: var(--surface);
-    --glass-border: var(--border);
-    --menu-item: transparent;
-    --menu-item-active: var(--accent-soft);
-    --overlay-bg: rgba(15, 20, 30, 0.4);
+    --bg: #EEF1F5; --surface: #FFFFFF; --surface-2: #F4F6F8;
+    --text: #0B141A; --text-secondary: #4A5568; --text-muted: #718096;
+    --border: #D8DEE6; --border-strong: #C5CED8;
+    --accent: #2AABEE; --accent-hover: #1E9AD8; --accent-soft: rgba(42, 171, 238, 0.14);
+    --success: #34C759; --success-soft: rgba(52, 199, 89, 0.14);
+    --danger: #FF3B30; --danger-soft: rgba(255, 59, 48, 0.12);
+    --shadow: 0 1px 2px rgba(0,0,0,.05); --shadow-lg: 0 12px 36px rgba(0,0,0,.12);
+    --r-sm: 10px; --r-lg: 16px; --r-pill: 999px;
+    --header-height: 52px; --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
-
   [data-theme="dark"] {
-    --bg: #0A0C10;
-    --surface: #14181F;
-    --surface-2: #1C222C;
-    --text: #F2F5F8;
-    --text-secondary: #A8B3C2;
-    --text-muted: #7A8698;
-    --border: #2A3140;
-    --border-strong: #3A4354;
-    --accent: #3BB4F0;
-    --accent-hover: #5CC4F5;
-    --accent-soft: rgba(59, 180, 240, 0.2);
-    --accent-glow: rgba(59, 180, 240, 0.3);
-    --success: #30D158;
-    --success-soft: rgba(48, 209, 88, 0.16);
-    --danger: #FF453A;
-    --danger-soft: rgba(255, 69, 58, 0.16);
-    --warning: #FFD60A;
-    --warning-soft: rgba(255, 214, 10, 0.14);
-    --shadow: 0 1px 2px rgba(0,0,0,.35);
-    --shadow-md: 0 4px 14px rgba(0,0,0,.4);
-    --shadow-lg: 0 12px 36px rgba(0,0,0,.5);
-    --overlay-bg: rgba(0,0,0,.55);
+    --bg: #0A0C10; --surface: #14181F; --surface-2: #1C222C;
+    --text: #F2F5F8; --text-secondary: #A8B3C2; --text-muted: #7A8698;
+    --border: #2A3140; --border-strong: #3A4354;
+    --accent: #3BB4F0; --accent-hover: #5CC4F5; --accent-soft: rgba(59, 180, 240, 0.2);
+    --shadow: 0 1px 2px rgba(0,0,0,.35); --shadow-lg: 0 12px 36px rgba(0,0,0,.5);
   }
-
-  [data-accent="blue"] { --accent:#2AABEE; --accent-hover:#1E9AD8; --accent-soft:rgba(42,171,238,.14); --accent-glow:rgba(42,171,238,.28); }
-  [data-accent="violet"] { --accent:#8B5CF6; --accent-hover:#7C3AED; --accent-soft:rgba(139,92,246,.16); --accent-glow:rgba(139,92,246,.3); }
-  [data-accent="teal"] { --accent:#14B8A6; --accent-hover:#0D9488; --accent-soft:rgba(20,184,166,.16); --accent-glow:rgba(20,184,166,.3); }
-  [data-accent="orange"] { --accent:#F97316; --accent-hover:#EA580C; --accent-soft:rgba(249,115,22,.16); --accent-glow:rgba(249,115,22,.3); }
-  [data-accent="pink"] { --accent:#EC4899; --accent-hover:#DB2777; --accent-soft:rgba(236,72,153,.16); --accent-glow:rgba(236,72,153,.3); }
-  [data-accent="green"] { --accent:#22C55E; --accent-hover:#16A34A; --accent-soft:rgba(34,197,94,.16); --accent-glow:rgba(34,197,94,.3); }
-
-  [data-theme="dark"][data-accent="blue"] { --accent:#3BB4F0; --accent-hover:#5CC4F5; }
-  [data-contrast="high"] { --text-secondary: var(--text); --text-muted: var(--text-secondary); }
-  [data-theme="light"][data-contrast="high"] { --text:#000; --text-secondary:#1A1A1A; --text-muted:#333; --border-strong:#8A949E; }
-  [data-theme="dark"][data-contrast="high"] { --text:#FFF; --text-secondary:#EEE; --text-muted:#CCC; --border-strong:#6A7380; }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
-  body {
-    font-family: var(--font);
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.4;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
-  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.4; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
   #app { min-height: 100%; }
-
-  /* Auth */
-  #login-screen, #tfa-screen, #forgot-screen {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center;
-    padding: 24px 16px; background: var(--bg);
-  }
-  .login-card {
-    width: 100%; max-width: 380px; background: var(--surface);
-    border-radius: 20px; padding: 28px 22px 24px;
-    box-shadow: var(--shadow-lg); border: 1px solid var(--border);
-  }
-  .login-logo {
-    width: 52px; height: 52px; border-radius: 14px;
-    background: var(--accent); color: #fff;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 16px; font-size: 24px; font-weight: 700;
-  }
-  .login-card h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 4px; }
-  .login-card .subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 22px; }
-
-  /* Shell */
-  #app-screen { display: flex; flex-direction: column; min-height: 100vh; }
-  .topbar {
-    position: sticky; top: 0; z-index: 40; height: var(--header-height);
-    background: var(--surface); border-bottom: 0.5px solid var(--border);
-    display: flex; align-items: center; padding: 0 4px 0 2px; gap: 2px;
-  }
-  .topbar-btn {
-    width: 44px; height: 44px; border: none; background: transparent; border-radius: 12px;
-    color: var(--accent); display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-  }
-  .topbar-btn:active { background: var(--accent-soft); }
-  .topbar-btn svg { width: 22px; height: 22px; }
-  .topbar-btn.muted { color: var(--text-secondary); }
-  .topbar-title {
-    flex: 1; font-size: 17px; font-weight: 600; letter-spacing: -.01em;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 2px;
-  }
-  .topbar-actions { display: flex; align-items: center; }
-  .ws-select {
-    max-width: 120px; padding: 6px 8px; font-size: 13px; font-weight: 500;
-    border-radius: 8px; border: 1.5px solid var(--border-strong);
-    background: var(--surface-2); color: var(--text); font-family: inherit; margin-right: 4px;
-  }
-
-  /* Overlay + menu */
-  .overlay {
-    position: fixed; inset: 0; background: var(--overlay-bg); z-index: 50;
-    opacity: 0; pointer-events: none; transition: opacity .22s var(--ease);
-  }
-  .overlay.open { opacity: 1; pointer-events: auto; }
-  .sidemenu {
-    position: fixed; top: 0; left: 0; bottom: 0; width: min(300px, 88vw); z-index: 60;
-    transform: translateX(-105%); transition: transform .28s var(--ease);
-    display: flex; flex-direction: column; background: var(--surface);
-    border-right: 0.5px solid var(--border); box-shadow: var(--shadow-lg);
-    padding: 8px 10px 12px;
-  }
-  .sidemenu.open { transform: translateX(0); }
-  .side-close {
-    position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; border-radius: 50%;
-    border: none; background: var(--surface-2); color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center; cursor: pointer;
-  }
-  .side-profile {
-    display: flex; align-items: center; gap: 12px; padding: 14px 12px; margin: 28px 0 8px;
-    border-radius: var(--r-lg); background: var(--surface-2); cursor: pointer;
-  }
-  .side-profile:active { background: var(--accent-soft); }
-  .side-profile .avatar {
-    width: 48px; height: 48px; border-radius: 50%; background: var(--accent); color: #fff;
-    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px;
-    flex-shrink: 0; position: relative; overflow: hidden;
-  }
-  .side-profile .avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .side-profile .online {
-    position: absolute; right: 1px; bottom: 1px; width: 11px; height: 11px;
-    background: var(--success); border: 2px solid var(--surface); border-radius: 50%;
-  }
-  .side-profile-text { flex: 1; min-width: 0; }
-  .side-profile-name { font-weight: 600; font-size: 16px; letter-spacing: -.01em; }
-  .side-profile-sub { font-size: 13px; color: var(--text-secondary); margin-top: 1px; }
-  .side-profile-mail {
-    font-size: 12px; color: var(--text-muted); margin-top: 3px;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-  }
-  .sidemenu-nav { flex: 1; overflow-y: auto; padding: 4px 0; }
-  .sidemenu-section {
-    font-size: 12px; font-weight: 600; color: var(--text-muted);
-    padding: 14px 12px 6px; letter-spacing: .02em;
-  }
-  .sidemenu-item {
-    display: flex; align-items: center; gap: 12px; padding: 12px;
-    margin-bottom: 2px; border-radius: var(--r-md); border: none; background: transparent;
-    color: var(--text); font-size: 15px; font-weight: 500; width: 100%;
-    text-align: left; cursor: pointer; font-family: inherit; min-height: 44px;
-  }
-  .sidemenu-item:active { background: var(--surface-2); }
-  .sidemenu-item.active { background: var(--accent-soft); color: var(--accent); }
-  .sidemenu-item svg { width: 20px; height: 20px; flex-shrink: 0; opacity: .9; }
-  .sidemenu-item .chev { margin-left: auto; opacity: .35; font-size: 16px; }
-  .sidemenu-item .soon {
-    margin-left: auto; font-size: 11px; font-weight: 600; color: var(--accent);
-    background: var(--accent-soft); padding: 2px 8px; border-radius: 8px;
-  }
-  .sidemenu-footer { padding-top: 6px; border-top: 0.5px solid var(--border); margin-top: 4px; }
-  .sidemenu-item.logout { color: var(--danger); }
-
-  /* Content */
-  #view {
-    flex: 1; padding: 12px 12px calc(var(--nav-height) + var(--safe-bottom) + 16px);
-    max-width: 560px; margin: 0 auto; width: 100%;
-  }
-
-  .bottom-nav {
-    position: fixed; left: 0; right: 0; bottom: 0;
-    height: calc(var(--nav-height) + var(--safe-bottom));
-    padding-bottom: var(--safe-bottom);
-    background: var(--surface); border-top: 0.5px solid var(--border);
-    display: flex; z-index: 30;
-  }
-  .bottom-nav button {
-    flex: 1; border: none; background: transparent; color: var(--text-muted);
-    font-size: 10px; font-weight: 500; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 2px; cursor: pointer;
-    font-family: inherit; padding: 6px 2px 4px; min-height: 44px;
-  }
-  .bottom-nav button.active { color: var(--accent); }
-  .bottom-nav button svg { width: 24px; height: 24px; }
-
-  h1 { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 2px; }
-  h2 { font-size: 13px; font-weight: 600; margin: 20px 0 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .03em; }
-  .page-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 14px; }
-  label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin: 14px 0 6px; }
-  input, select, textarea, button { font-family: inherit; font-size: 16px; }
-
-  input[type="text"], input[type="email"], input[type="password"], input[type="number"],
-  input[type="datetime-local"], input[type="search"], input[type="file"], select, textarea {
-    width: 100%; padding: 12px 14px; border-radius: var(--r-sm);
-    border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text);
-  }
-  input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-soft);
-  }
-  input:disabled, select:disabled, textarea:disabled { opacity: .55; cursor: not-allowed; background: var(--surface-2); }
-  textarea { resize: vertical; min-height: 84px; }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 13px 18px; border-radius: var(--r-sm); border: none;
-    font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; margin-top: 14px;
-    letter-spacing: -.01em; min-height: 48px; transition: transform .12s, opacity .15s, background .15s;
-  }
-  .btn:active:not(:disabled) { transform: scale(.98); }
-  .btn:disabled { opacity: .45; cursor: default; }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-primary:active:not(:disabled) { background: var(--accent-hover); }
-  .btn-secondary {
-    background: var(--surface); color: var(--text);
-    border: 1.5px solid var(--border-strong);
-  }
-  .btn-danger { background: var(--danger); color: #fff; }
-  .btn-ghost {
-    background: transparent; color: var(--accent); width: auto;
-    padding: 8px 12px; font-size: 15px; font-weight: 500; margin-top: 0;
-    min-height: 44px; box-shadow: none;
-  }
-  .btn-sm {
-    width: auto; padding: 8px 14px; font-size: 14px; margin-top: 0;
-    border-radius: var(--r-sm); min-height: 36px;
-  }
-
-  .card {
-    background: var(--surface); border-radius: var(--r-lg);
-    padding: 14px 16px; margin-bottom: 8px; box-shadow: var(--shadow);
-    border: 0.5px solid var(--border);
-  }
-  .card.click { cursor: pointer; }
-  .card.click:active { transform: scale(.985); background: var(--surface-2); }
-
-  .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-  .gap { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .stack { display: flex; flex-direction: column; gap: 8px; }
-  .muted { color: var(--text-secondary); font-size: 14px; }
-  .small { font-size: 12px; color: var(--text-muted); }
-
-  .badge {
-    display: inline-flex; align-items: center; padding: 4px 10px; border-radius: var(--r-pill);
-    font-size: 12px; font-weight: 600; background: var(--accent-soft); color: var(--accent); white-space: nowrap;
-  }
-  .badge.bad { background: var(--danger-soft); color: var(--danger); }
-  .badge.ok { background: var(--success-soft); color: var(--success); }
-  .badge.warn { background: var(--warning-soft); color: var(--warning); }
-  .badge.neutral { background: var(--surface-2); color: var(--text-secondary); border: 1px solid var(--border); }
-
-  .alert { padding: 12px 14px; border-radius: var(--r-sm); font-size: 14px; margin-bottom: 12px; line-height: 1.4; }
-  .alert-info { background: var(--warning-soft); color: #8A5A00; }
-  [data-theme="dark"] .alert-info { color: #F5D76E; }
-  .alert-error { background: var(--danger-soft); color: var(--danger); }
-  .alert-success { background: var(--success-soft); color: var(--success); word-break: break-all; }
-
-  .empty { text-align: center; padding: 48px 24px; color: var(--text-muted); }
-  .empty-icon {
-    width: 72px; height: 72px; margin: 0 auto 16px; border-radius: 18px;
-    background: var(--accent-soft); display: flex; align-items: center; justify-content: center; color: var(--accent);
-  }
-  .empty-icon svg { width: 32px; height: 32px; }
-  .empty-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
-  .empty-desc { font-size: 14px; max-width: 240px; margin: 0 auto; color: var(--text-muted); }
-
-  .choices { display: flex; gap: 10px; }
-  .choice {
-    flex: 1; padding: 14px; border-radius: var(--r-sm);
-    border: 1.5px solid var(--border-strong); background: var(--surface);
-    color: var(--text); font-weight: 600; font-size: 16px; cursor: pointer;
-    font-family: inherit; min-height: 48px;
-  }
-  .choice.on.yes { background: var(--success); color: #fff; border-color: var(--success); }
-  .choice.on.no { background: var(--danger); color: #fff; border-color: var(--danger); }
-  .choice:disabled { opacity: .5; cursor: default; }
-
-  .flag { color: var(--danger); font-size: 13px; font-weight: 600; margin-top: 8px; }
-  .photo { max-width: 100%; border-radius: 12px; margin-top: 10px; }
-  .itemrow { border-top: 0.5px solid var(--border); padding-top: 16px; margin-top: 16px; }
-
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-  .chip {
-    padding: 7px 14px; border-radius: var(--r-pill); border: 1.5px solid var(--border-strong);
-    background: var(--surface); color: var(--text-secondary); font-size: 13px; font-weight: 500;
-    cursor: pointer; font-family: inherit; min-height: 32px;
-  }
-  .chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-  .toast {
-    position: fixed; left: 16px; right: 16px;
-    bottom: calc(var(--nav-height) + var(--safe-bottom) + 14px);
-    background: #2C2C2E; color: #fff; padding: 14px 18px; border-radius: 12px;
-    z-index: 100; font-size: 15px; font-weight: 500; box-shadow: var(--shadow-lg);
-    transform: translateY(24px); opacity: 0; transition: transform .28s, opacity .28s;
-    pointer-events: none; text-align: center;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.bad { background: var(--danger); }
-
-  .stub-icon {
-    width: 68px; height: 68px; margin: 0 auto 18px; background: var(--accent-soft);
-    border-radius: 18px; display: flex; align-items: center; justify-content: center; color: var(--accent);
-  }
-  .stub-icon svg { width: 30px; height: 30px; }
   .hidden { display: none !important; }
-  .back-btn { margin-bottom: 8px; }
-  .divider { height: 0.5px; background: var(--border); margin: 20px 0; }
-  .section-label {
-    font-size: 13px; font-weight: 600; color: var(--text-muted);
-    text-transform: uppercase; letter-spacing: .03em; padding: 8px 4px 6px;
-  }
-  .skeleton {
-    background: linear-gradient(90deg, var(--border) 25%, var(--surface-2) 50%, var(--border) 75%);
-    background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 10px; height: 16px;
-  }
-  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
-  /* List rows */
-  .list-group {
-    background: var(--surface); border-radius: var(--r-lg); overflow: hidden;
-    box-shadow: var(--shadow); border: 0.5px solid var(--border);
-  }
-  .list-row { position: relative; overflow: hidden; border-bottom: 0.5px solid var(--border); }
+  
+  /* Экран входа */
+  #login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); }
+  .login-card { width: 100%; max-width: 380px; background: var(--surface); border-radius: 20px; padding: 28px 22px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); }
+  .login-logo { width: 52px; height: 52px; border-radius: 14px; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; font-size: 24px; font-weight: 700; }
+  .login-card h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .login-card .subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 22px; }
+  label { display: block; font-size: 13px; font-weight: 500; color: var(--text-secondary); margin: 14px 0 6px; }
+  input, button { font-family: inherit; font-size: 16px; }
+  input { width: 100%; padding: 12px 14px; border-radius: var(--r-sm); border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--text); }
+  input:focus { outline: none; border-color: var(--accent); }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 18px; border-radius: var(--r-sm); border: none; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; margin-top: 14px; min-height: 48px; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: var(--surface-2); color: var(--text); }
+  .alert { padding: 12px; border-radius: var(--r-sm); font-size: 14px; margin-top: 12px; }
+  .alert-error { background: var(--danger-soft); color: var(--danger); }
+  
+  /* Оболочка приложения */
+  #app-screen { display: flex; flex-direction: column; min-height: 100vh; padding-bottom: calc(80px + var(--safe-bottom)); }
+  .topbar { position: sticky; top: 0; z-index: 40; height: var(--header-height); background: var(--surface); border-bottom: 0.5px solid var(--border); display: flex; align-items: center; padding: 0 8px; }
+  .topbar-btn { width: 44px; height: 44px; border: none; background: transparent; border-radius: 12px; color: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .topbar-title { flex: 1; font-size: 17px; font-weight: 600; padding-left: 4px; }
+  
+  #view { flex: 1; padding: 16px; max-width: 600px; margin: 0 auto; width: 100%; }
+  h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .page-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+  
+  /* Списки */
+  .list-group { background: var(--surface); border-radius: var(--r-lg); overflow: hidden; border: 0.5px solid var(--border); }
+  .list-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
   .list-row:last-child { border-bottom: none; }
-  .list-row-inner {
-    display: flex; align-items: center; gap: 12px; padding: 12px 16px;
-    background: var(--surface); position: relative; z-index: 1;
-    transition: transform .2s var(--ease); touch-action: pan-y; min-height: 56px;
-  }
-  .list-row-actions { position: absolute; right: 0; top: 0; bottom: 0; display: flex; z-index: 0; }
-  .list-row-actions button {
-    border: none; color: #fff; font-weight: 600; font-size: 14px;
-    padding: 0 20px; cursor: pointer; font-family: inherit; min-width: 88px;
-  }
-  .list-row-actions .act-delete { background: var(--danger); }
-  .list-row.open .list-row-inner { transform: translateX(-88px); }
-
-  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
-  .swatch {
-    width: 36px; height: 36px; border-radius: 50%; border: 3px solid transparent;
-    cursor: pointer; box-shadow: var(--shadow-md);
-  }
-  .swatch.on { border-color: var(--text); }
-
-  .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 10px; }
-  .emoji-grid button {
-    aspect-ratio: 1; border: 1.5px solid var(--border); border-radius: 12px;
-    background: var(--surface); font-size: 22px; cursor: pointer; min-height: 44px;
-  }
-  .emoji-grid button.on { border-color: var(--accent); background: var(--accent-soft); }
-
-  .avatar-lg {
-    width: 72px; height: 72px; border-radius: 50%; background: var(--accent);
-    color: #fff; display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 28px; overflow: hidden; flex-shrink: 0;
-  }
-  .avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
-
-  .fab {
-    position: fixed; right: 16px; bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
-    width: 56px; height: 56px; border-radius: 50%; border: none;
-    background: var(--accent); color: #fff; font-size: 28px; font-weight: 300; line-height: 1;
-    box-shadow: 0 4px 16px var(--accent-glow); cursor: pointer; z-index: 25;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .fab:active { transform: scale(.94); background: var(--accent-hover); }
-
-  .float-back {
-    position: sticky; top: calc(var(--header-height) + 8px); z-index: 15;
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 8px 14px; border-radius: var(--r-pill); border: 1px solid var(--border);
-    background: var(--surface); color: var(--accent); font-weight: 600; font-size: 14px;
-    font-family: inherit; box-shadow: var(--shadow); cursor: pointer; margin-bottom: 12px;
-    min-height: 36px;
-  }
-
-  .option-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-  .option-row input { flex: 1; }
-  .choice-opt {
-    display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin-top: 8px;
-    border-radius: var(--r-md); border: 1.5px solid var(--border-strong); background: var(--surface);
-    cursor: pointer; font-weight: 500; min-height: 44px;
-  }
-  .choice-opt.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-  .star-btn {
-    border: none; background: transparent; font-size: 20px; cursor: pointer;
-    padding: 8px; line-height: 1; min-width: 44px; min-height: 44px;
-  }
-
-  .card {
-    box-shadow: none;
-  }
-  .card.click:active { background: var(--surface-2); }
-  .list-group { box-shadow: none; }
-  .login-card { box-shadow: var(--shadow-md); }
-  .icon-btn {
-    width: 40px; height: 40px; border: none; background: transparent;
-    border-radius: 10px; color: var(--text-secondary); cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center;
-    font-size: 20px; font-weight: 700; line-height: 1; font-family: inherit;
-  }
-  .icon-btn:active { background: var(--surface-2); }
-  .menu-pop {
-    position: absolute; right: 8px; top: 40px; z-index: 20;
-    min-width: 180px; background: var(--surface); border: 0.5px solid var(--border);
-    border-radius: 12px; box-shadow: var(--shadow-lg); padding: 6px;
-  }
-  .menu-pop button {
-    display: block; width: 100%; text-align: left; border: none; background: transparent;
-    padding: 12px 14px; border-radius: 8px; font-size: 15px; font-weight: 500;
-    color: var(--text); cursor: pointer; font-family: inherit;
-  }
-  .menu-pop button:active { background: var(--surface-2); }
-  .menu-pop button.danger { color: var(--danger); }
-  .card-head { position: relative; }
-  .hint {
-    font-size: 12px; color: var(--text-muted); padding: 8px 4px 4px;
-  }
-  .run-row-overdue {
-    background: var(--danger-soft);
-  }
-
-
-  /* Telegram-like top folders */
-  .folders {
-    position: sticky; top: var(--header-height); z-index: 35;
-    background: var(--bg);
-    padding: 8px 12px 10px;
-    display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .folders::-webkit-scrollbar { display: none; }
-  .folder {
-    flex: 0 0 auto; border: none; cursor: pointer; font-family: inherit;
-    padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 600;
-    background: var(--surface); color: var(--text-secondary);
-    border: 0.5px solid var(--border); min-height: 36px;
-    box-shadow: var(--shadow);
-  }
-  .folder.active {
-    background: var(--accent); color: #fff; border-color: var(--accent);
-  }
-  .folder:active { transform: scale(.97); }
-
-  /* Floating cloud bottom console */
-  .bottom-nav {
-    position: fixed; left: 50%; right: auto; bottom: calc(12px + var(--safe-bottom));
-    transform: translateX(-50%);
-    width: min(420px, calc(100% - 24px));
-    height: 64px; padding: 0; padding-bottom: 0;
-    background: var(--surface);
-    border: 0.5px solid var(--border);
-    border-radius: 22px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.14), 0 2px 8px rgba(0,0,0,.06);
-    display: flex; align-items: center; z-index: 30;
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  }
-  [data-theme="dark"] .bottom-nav {
-    box-shadow: 0 8px 32px rgba(0,0,0,.45), 0 2px 8px rgba(0,0,0,.3);
-    background: rgba(28, 34, 44, 0.92);
-  }
-  .bottom-nav button {
-    flex: 1; border: none; background: transparent; color: var(--text-muted);
-    font-size: 10px; font-weight: 600; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 3px; cursor: pointer;
-    font-family: inherit; padding: 8px 4px; min-height: 52px; border-radius: 16px;
-    margin: 0 4px;
-  }
-  .bottom-nav button.active {
-    color: var(--accent);
-    background: var(--accent-soft);
-  }
-  .bottom-nav button svg { width: 24px; height: 24px; }
-
-  #view {
-    padding-bottom: calc(64px + var(--safe-bottom) + 28px);
-  }
-  .fab {
-    bottom: calc(64px + var(--safe-bottom) + 28px);
-  }
-  .toast {
-    bottom: calc(64px + var(--safe-bottom) + 24px);
-  }
-
-
-  /* Translucent surfaces */
-  .topbar {
-    background: rgba(255,255,255,.78);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-bottom: 0.5px solid var(--border);
-  }
-  [data-theme="dark"] .topbar {
-    background: rgba(20,24,31,.82);
-  }
-  .folders {
-    background: transparent;
-    padding: 8px 12px 6px;
-  }
-  .folder {
-    border-radius: 999px;
-    background: rgba(255,255,255,.55);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  }
-  [data-theme="dark"] .folder {
-    background: rgba(40,48,60,.55);
-  }
-  .folder.active {
-    background: var(--accent);
-    color: #fff;
-  }
-  .bottom-nav {
-    background: rgba(255,255,255,.72);
-    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    border-radius: 28px;
-    border: 0.5px solid rgba(255,255,255,.4);
-  }
-  [data-theme="dark"] .bottom-nav {
-    background: rgba(28,34,44,.78);
-    border-color: rgba(255,255,255,.08);
-  }
-  .btn, .btn-primary, .btn-secondary, .btn-danger {
-    border-radius: 999px;
-  }
-  .btn-sm { border-radius: 999px; }
-  .btn-ghost { border-radius: 999px; }
-  .card {
-    border-radius: 20px;
-    background: rgba(255,255,255,.72);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border: 0.5px solid rgba(0,0,0,.06);
-  }
-  [data-theme="dark"] .card {
-    background: rgba(28,34,44,.72);
-    border-color: rgba(255,255,255,.06);
-  }
-  input[type="text"], input[type="email"], input[type="password"], input[type="number"],
-  input[type="datetime-local"], input[type="search"], select, textarea {
-    border-radius: 16px;
-    background: rgba(255,255,255,.7);
-  }
-  [data-theme="dark"] input[type="text"],
-  [data-theme="dark"] input[type="email"],
-  [data-theme="dark"] input[type="password"],
-  [data-theme="dark"] input[type="number"],
-  [data-theme="dark"] input[type="datetime-local"],
-  [data-theme="dark"] input[type="search"],
-  [data-theme="dark"] select,
-  [data-theme="dark"] textarea {
-    background: rgba(28,34,44,.7);
-  }
-  .choice, .choice-opt, .chip, .list-group {
-    border-radius: 16px;
-  }
-  .list-group {
-    background: rgba(255,255,255,.72);
-    backdrop-filter: blur(12px);
-  }
-  [data-theme="dark"] .list-group { background: rgba(28,34,44,.72); }
-  .login-card {
-    border-radius: 28px;
-    background: rgba(255,255,255,.8);
-    backdrop-filter: blur(20px);
-  }
-  [data-theme="dark"] .login-card { background: rgba(28,34,44,.85); }
-  .fab { border-radius: 50%; }
-  .menu-pop { border-radius: 18px; }
-  .toast { border-radius: 18px; }
-  .badge { border-radius: 999px; }
-  /* hide legacy side menu chrome if present */
-  .sidemenu, .overlay, #sidemenu, #overlay { display: none !important; }
-
-
-  /* Bottom cloud — matte glass */
-  .bottom-nav {
-    position: fixed; left: 50%; right: auto;
-    bottom: calc(14px + var(--safe-bottom));
-    transform: translateX(-50%);
-    width: min(400px, calc(100% - 28px));
-    height: 70px; padding: 6px;
-    background: rgba(255, 255, 255, 0.42);
-    backdrop-filter: blur(28px) saturate(1.2);
-    -webkit-backdrop-filter: blur(28px) saturate(1.2);
-    border-radius: 36px;
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    box-shadow: 0 10px 40px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.5);
-    display: flex; align-items: center; z-index: 30;
-  }
-  [data-theme="dark"] .bottom-nav {
-    background: rgba(22, 28, 38, 0.48);
-    border-color: rgba(255,255,255,.10);
-    box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.06);
-  }
-  .bottom-nav button {
-    flex: 1; border: none; background: transparent;
-    color: var(--text-secondary);
-    font-size: 10px; font-weight: 600;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 2px;
-    cursor: pointer; font-family: inherit;
-    padding: 6px 2px; min-height: 56px; border-radius: 28px;
-    margin: 0 2px; position: relative; z-index: 1;
-    transition: color .25s var(--ease);
-  }
-  .bottom-nav button svg {
-    width: 24px; height: 24px;
-    stroke-width: 2.25;
-    fill: none;
-    color: inherit;
-  }
-  .bottom-nav button.active {
-    color: var(--text);
-    background: transparent;
-  }
-  /* Glass circle indicator under active tab */
-  .nav-blob {
-    position: absolute; top: 6px; bottom: 6px;
-    width: 0; border-radius: 50%;
-    background: rgba(255,255,255,.55);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,.55);
-    box-shadow: 0 4px 16px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.7);
-    transition: left .35s cubic-bezier(.34,1.2,.64,1), width .35s cubic-bezier(.34,1.2,.64,1);
-    pointer-events: none; z-index: 0;
-  }
-  [data-theme="dark"] .nav-blob {
-    background: rgba(255,255,255,.12);
-    border-color: rgba(255,255,255,.14);
-    box-shadow: 0 4px 16px rgba(0,0,0,.3);
-  }
-
-  /* Sticky search */
-  .search-sticky {
-    position: sticky; top: var(--header-height); z-index: 34;
-    padding: 8px 12px 10px;
-    background: rgba(238,241,245,.82);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  }
-  [data-theme="dark"] .search-sticky {
-    background: rgba(10,12,16,.82);
-  }
-  .search-sticky input[type="search"] {
-    border-radius: 999px !important;
-    padding: 12px 44px 12px 16px;
-    background: rgba(255,255,255,.65) !important;
-    border: 1px solid rgba(0,0,0,.08);
-    transition: box-shadow .25s, border-color .25s, transform .2s;
-  }
-  [data-theme="dark"] .search-sticky input[type="search"] {
-    background: rgba(28,34,44,.65) !important;
-    border-color: rgba(255,255,255,.1);
-  }
-  .search-sticky input[type="search"]:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-soft);
-    transform: scale(1.01);
-  }
-  @keyframes searchPulse {
-    0% { box-shadow: 0 0 0 0 var(--accent-soft); }
-    70% { box-shadow: 0 0 0 8px transparent; }
-    100% { box-shadow: 0 0 0 0 transparent; }
-  }
-  .search-sticky.pulse input {
-    animation: searchPulse .6s ease;
-  }
-
-  /* Dense emoji-like icons globally in chrome */
-  .topbar-btn svg, .folder svg, .sidemenu-item svg {
-    stroke-width: 2.25;
-    color: inherit;
-  }
-  .folder { color: var(--text-secondary); }
-  .folder.active { color: #fff; }
-
-  #view {
-    padding-bottom: calc(70px + var(--safe-bottom) + 28px);
-  }
-  .fab {
-    bottom: calc(70px + var(--safe-bottom) + 28px);
-  }
-  .toast {
-    bottom: calc(70px + var(--safe-bottom) + 24px);
-  }
-
-
-  /* Narrow matte console */
-  .bottom-nav {
-    position: fixed; left: 50%; right: auto;
-    bottom: calc(16px + var(--safe-bottom));
-    transform: translateX(-50%);
-    width: min(280px, calc(100% - 64px));
-    height: 58px; padding: 4px;
-    background: rgba(255, 255, 255, 0.38);
-    backdrop-filter: blur(30px) saturate(1.25);
-    -webkit-backdrop-filter: blur(30px) saturate(1.25);
-    border-radius: 29px;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 8px 28px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.55);
-    display: flex; align-items: stretch; z-index: 30;
-  }
-  [data-theme="dark"] .bottom-nav {
-    background: rgba(24, 28, 36, 0.5);
-    border-color: rgba(255,255,255,.12);
-    box-shadow: 0 8px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
-  }
-  .bottom-nav button {
-    flex: 1; border: none; background: transparent;
-    color: var(--text-secondary);
-    font-size: 0; /* hide labels — icon only like Shortcuts dock feel, keep aria via title */
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    cursor: pointer; font-family: inherit;
-    padding: 0; min-height: 0; border-radius: 24px;
-    margin: 0; position: relative; z-index: 1;
-    transition: color .3s ease;
-  }
-  .bottom-nav button .nav-label {
-    font-size: 9px; font-weight: 600; margin-top: 1px;
-    max-width: 100%; overflow: hidden; text-overflow: ellipsis;
-  }
-  .bottom-nav button svg {
-    width: 26px; height: 26px;
-    color: inherit;
-  }
-  .bottom-nav button.active { color: var(--text); }
-
-  /* Liquid droplet — almost full height of console */
-  .nav-blob {
-    position: absolute;
-    top: 4px; bottom: 4px;
-    left: 4px;
-    width: 48px; height: auto;
-    border-radius: 999px;
-    background: linear-gradient(160deg, rgba(255,255,255,.72), rgba(255,255,255,.38));
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,.65);
-    box-shadow:
-      0 4px 14px rgba(0,0,0,.10),
-      inset 0 1px 1px rgba(255,255,255,.85),
-      inset 0 -2px 6px rgba(0,0,0,.06);
-    pointer-events: none; z-index: 0;
-    transition:
-      left .45s cubic-bezier(.22, 1, .36, 1),
-      width .45s cubic-bezier(.22, 1, .36, 1),
-      border-radius .35s ease,
-      transform .45s cubic-bezier(.22, 1, .36, 1);
-    transform: scale(1);
-  }
-  .nav-blob.stretch {
-    border-radius: 40% 40% 40% 40% / 45% 45% 45% 45%;
-    transform: scaleY(0.92) scaleX(1.08);
-  }
-  [data-theme="dark"] .nav-blob {
-    background: linear-gradient(160deg, rgba(255,255,255,.22), rgba(255,255,255,.08));
-    border-color: rgba(255,255,255,.18);
-    box-shadow: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2);
-  }
-
-  /* Top folders with long liquid pill */
-  .folders {
-    position: sticky; top: var(--header-height); z-index: 35;
-    background: transparent;
-    padding: 6px 12px 8px;
-    display: flex; gap: 0; overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    position: sticky;
-  }
-  .folders-track {
-    position: relative;
-    display: flex; gap: 0;
-    background: rgba(255,255,255,.32);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 22px;
-    padding: 3px;
-    border: 1px solid rgba(255,255,255,.4);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
-    margin: 0 auto;
-    max-width: 100%;
-  }
-  [data-theme="dark"] .folders-track {
-    background: rgba(30,36,46,.45);
-    border-color: rgba(255,255,255,.1);
-  }
-  .folder {
-    flex: 0 0 auto; border: none; cursor: pointer; font-family: inherit;
-    padding: 8px 14px; border-radius: 19px; font-size: 13px; font-weight: 600;
-    background: transparent; color: var(--text-secondary);
-    border: none; min-height: 34px; box-shadow: none;
-    position: relative; z-index: 1;
-    white-space: nowrap;
-  }
-  .folder.active {
-    background: transparent; color: var(--text);
-    border: none;
-  }
-  .folder-blob {
-    position: absolute; top: 3px; bottom: 3px; left: 3px;
-    border-radius: 19px;
-    background: linear-gradient(165deg, rgba(255,255,255,.75), rgba(255,255,255,.4));
-    border: 1px solid rgba(255,255,255,.55);
-    box-shadow: 0 2px 10px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.9);
-    pointer-events: none; z-index: 0;
-    transition: left .4s cubic-bezier(.22,1,.36,1), width .4s cubic-bezier(.22,1,.36,1), transform .35s ease;
-  }
-  .folder-blob.stretch {
-    transform: scaleY(0.9) scaleX(1.06);
-    border-radius: 14px;
-  }
-  [data-theme="dark"] .folder-blob {
-    background: linear-gradient(165deg, rgba(255,255,255,.2), rgba(255,255,255,.08));
-    border-color: rgba(255,255,255,.14);
-  }
-
-  /* Compact topbar — no title noise */
-  .topbar-title { display: none; }
-  #search-btn { display: none !important; }
-  .topbar { justify-content: flex-start; }
-
-  #view { padding-bottom: calc(58px + var(--safe-bottom) + 28px); }
-  .fab { bottom: calc(58px + var(--safe-bottom) + 28px); }
-  .toast { bottom: calc(58px + var(--safe-bottom) + 24px); }
-
-
-  /* Wider content — no top search */
-  #view {
-    max-width: 640px;
-    padding-left: 14px;
-    padding-right: 14px;
-    padding-bottom: calc(72px + var(--safe-bottom) + 24px);
-  }
-  .folders-track { width: 100%; justify-content: stretch; }
-  .folders-track .folder { flex: 1; text-align: center; }
-
-  /* Bottom dock row: cloud + search orb */
-  .dock {
-    position: fixed;
-    left: 0; right: 0;
-    bottom: calc(14px + var(--safe-bottom));
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 0 16px;
-    pointer-events: none;
-  }
-  .dock > * { pointer-events: auto; }
-
-  .bottom-nav {
-    position: relative; left: auto; right: auto; bottom: auto;
-    transform: none;
-    width: min(240px, calc(100% - 90px));
-    height: 56px; padding: 3px;
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(30px) saturate(1.2);
-    -webkit-backdrop-filter: blur(30px) saturate(1.2);
-    border-radius: 28px;
-    border: 1px solid rgba(255,255,255,.5);
-    box-shadow: 0 8px 28px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.55);
-    display: flex; align-items: stretch;
-  }
-  [data-theme="dark"] .bottom-nav {
-    background: rgba(24,28,36,.52);
-    border-color: rgba(255,255,255,.12);
-  }
-  .bottom-nav button {
-    flex: 1; border: none; background: transparent;
-    color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; padding: 0; margin: 0;
-    border-radius: 24px; position: relative; z-index: 1;
-    transition: color .3s ease;
-  }
-  .bottom-nav button.active { color: var(--text); }
-  .bottom-nav button svg {
-    width: 24px; height: 24px; display: block;
-    fill: currentColor; stroke: none;
-  }
-  .bottom-nav button .nav-label { display: none; }
-
-  /* Water-tension blob */
-  .nav-blob {
-    position: absolute;
-    top: 3px; bottom: 3px;
-    left: 3px;
-    width: 56px;
-    border-radius: 999px;
-    background: linear-gradient(165deg, rgba(255,255,255,.78), rgba(255,255,255,.42));
-    border: 1px solid rgba(255,255,255,.7);
-    box-shadow:
-      0 2px 12px rgba(0,0,0,.1),
-      inset 0 1px 1px rgba(255,255,255,.95),
-      inset 0 -3px 8px rgba(0,0,0,.05);
-    pointer-events: none; z-index: 0;
-    will-change: left, width, border-radius, transform;
-  }
-  [data-theme="dark"] .nav-blob {
-    background: linear-gradient(165deg, rgba(255,255,255,.24), rgba(255,255,255,.08));
-    border-color: rgba(255,255,255,.16);
-  }
-
-  /* Search orb — separate right of console */
-  .search-orb {
-    width: 56px; height: 56px; border-radius: 50%;
-    border: 1px solid rgba(255,255,255,.5);
-    background: rgba(255,255,255,.4);
-    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-    box-shadow: 0 8px 28px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.55);
-    color: var(--text-secondary);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    transition: transform .2s ease, color .2s, background .2s;
-  }
-  .search-orb svg { width: 24px; height: 24px; fill: currentColor; display: block; }
-  .search-orb.active, .search-orb:active {
-    color: var(--text);
-    transform: scale(0.94);
-    background: rgba(255,255,255,.55);
-  }
-  [data-theme="dark"] .search-orb {
-    background: rgba(24,28,36,.52);
-    border-color: rgba(255,255,255,.12);
-  }
-
-  .fab { bottom: calc(56px + var(--safe-bottom) + 28px); }
-  .toast { bottom: calc(56px + var(--safe-bottom) + 24px); }
-
-
-  /* ===== Liquid glass buttons & animations ===== */
-  :root { --lg-bg: linear-gradient(165deg, rgba(255,255,255,.74), rgba(255,255,255,.34)); --lg-bd: rgba(255,255,255,.7); --lg-sh: 0 4px 14px rgba(0,0,0,.09), inset 0 1px 1px rgba(255,255,255,.9), inset 0 -3px 8px rgba(0,0,0,.05); }
-  [data-theme="dark"] { --lg-bg: linear-gradient(165deg, rgba(255,255,255,.2), rgba(255,255,255,.07)); --lg-bd: rgba(255,255,255,.14); --lg-sh: 0 4px 14px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.2); }
-  .btn-secondary, .chip, .choice, .choice-opt, .icon-btn, .float-back, .topbar-btn, .lay-mv {
-    background: var(--lg-bg); border: 1px solid var(--lg-bd); box-shadow: var(--lg-sh);
-    backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
-  }
-  .topbar-btn { border-radius: 50%; margin: 0 2px; }
-  .btn-primary, .fab, .chip.active {
-    background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent));
-    border: 1px solid rgba(255,255,255,.45); color: #fff;
-    box-shadow: 0 6px 18px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,.55), inset 0 -3px 8px rgba(0,0,0,.12);
-  }
-  .btn-danger {
-    background: linear-gradient(165deg, color-mix(in srgb, var(--danger) 80%, #fff), var(--danger));
-    border: 1px solid rgba(255,255,255,.4); box-shadow: 0 6px 18px var(--danger-soft), inset 0 1px 1px rgba(255,255,255,.5);
-  }
-  .btn-ghost { background: transparent; border: none; box-shadow: none; }
-  [data-lq] { overflow: hidden; -webkit-tap-highlight-color: transparent; transition: transform .55s cubic-bezier(.34,1.56,.64,1), border-radius .45s ease, background .25s, box-shadow .25s; }
-  [data-lq].lq-down { transform: scale(1.07, .9) !important; border-radius: 42% 58% 55% 45% / 55% 45% 58% 42% !important; transition-duration: .14s; }
-  .lq-glint { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%; pointer-events: none;
-    background: radial-gradient(circle, rgba(255,255,255,.8), rgba(255,255,255,0) 70%); animation: lqGlint .6s ease-out forwards; }
-  @keyframes lqGlint { to { transform: scale(18); opacity: 0; } }
-  .bottom-nav button svg, .search-orb svg { fill: none !important; stroke: currentColor !important; stroke-width: 1.9; }
-  .bottom-nav button.active svg { stroke-width: 2.3; }
-  .topbar-actions { margin-left: auto; }
-
-  /* flexible dock + top panel */
-  .bottom-nav { width: auto !important; max-width: calc(100% - 132px); flex: 0 1 auto; min-width: 0; }
-  .bottom-nav button { flex: 1 1 56px; min-width: 46px; max-width: 62px; }
-  .folders-track { width: max-content; min-width: 100%; }
-  .folders-track .folder { flex: 1 0 auto; }
-  .folder-blob { transition: left .4s cubic-bezier(.22,1,.36,1), width .4s cubic-bezier(.22,1,.36,1), transform .35s ease, opacity .3s; }
-
-  /* team plus orb + liquid sheet */
-  .plus-orb { background: linear-gradient(165deg, color-mix(in srgb, var(--accent) 80%, #fff), var(--accent)) !important; color: #fff !important; border-color: rgba(255,255,255,.5) !important; box-shadow: 0 8px 24px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,.6) !important; }
-  .lq-backdrop { position: fixed; inset: 0; background: var(--overlay-bg); z-index: 70; opacity: 0; pointer-events: none; transition: opacity .3s; }
-  .lq-backdrop.open { opacity: 1; pointer-events: auto; }
-  .lq-sheet { position: fixed; left: 12px; right: 12px; bottom: calc(12px + var(--safe-bottom)); max-width: 520px; margin: 0 auto; max-height: 82vh; overflow: auto;
-    z-index: 71; padding: 8px 16px 18px; border-radius: 50%; background: rgba(255,255,255,.86);
-    backdrop-filter: blur(30px) saturate(1.3); -webkit-backdrop-filter: blur(30px) saturate(1.3); border: 1px solid var(--lg-bd); box-shadow: var(--shadow-lg);
-    transform: scale(.06); opacity: 0; pointer-events: none;
-    transition: transform .6s cubic-bezier(.34,1.35,.5,1), opacity .25s, border-radius .55s ease; }
-  [data-theme="dark"] .lq-sheet { background: rgba(24,28,36,.9); }
-  .lq-sheet.open { transform: scale(1); opacity: 1; pointer-events: auto; border-radius: 32px; }
-  .lq-grab { width: 40px; height: 5px; border-radius: 3px; background: var(--border-strong); margin: 4px auto 10px; }
-
-  /* layout editor */
-  .lay-row { display: flex; align-items: center; gap: 10px; padding: 10px 2px; border-bottom: .5px solid var(--border); }
-  .lay-row:last-child { border-bottom: none; }
-  .lay-ic { width: 22px; height: 22px; display: flex; color: var(--accent); }
-  .lay-t { flex: 1; font-weight: 500; }
-  .lay-mv { width: 32px; height: 32px; padding: 0; border-radius: 50%; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
-  .lay-mv svg { width: 16px; height: 16px; }
-  .lay-sw { width: 52px; height: 30px; border-radius: 999px; border: 1px solid var(--lg-bd); background: var(--surface-2); position: relative; padding: 0; flex: none; cursor: pointer; transition: background .3s; }
-  .lay-sw i { position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 999px; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.25);
-    transition: transform .5s cubic-bezier(.34,1.56,.64,1), width .25s; }
-  .lay-sw:active i { width: 30px; }
-  .lay-sw.on { background: var(--accent); }
-  .lay-sw.on i { transform: translateX(22px); }
-  .lay-sw.on:active i { transform: translateX(14px); }
-  .lay-sw:disabled { opacity: .45; }
-
-  /* ===== v3: bigger dock (up to 5), round buttons, grow animations, menu fix ===== */
-  .dock { gap: 8px; padding: 0 10px; bottom: calc(16px + var(--safe-bottom)); }
-  .bottom-nav { height: 66px; border-radius: 33px; padding: 4px; max-width: calc(100% - 76px); }
-  .dock:has(.plus-orb:not(.hidden)) .bottom-nav { max-width: calc(100% - 144px); }
-  .bottom-nav button { flex: 1 1 64px; min-width: 38px; max-width: 68px; border-radius: 50%; }
-  .bottom-nav button svg { width: 27px; height: 27px; }
-  .search-orb { width: 60px; height: 60px; }
-  .search-orb svg { width: 26px; height: 26px; }
-  #view { padding-bottom: calc(96px + var(--safe-bottom) + 24px); }
-  .fab { bottom: calc(66px + var(--safe-bottom) + 34px); }
-  .toast { bottom: calc(66px + var(--safe-bottom) + 30px); }
-
-  /* round buttons everywhere */
-  .btn, .btn-sm, .btn-ghost, .chip, .choice, .icon-btn, .star-btn, .float-back, .lay-mv, .emoji-grid button { border-radius: 999px; }
-  .choice-opt { border-radius: 26px; }
-  .icon-btn, .star-btn { width: 40px; height: 40px; padding: 0; border-radius: 50%; }
-  .emoji-grid button { border-radius: 50%; }
-  .menu-pop button { border-radius: 999px; }
-
-  /* search-like pulse ring on every press */
-  .lq-ring { animation: lqRing .6s ease-out; }
-  @keyframes lqRing { 0% { box-shadow: 0 0 0 0 var(--accent-glow); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-
-  /* sub-items grow where they appear */
-  @keyframes popGrow { 0% { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); } }
-  .menu-pop, .emoji-grid button, .choice-opt, .option-row, .alert, .lay-row { animation: popGrow .42s cubic-bezier(.34,1.4,.5,1) both; }
-  .menu-pop { transform-origin: top right; min-width: 200px; padding: 8px; border-radius: 26px; background: var(--lg-bg), var(--surface);
-    background-color: rgba(255,255,255,.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid var(--lg-bd); z-index: 80; }
-  [data-theme="dark"] .menu-pop { background-color: rgba(24,28,36,.94); }
-  .menu-pop button { transform-origin: top right; animation: popGrow .42s cubic-bezier(.34,1.4,.5,1) both; margin-bottom: 2px; }
-  .menu-pop button:nth-child(2) { animation-delay: .06s; } .menu-pop button:nth-child(3) { animation-delay: .12s; }
-  .menu-pop button:hover, .menu-pop button:active { background: var(--accent-soft); }
-
-  /* menu no longer slides under the next card */
-  .card, .list-group { overflow: visible; }
-  .card:has(.menu-pop) { position: relative; z-index: 60; }
-  .card-head { position: relative; }
-
-  /* v4: perfectly round dock buttons */
-  .bottom-nav { --d: min(58px, calc((100vw - 28px - 68px) / var(--n, 3))); height: calc(var(--d) + 8px); width: auto !important; max-width: none; padding: 4px; }
-  .dock:has(.plus-orb:not(.hidden)) .bottom-nav { --d: min(58px, calc((100vw - 28px - 136px) / var(--n, 3))); max-width: none; }
-  .bottom-nav button { flex: 0 0 var(--d); width: var(--d); height: var(--d); min-width: 0; max-width: none; padding: 0; border-radius: 50%; }
-  .bottom-nav button svg { width: calc(var(--d) * .46); height: calc(var(--d) * .46); }
-  .nav-blob { border-radius: 50%; }
-
-  /* ===== v5: soft local press effect, orbs column ===== */
-  [data-lq].lq-down { transform: none !important; border-radius: inherit !important; }
-  .lq-ring { animation: none !important; }
-  .lq-glint { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%; pointer-events: none; animation: none;
-    background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 70%); opacity: .8; transform: scale(1);
-    transition: transform .5s cubic-bezier(.2,.7,.2,1), opacity .45s ease; }
-  .lq-glint.grow { transform: scale(11); }
-  .lq-glint.out { opacity: 0; }
-  .btn-secondary .lq-glint, .chip:not(.active) .lq-glint, .choice:not(.on) .lq-glint, .choice-opt .lq-glint, .icon-btn .lq-glint, .topbar-btn .lq-glint, .float-back .lq-glint, .lay-mv .lq-glint, .menu-pop button .lq-glint, .search-orb:not(.plus-orb) .lq-glint, .bottom-nav button .lq-glint, .folder .lq-glint, .star-btn .lq-glint, .emoji-grid button .lq-glint {
-    background: radial-gradient(circle, var(--accent-glow), rgba(255,255,255,0) 70%); }
-  @keyframes popGrow { 0% { transform: scale(.82); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-  .menu-pop, .menu-pop button, .emoji-grid button, .choice-opt, .option-row, .alert, .lay-row { animation-duration: .28s; animation-timing-function: cubic-bezier(.2,.8,.2,1); }
-  .lq-sheet { transition: transform .5s cubic-bezier(.22,1,.36,1), opacity .25s, border-radius .45s ease; }
-  .lay-sw i { transition: transform .4s cubic-bezier(.22,1.1,.36,1), width .2s; }
-  .dock { align-items: flex-end; }
-  .orbs { display: flex; flex-direction: column; gap: 8px; align-items: center; }
-  .dock:has(.plus-orb:not(.hidden)) .bottom-nav { --d: min(58px, calc((100vw - 28px - 68px) / var(--n, 3))); }
-
-  /* messages + audit */
-  .cm { padding: 10px 0; border-top: .5px solid var(--border); animation: popGrow .28s ease-out both; }
-  .cm-photos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .cm-photos img { width: 72px; height: 72px; object-fit: cover; border-radius: 18px; border: 1px solid var(--lg-bd); }
-  .audit-det { margin-top: 8px; padding-top: 8px; border-top: .5px dashed var(--border); }
-  .audit-det pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; color: var(--text-secondary); margin-top: 6px; }
-
-  /* sorting + compact date */
-  .sortbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 6px; margin-bottom: 6px; }
-  .sortbar::-webkit-scrollbar { display: none; }
-  .sortbar .chip { flex: 0 0 auto; white-space: nowrap; }
-  .sort-dir { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
-  .sort-dir svg { width: 16px; height: 16px; }
-  input[type="datetime-local"] { width: auto; min-width: 200px; max-width: 100%; height: 40px; min-height: 40px; padding: 6px 14px; font-size: 14px; border-radius: 999px; display: block; }
-
-  /* ===== v6: water pill — вода, капли, реакция на тему ===== */
-  :root {
-    --w1: color-mix(in srgb, var(--accent) 34%, #ffffff);
-    --w2: color-mix(in srgb, var(--accent) 74%, #ffffff);
-    --w-op: .66; --w-hi: rgba(255,255,255,.95);
-  }
-  [data-theme="dark"] {
-    --w1: color-mix(in srgb, var(--accent) 52%, #0d131b);
-    --w2: color-mix(in srgb, var(--accent) 88%, #0d131b);
-    --w-op: .58; --w-hi: rgba(255,255,255,.6);
-  }
-  [data-contrast="high"] { --w-op: .92; }
-  .bottom-nav, .folders-track { position: relative; }
-  .nav-blob, .folder-blob { display: none !important; }
-  .water-goo { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: url(#goo); opacity: var(--w-op); transition: opacity .5s ease; }
-  .water-shine { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity .5s ease; }
-  .water-body, .water-drop, .ws-pill, .ws-spark { position: absolute; left: 0; top: 0; pointer-events: none; }
-  .water-body {
-    border-radius: 999px; will-change: transform, width;
-    background-image:
-      radial-gradient(42% 75% at 24% 28%, rgba(255,255,255,.5), transparent 72%),
-      radial-gradient(36% 62% at 76% 72%, rgba(255,255,255,.26), transparent 72%),
-      linear-gradient(165deg, var(--w2), var(--w1));
-    background-size: 220% 100%, 220% 100%, 100% 100%;
-    background-repeat: no-repeat;
-    animation: waterCaustic 6s ease-in-out infinite alternate;
-    transition: filter .5s ease;
-  }
-  .water-drop { width: 16px; height: 16px; border-radius: 50%; transform: translate(0,0) scale(0); background: linear-gradient(165deg, var(--w2), var(--w1)); will-change: transform; }
-  @keyframes waterCaustic { from { background-position: 0% 0, 100% 0, 0 0; } to { background-position: 100% 0, 0% 0, 0 0; } }
-  .ws-pill { border-radius: 999px; will-change: transform, width; box-shadow: inset 0 -5px 10px -4px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--w-hi) 45%, transparent); }
-  .ws-arc { position: absolute; left: 14%; right: 14%; top: 7%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, var(--w-hi), rgba(255,255,255,0)); opacity: .62; animation: wsPulse 4.2s ease-in-out infinite alternate; }
-  .ws-dot { position: absolute; left: 17%; top: 17%; width: 9px; height: 6px; border-radius: 50%; background: var(--w-hi); transform: rotate(-24deg); box-shadow: 0 0 6px var(--w-hi); }
-  .ws-dot2 { position: absolute; left: calc(17% + 12px); top: calc(17% + 5px); width: 3px; height: 3px; border-radius: 50%; background: var(--w-hi); opacity: .8; }
-  .ws-spark { width: 4px; height: 4px; border-radius: 50%; background: var(--w-hi); opacity: 0; box-shadow: 0 0 5px var(--w-hi); }
-  @keyframes wsPulse { from { opacity: .5; } to { opacity: .8; } }
-  [data-theme="dark"] .ws-arc { opacity: .42; }
-  .bottom-nav button, .folder { z-index: 1; }
-  .bottom-nav button.active, .folder.active { color: var(--text); transition: color .35s ease; }
-  .theme-ring { position: fixed; z-index: 200; width: 40px; height: 40px; border-radius: 50%; pointer-events: none; transform: translate(-50%,-50%) scale(0);
-    border: 1px solid var(--accent); box-shadow: inset 0 0 10px var(--accent-glow), 0 0 12px var(--accent-glow); }
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-  ::view-transition-new(root) { z-index: 2; }
-  ::view-transition-old(root) { z-index: 1; }
-  @media (prefers-reduced-motion: reduce) { .water-body, .ws-arc { animation: none; } }
+  .list-row:active { background: var(--surface-2); }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 16px; flex-shrink: 0; }
+  .info { flex: 1; min-width: 0; }
+  .info-title { font-weight: 600; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .info-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  
+  /* Бейджи */
+  .badge { padding: 4px 8px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600; }
+  .badge.ok { background: var(--success-soft); color: var(--success); }
+  .badge.pending { background: var(--accent-soft); color: var(--accent); }
+  .badge.danger { background: var(--danger-soft); color: var(--danger); }
+  
+  /* Нижнее меню */
+  .dock { position: fixed; left: 0; right: 0; bottom: calc(14px + var(--safe-bottom)); z-index: 30; display: flex; justify-content: center; pointer-events: none; }
+  .bottom-nav { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 28px; padding: 4px; box-shadow: 0 8px 28px rgba(0,0,0,.1); pointer-events: auto; }
+  .bottom-nav button { width: 56px; height: 48px; border: none; background: transparent; border-radius: 24px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .bottom-nav button.active { color: var(--accent); background: var(--accent-soft); }
+  .bottom-nav button svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2; }
+  
+  .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 15px; }
 </style>
 </head>
 <body>
 <div id="app">
+  <!-- ЭКРАН ВХОДА -->
   <div id="login-screen">
     <div class="login-card">
       <div class="login-logo">✓</div>
       <h1>Чеклисты</h1>
       <p class="subtitle">Войдите в аккаунт</p>
-      <label for="login-id">Никнейм</label>
-      <input type="text" id="login-id" placeholder="nickname" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
-      <label for="password">Пароль</label>
-      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      <label for="login-email">Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="username">
+      <label for="login-password">Пароль</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
       <button class="btn btn-primary" id="login-btn">Войти</button>
-      <p class="small" style="margin-top:14px;text-align:center">Забыли пароль? Попросите администратора выдать новый.</p>
-      <div id="login-error" class="alert alert-error hidden" style="margin-top:16px"></div>
+      <div id="login-error" class="alert alert-error hidden"></div>
     </div>
   </div>
-  <div id="tfa-screen" class="hidden">
-    <div class="login-card">
-      <div class="login-logo">🔐</div>
-      <h1>Подтверждение</h1>
-      <p class="subtitle">Код из приложения-аутентификатора</p>
-      <label for="tfa-code">Код</label>
-      <input type="text" id="tfa-code" placeholder="000000" inputmode="numeric" autocomplete="one-time-code" maxlength="8">
-      <button class="btn btn-primary" id="tfa-btn">Подтвердить</button>
-      <button class="btn btn-ghost" id="tfa-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
-      <div id="tfa-error" class="alert alert-error hidden" style="margin-top:16px"></div>
-    </div>
-  </div>
+
+  <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
   <div id="app-screen" class="hidden">
     <header class="topbar">
-      <button class="topbar-btn" id="menu-btn" aria-label="Меню">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+      <button class="topbar-btn hidden" id="back-btn"></button>
       <div class="topbar-title" id="topbar-title">Чеклисты</div>
-      <div class="topbar-actions" id="topbar-actions">
-        <select id="ws-select" class="ws-select hidden"></select>
-        <button class="topbar-btn muted" id="search-btn" aria-label="Поиск">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
-        </button>
-      </div>
     </header>
-    <div class="folders" id="folders"></div>
-    <div class="overlay" id="overlay"></div>
-    <aside class="sidemenu" id="sidemenu">
-      <button class="side-close" id="side-close" aria-label="Закрыть">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
-      </button>
-      <div class="side-profile" id="side-profile">
-        <div class="avatar" id="side-avatar">?</div>
-        <div class="side-profile-text">
-          <div class="side-profile-name" id="side-name">—</div>
-          <div class="side-profile-sub" id="side-role">Профиль</div>
-        </div>
-      </div>
-      <nav class="sidemenu-nav" id="sidemenu-nav"></nav>
-      <div class="sidemenu-footer">
-        <button class="sidemenu-item logout" id="logout-side">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-          Выйти<span class="chev">›</span>
-        </button>
-      </div>
-    </aside>
+    
     <main id="view"></main>
-    <div class="dock" id="dock"><nav class="bottom-nav" id="bottom-nav"></nav><div class="orbs"><button type="button" class="search-orb plus-orb hidden" id="plus-orb" title="Добавить сотрудника"></button><button type="button" class="search-orb" id="search-orb" title="Поиск"></button></div></div>
+    
+    <div class="dock">
+      <nav class="bottom-nav" id="bottom-nav"></nav>
+    </div>
   </div>
 </div>
-<div id="toast" class="toast"></div>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-  <filter id="goo" x="-20%" y="-70%" width="140%" height="240%" color-interpolation-filters="sRGB">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="b"/>
-    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="g"/>
-    <feComposite in="SourceGraphic" in2="g" operator="atop"/>
-  </filter>
-</defs></svg>
+
 <script type="module">
-const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
-const onApiHost = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port === '3000';
-const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : (onApiHost ? '' : 'http://localhost:3000');
-const tg = window.Telegram?.WebApp;
-if (tg) { tg.ready(); tg.expand(); }
-const $ = (id) => document.getElementById(id);
-let csrfToken = null;
-const DEFAULT_LAYOUT = () => ({ top: ['all','tpl','people'], dock: ['all','settings'] });
-function normLayout(l) {
-  const fix = (a) => [...new Set(a.map(k => k === 'mine' ? 'all' : k))];
-  return { top: fix(l.top).filter(k => k !== 'settings'), dock: fix(l.dock) };
-}
-function loadLayout() {
-  try { const l = JSON.parse(localStorage.getItem('layout') || 'null'); if (l && Array.isArray(l.top) && Array.isArray(l.dock)) return normLayout(l); } catch {}
-  return DEFAULT_LAYOUT();
-}
-const state = {
-  me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null,
-  tab: 'all', filter: '', searchQuery: '', searchPrevTab: 'all',
-  theme: localStorage.getItem('theme') || 'light',
-  accent: localStorage.getItem('accent') || 'blue',
-  contrast: localStorage.getItem('contrast') || 'normal',
-  avatarEmoji: localStorage.getItem('avatarEmoji') || '',
-  avatarDataUrl: localStorage.getItem('avatarDataUrl') || '',
-  favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
-  layout: loadLayout(),
-};
-const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
-const S = (d) => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-const icons = {
-  list: S('<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><path d="M8 12.5l2.8 2.8L16 9.5"/>'),
-  all: S('<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 12.5l9 5 9-5"/><path d="M3 17l9 5 9-5"/>'),
-  template: S('<rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4.5h6M9 10h6M9 14h4"/>'),
-  people: S('<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.8 5.5-4.8s4.9 1.8 5.5 4.8"/><path d="M16 5.2a3 3 0 010 5.6M17.5 14.6c1.7.6 2.7 2.1 3 4.4"/>'),
-  audit: S('<path d="M12 3l7.5 3v5.5c0 4.5-3.1 8-7.5 9.5-4.4-1.5-7.5-5-7.5-9.5V6z"/><path d="M9 12l2.2 2.2L15.2 10"/>'),
-  settings: S('<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/>'),
-  search: S('<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/>'),
-  empty: S('<path d="M4 13l2.5-7.5A2 2 0 018.4 4h7.2a2 2 0 011.9 1.5L20 13v5a2 2 0 01-2 2H6a2 2 0 01-2-2z"/><path d="M4 13h4.5l1 2.5h5l1-2.5H20"/>'),
-  more: S('<circle cx="6" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18" cy="12" r="1.3"/>'),
-  msg: S('<path d="M5 5h14a2 2 0 012 2v8a2 2 0 01-2 2h-6l-4 3.5V17H5a2 2 0 01-2-2V7a2 2 0 012-2z"/>'),
-  back: S('<path d="M15 5l-7 7 7 7"/>'),
-  bell: S('<path d="M6 16v-5a6 6 0 1112 0v5l1.5 2h-15z"/><path d="M10 21h4"/>'),
-  plus: S('<path d="M12 5v14M5 12h14"/>'),
-  tune: S('<rect x="3.5" y="4" width="17" height="6" rx="2.5"/><rect x="3.5" y="14" width="10" height="6" rx="2.5"/><path d="M17.5 17h3M19 15.5v3"/>'),
-  star: S('<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9-4.3-4.1 5.9-.8z"/>'),
-  up: S('<path d="M6 14l6-6 6 6"/>'),
-  down: S('<path d="M6 10l6 6 6-6"/>'),
-};
-const SECTIONS = {
-  all: { t: 'Чеклисты', s: 'Все', i: 'all', ok: () => true },
-  tpl: { t: 'Шаблоны', s: 'Шаблоны', i: 'template', ok: () => can('checklists.templates.read') },
-  people: { t: 'Команда', s: 'Команда', i: 'people', ok: () => can('users.create') || can('users.read') },
-  fav: { t: 'Избранное', s: 'Избранное', i: 'star', ok: () => can('checklists.templates.read') },
-  notifications: { t: 'Сообщения', s: 'Сообщения', i: 'msg', ok: () => true },
-  audit: { t: 'Журнал аудита', s: 'Журнал', i: 'audit', ok: () => true },
-  settings: { t: 'Кабинет', s: 'Кабинет', i: 'settings', ok: () => true },
-};
-const rootSet = () => [...new Set(['all', ...state.layout.top, ...state.layout.dock])].filter(k => k !== 'settings');
-function pluralPunkty(n) {
-  const x = Math.abs(Number(n)) || 0;
-  const n10 = x % 10, n100 = x % 100;
-  if (n10 === 1 && n100 !== 11) return x + ' пункт';
-  if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return x + ' пункта';
-  return x + ' пунктов';
-}
+  // --- НАСТРОЙКИ ---
+  const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev'; // ВАШ АДРЕС NGROK
+  const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
+  
+  // Инициализация Telegram
+  const tg = window.Telegram?.WebApp;
+  if (tg) { tg.ready(); tg.expand(); }
 
-function h(tag, props, ...kids) {
-  const e = document.createElement(tag);
-  for (const [k, v] of Object.entries(props || {})) {
-    if (k === 'class') e.className = v;
-    else if (k === 'html') e.innerHTML = v;
-    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
-    else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v);
-  }
-  for (const c of kids.flat(Infinity)) {
-    if (c == null || c === false) continue;
-    e.append(c.nodeType ? c : document.createTextNode(String(c)));
-  }
-  return e;
-}
-const arr = (d) => Array.isArray(d) ? d : (d && (d.items || d.data || d.runs || d.templates || d.users)) || [];
-const can = (p) => !!state.me?.permissions?.includes(p);
-const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
-const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
-const statusName = (s) => STATUS[s] || s || '';
-const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || '') : '';
-const atNick = (u) => u?.nickname ? '@' + u.nickname : '';
-const NICK_RE = /^[A-Za-z0-9._-]{3,32}$/;
-const initials = (u) => { const n = personName(u); if (!n) return '?'; return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); };
-function setView(...nodes) { $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType)); }
-function toast(msg, bad = false) {
-  const t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : '') + ' show';
-  clearTimeout(toast._t); toast._t = setTimeout(() => { t.className = 'toast'; }, 3800);
-}
-function authHeaders() {
-  const headers = { 'ngrok-skip-browser-warning': '1' };
-  const token = localStorage.getItem('token');
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  if (csrfToken) headers['x-csrf-token'] = csrfToken;
-  return headers;
-}
-async function api(method, path, body) {
-  const headers = authHeaders();
-  let payload;
-  if (body instanceof FormData) payload = body;
-  else if (body !== undefined) { headers['content-type'] = 'application/json'; payload = JSON.stringify(body); }
-  let res;
-  try { res = await fetch(API_BASE + path, { method, headers, credentials: 'include', body: payload }); }
-  catch { throw new Error('Нет связи с сервером'); }
-  const text = await res.text();
-  let data = null;
-  try { data = text ? JSON.parse(text) : null; } catch { data = text; }
-  if (!res.ok) {
-    const msg = (data && (data.message || data.error)) || res.statusText || `HTTP ${res.status}`;
-    const err = new Error(Array.isArray(msg) ? msg.join(', ') : String(msg));
-    err.status = res.status; throw err;
-  }
-  return data;
-}
-async function show(fn) {
-  setView(h('div', { class: 'stack', style: 'padding:8px 2px' }, h('div', { class: 'skeleton', style: 'height:22px;width:55%' }), h('div', { class: 'skeleton', style: 'height:72px;margin-top:14px' })));
-  try { await fn(); }
-  catch (e) {
-    if (e.status === 401) { toLogin('Сессия истекла'); return; }
-    setView(h('div', { class: 'alert alert-error' }, e.message), h('button', { class: 'btn btn-secondary', onclick: () => show(fn) }, 'Повторить'));
-  }
-}
-function applyAppearance() {
-  document.documentElement.setAttribute('data-theme', state.theme === 'dark' ? 'dark' : 'light');
-  document.documentElement.setAttribute('data-accent', state.accent || 'blue');
-  document.documentElement.setAttribute('data-contrast', state.contrast || 'normal');
-  localStorage.setItem('theme', state.theme);
-  localStorage.setItem('accent', state.accent);
-  localStorage.setItem('contrast', state.contrast);
-  try { tg?.setHeaderColor?.(state.theme === 'dark' ? '#14181f' : '#ffffff'); } catch {}
-  try { tg?.setBackgroundColor?.(state.theme === 'dark' ? '#0a0c10' : '#eef1f5'); } catch {}
-}
-applyAppearance();
-function showScreen(id) { ['login-screen','tfa-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
-function toLogin(msg) {
-  csrfToken = null; state.me = null; localStorage.removeItem('token'); showScreen('login-screen');
-  const el = $('login-error');
-  if (msg) { el.textContent = msg; el.classList.remove('hidden'); } else el.classList.add('hidden');
-}
-async function afterLogin() {
-  state.me = await api('GET', '/auth/me');
-  csrfToken = state.me.csrfToken || csrfToken;
-  try {
-    const local = JSON.parse(localStorage.getItem('profileLocal') || 'null');
-    if (local && state.me && local.id === state.me.id) {
-      if (local.firstName) state.me.firstName = local.firstName;
-      if (local.lastName) state.me.lastName = local.lastName;
-      if (local.nickname) state.me.nickname = local.nickname;
+  // --- СОСТОЯНИЕ ---
+  const state = {
+    me: null,
+    token: localStorage.getItem('token') || null,
+    csrf: null,
+    wsId: localStorage.getItem('wsId') || null,
+    currentTab: 'checklists',
+  };
+
+  const $ = (id) => document.getElementById(id);
+
+  // --- API ОБЕРТКА ---
+  async function api(method, path, body) {
+    const headers = { 'ngrok-skip-browser-warning': '1' };
+    if (state.token) headers['Authorization'] = `Bearer ${state.token}`;
+    if (state.csrf) headers['x-csrf-token'] = state.csrf;
+    if (body) headers['content-type'] = 'application/json';
+
+    const res = await fetch(API_BASE + path, {
+      method, headers, body: body ? JSON.stringify(body) : undefined
+    });
+    
+    const text = await res.text();
+    let data = null; try { data = text ? JSON.parse(text) : null; } catch { data = text; }
+    
+    if (!res.ok) {
+      if (res.status === 401) { logout(); throw new Error('Сессия истекла'); }
+      throw new Error(data?.message || res.statusText || 'Ошибка');
     }
-  } catch {}
-  state.workspaces = arr(await api('GET', '/workspaces'));
-  if (!state.workspaces.find(w => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
-  localStorage.setItem('wsId', state.wsId || '');
-  try { localStorage.setItem('lastNick', state.me.nickname || ''); } catch {}
-  showScreen('app-screen');
-  updateSideUser();
-  renderWsSelect();
-  renderSideMenu();
-  renderBottomNav();
-  renderFolders();
-
-  // ПРАВКА: если нужно сменить пароль — принудительно на профиль
-  if (state.me.requirePasswordChange) {
-    go('me');
-    toast('Смените пароль, чтобы продолжить');
-  } else {
-    go('all');
+    return data;
   }
-}
-function updateSideUser() {
-  const me = state.me; const av = $('side-avatar'); av.innerHTML = '';
-  if (state.avatarDataUrl) { const img = document.createElement('img'); img.src = state.avatarDataUrl; av.append(img); }
-  else if (state.avatarEmoji) { av.textContent = state.avatarEmoji; av.style.fontSize = '22px'; }
-  else { av.textContent = initials(me); av.style.fontSize = ''; }
-  const online = document.createElement('span'); online.className = 'online'; av.append(online);
-  $('side-name').textContent = personName(me) || 'Пользователь';
-  $('side-role').textContent = atNick(me) || 'Профиль';
-}
-function renderWsSelect() {
-  const sel = $('ws-select');
-  if (state.workspaces.length < 2) { sel.classList.add('hidden'); return; }
-  sel.classList.remove('hidden');
-  sel.replaceChildren(...state.workspaces.map(w => h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)));
-  sel.onchange = () => { state.wsId = sel.value; localStorage.setItem('wsId', state.wsId); go(state.tab); };
-}
-try { const ln = localStorage.getItem('lastNick'); if (ln) $('login-id').value = ln; } catch {}
-$('login-btn').onclick = async () => {
-  $('login-error').classList.add('hidden');
-  const id = $('login-id').value.trim(); const password = $('password').value;
-  if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
-  $('login-btn').disabled = true;
-  try {
-    const payload = id.includes('@') ? { email: id, password } : { nickname: id, password };
-    const data = await api('POST', '/auth/login', payload);
-    if (data.twoFactorRequired) {
-      showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
-      if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-      csrfToken = data.csrfToken || null; return;
-    }
-    if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-    csrfToken = data.csrfToken || null; $('password').value = ''; await afterLogin();
-  } catch (e) { toLogin(e.message); }
-  finally { $('login-btn').disabled = false; }
-};
-$('tfa-btn').onclick = async () => {
-  const code = $('tfa-code').value.trim();
-  if (!code) { $('tfa-error').textContent = 'Введите код'; $('tfa-error').classList.remove('hidden'); return; }
-  $('tfa-btn').disabled = true;
-  try {
-    const data = await api('POST', '/auth/2fa/verify', { code });
-    if (data.sessionToken) localStorage.setItem('token', data.sessionToken);
-    csrfToken = data.csrfToken || csrfToken; await afterLogin();
-  } catch (e) { $('tfa-error').textContent = e.message || 'Ошибка 2FA'; $('tfa-error').classList.remove('hidden'); }
-  finally { $('tfa-btn').disabled = false; }
-};
-$('tfa-back').onclick = () => toLogin();
-function closeMenu() { /* side menu removed */ }
-function openMenu() { go('settings'); }
-$('menu-btn').onclick = () => go('settings'); if ($('overlay')) $('overlay').onclick = closeMenu; if ($('side-close')) $('side-close').onclick = closeMenu;
-if ($('side-profile')) $('side-profile').onclick = () => go('me');
-function renderSideMenu() { /* боковая панель отключена — всё в Кабинете */ }
-function sideItem(tab, iconHtml, label, isStub = false) {
-  return h('button', { class: 'sidemenu-item' + (state.tab === tab ? ' active' : ''), onclick: () => { closeMenu(); go(tab); } },
-    h('span', { html: iconHtml }), label, isStub ? h('span', { class: 'soon' }, 'скоро') : h('span', { class: 'chev' }, '›'));
-}
-if ($('logout-side')) $('logout-side').onclick = async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
-/* ===== Водяная «капля»: пружинная физика, растяжение плёнки, отрыв капель ===== */
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const waters = new WeakMap(), waterHosts = new Set();
-function getWater(host) {
-  let w = waters.get(host);
-  if (w) return w;
-  const body = h('i', { class: 'water-body' });
-  const drops = [0, 1, 2].map(() => h('i', { class: 'water-drop' }));
-  const sparks = [0, 1, 2].map(() => h('i', { class: 'ws-spark' }));
-  const pill = h('div', { class: 'ws-pill' }, h('i', { class: 'ws-arc' }), h('i', { class: 'ws-dot' }), h('i', { class: 'ws-dot2' }));
-  const goo = h('div', { class: 'water-goo' }, body, ...drops);
-  const shine = h('div', { class: 'water-shine' }, pill, ...sparks);
-  w = { host, goo, shine, body, pill, drops, sparks, l: null, r: null, vl: 0, vr: 0, tl: 0, tr: 0, dir: 1, top: 0, hgt: 40, cy: 20, arc: 8, raf: 0, t0: 0, ds: drops.map(() => ({ on: false })) };
-  waters.set(host, w); waterHosts.add(host);
-  return w;
-}
-function paintWater(w) {
-  const width = Math.max(10, w.r - w.l), nat = Math.max(10, w.tr - w.tl);
-  const sy = 1 - Math.min(.17, Math.max(0, width / nat - 1) * .22);
-  const tf = `translateX(${w.l}px) scaleY(${sy})`;
-  for (const el of [w.body, w.pill]) { el.style.transform = tf; el.style.width = width + 'px'; el.style.top = w.top + 'px'; el.style.height = w.hgt + 'px'; }
-}
-function hideDrop(w, i) { w.drops[i].style.transform = 'translate(0,0) scale(0)'; w.sparks[i].style.opacity = '0'; }
-function paintDrop(w, i, p, cx) {
-  const d = w.ds[i], el = w.drops[i], sp = w.sparks[i];
-  const e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-  const sin = Math.sin(Math.PI * p);
-  const x = d.fan != null ? cx + d.fan * sin : d.x0 + (cx - d.x0) * e;
-  const y = -d.arc * sin;
-  const sc = (d.size / 16) * (d.fan != null ? (.4 + .6 * sin) : (1 - .72 * p * p));
-  el.style.transform = `translate(${x - 8}px, ${w.cy - 8 + y}px) scale(${sc})`;
-  sp.style.transform = `translate(${x - 2 - 3 * sc}px, ${w.cy - 2 - 3 * sc + y}px) scale(${sc})`;
-  sp.style.opacity = String(Math.max(0, .95 * (1 - p * p)));
-}
-function tickWater(w, now) {
-  const dt = Math.min(.032, Math.max(.001, (now - w.t0) / 1000)); w.t0 = now;
-  // ведущий край быстрее, хвост тянется — как поверхностное натяжение воды
-  const kLead = 170, kTrail = 70, z = .82;
-  const kl = w.dir > 0 ? kTrail : kLead, kr = w.dir > 0 ? kLead : kTrail;
-  w.vl += (kl * (w.tl - w.l) - 2 * z * Math.sqrt(kl) * w.vl) * dt; w.l += w.vl * dt;
-  w.vr += (kr * (w.tr - w.r) - 2 * z * Math.sqrt(kr) * w.vr) * dt; w.r += w.vr * dt;
-  let busy = Math.abs(w.vl) > .06 || Math.abs(w.vr) > .06 || Math.abs(w.tl - w.l) > .08 || Math.abs(w.tr - w.r) > .08;
-  if (!busy) { w.l = w.tl; w.r = w.tr; w.vl = w.vr = 0; }
-  paintWater(w);
-  const cx = (w.l + w.r) / 2;
-  w.ds.forEach((d, i) => {
-    if (!d.on) return;
-    const el = now - d.t - d.delay;
-    if (el < 0) { busy = true; return; }
-    const p = el / d.dur;
-    if (p >= 1) { d.on = false; hideDrop(w, i); return; }
-    busy = true; paintDrop(w, i, p, cx);
-  });
-  w.raf = busy ? requestAnimationFrame((t) => tickWater(w, t)) : 0;
-}
-function kickWater(w) { if (!w.raf) { w.t0 = performance.now(); w.raf = requestAnimationFrame((t) => tickWater(w, t)); } }
-function spawnDrops(w, fromL, fromR, dir, dist) {
-  const n = dist > 150 ? 3 : dist > 70 ? 2 : 1, now = performance.now();
-  for (let i = 0; i < n; i++) {
-    const edge = dir > 0 ? fromL + (fromR - fromL) * .3 : fromL + (fromR - fromL) * .7;
-    Object.assign(w.ds[i], { on: true, t: now, delay: 40 + i * 90, dur: 560 + i * 120, x0: edge - dir * i * 7, fan: null, arc: w.arc * (i % 2 ? -.55 : 1), size: 16 - i * 3 });
-  }
-}
-function splashWater(w) {
-  if (w.l == null || REDUCED) return;
-  const now = performance.now();
-  w.ds.forEach((d, i) => Object.assign(d, { on: true, t: now, delay: i * 70, dur: 620 + i * 90, fan: (i - 1) * 20, arc: w.arc * (1.3 + i * .25), size: 15 - i * 2 }));
-  kickWater(w);
-}
-function waterTo(w, l, r, top, hgt, instant) {
-  w.top = top; w.hgt = hgt; w.cy = top + hgt / 2; w.arc = Math.min(12, hgt * .22);
-  const first = w.l == null;
-  const oldL = w.l, oldR = w.r;
-  w.tl = l; w.tr = r;
-  if (first || instant || REDUCED) { w.l = l; w.r = r; w.vl = w.vr = 0; paintWater(w); return; }
-  const dc = (l + r) / 2 - (oldL + oldR) / 2;
-  if (Math.abs(dc) > 1) w.dir = dc > 0 ? 1 : -1;
-  if (Math.abs(dc) >= 28) spawnDrops(w, oldL, oldR, w.dir, Math.abs(dc));
-  kickWater(w);
-}
-function syncWater(host, instant) {
-  const w = getWater(host);
-  const btn = host.querySelector('button.active');
-  if (host.offsetWidth === 0 || host.offsetParent === null && getComputedStyle(host).position !== 'fixed') { w.l = null; return; }
-  if (!btn) { w.goo.style.opacity = '0'; w.shine.style.opacity = '0'; return; }
-  w.goo.style.opacity = ''; w.shine.style.opacity = '';
-  waterTo(w, btn.offsetLeft, btn.offsetLeft + btn.offsetWidth, btn.offsetTop, btn.offsetHeight, instant);
-}
-addEventListener('resize', () => { waterHosts.forEach(hst => syncWater(hst, true)); });
-function wobbleWaters() { waterHosts.forEach(hst => splashWater(getWater(hst))); }
 
-/* Смена темы: круговая волна от места нажатия + капли на панелях */
-function changeAppearance(apply, ev) {
-  const x = ev?.clientX ?? innerWidth / 2, y = ev?.clientY ?? innerHeight / 2;
-  const R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-  const done = () => setTimeout(wobbleWaters, 380);
-  if (REDUCED || !document.startViewTransition) { apply(); done(); return; }
-  const ring = h('div', { class: 'theme-ring' });
-  ring.style.left = x + 'px'; ring.style.top = y + 'px';
-  document.body.append(ring);
-  const vt = document.startViewTransition(() => { apply(); });
-  vt.ready.then(() => {
-    document.documentElement.animate(
-      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${R}px at ${x}px ${y}px)`] },
-      { duration: 1000, easing: 'cubic-bezier(.22,.7,.18,1)', pseudoElement: '::view-transition-new(root)' });
-    ring.animate([{ transform: 'translate(-50%,-50%) scale(0)', opacity: .7 }, { transform: `translate(-50%,-50%) scale(${R * 2 / 40})`, opacity: 0 }],
-      { duration: 1000, easing: 'cubic-bezier(.22,.7,.18,1)' }).onfinish = () => ring.remove();
-  }).catch(() => ring.remove());
-  vt.finished.finally(done);
-}
-
-function renderFolders() {
-  const el = $('folders');
-  if (!el) return;
-  const tabs = state.layout.top.filter(k => SECTIONS[k] && k !== 'settings' && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s }));
-  const hide = !tabs.length || ['search', 'me', 'settings', 'layout'].includes(state.tab);
-  el.style.display = hide ? 'none' : 'flex';
-  let track = el._track;
-  if (!track) { track = el._track = h('div', { class: 'folders-track' }); }
-  const w = getWater(track);
-  track.replaceChildren(w.goo, w.shine, ...tabs.map(({ k, t }) => h('button', {
-    class: 'folder' + (state.tab === k ? ' active' : ''), type: 'button', 'data-tab': k, onclick: () => go(k),
-  }, t)));
-  if (track.parentNode !== el) el.replaceChildren(track);
-  requestAnimationFrame(() => {
-    syncWater(track);
-    const act = track.querySelector('.folder.active');
-    if (act) el.scrollTo({ left: Math.max(0, act.offsetLeft - 40), behavior: REDUCED ? 'auto' : 'smooth' });
-  });
-}
-
-function renderBottomNav() {
-  const tabs = state.layout.dock.filter(k => SECTIONS[k] && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s, icon: icons[SECTIONS[k].i] }));
-  if (!tabs.some(x => x.k === 'settings')) tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
-  const nav = $('bottom-nav');
-  const w = getWater(nav);
-  const btns = tabs.map(({ k, t, icon }) => {
-    const active = state.tab === k || (k === 'settings' && (['settings','me','layout'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
-    const b = h('button', { class: active ? 'active' : '', type: 'button', title: t, 'data-tab': k, onclick: () => go(k) });
-    b.innerHTML = icon;
-    return b;
-  });
-  nav.replaceChildren(w.goo, w.shine, ...btns);
-  nav.style.setProperty('--n', tabs.length);
-  const orb = $('search-orb');
-  if (orb) {
-    orb.innerHTML = icons.search;
-    orb.classList.toggle('active', state.tab === 'search');
-    orb.onclick = () => go('search');
-  }
-  requestAnimationFrame(() => syncWater(nav));
-}
-function toggleFavorite(id) {
-  const set = new Set(state.favorites || []);
-  if (set.has(id)) set.delete(id); else set.add(id);
-  state.favorites = [...set];
-  localStorage.setItem('favorites', JSON.stringify(state.favorites));
-}
-function isFavorite(id) { return (state.favorites || []).includes(id); }
-function encodeChoiceUnit(mode, options) {
-  return 'choice:' + mode + ':' + options.map(o => String(o).replace(/\|/g, '/')).join('|');
-}
-function parseChoiceUnit(unit) {
-  if (!unit || !String(unit).startsWith('choice:')) return null;
-  const parts = String(unit).split(':');
-  if (parts.length < 3) return null;
-  return { mode: parts[1], options: parts.slice(2).join(':').split('|').filter(Boolean) };
-}
-function go(tab) {
-  if (tab === 'mine') tab = 'all';
-  if (typeof openRun !== 'undefined' && openRun._restore) { try { openRun._restore(); } catch {} openRun._restore = null; }
-  if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
-  // Кнопка назад в шапке
-  const menuBtn = $('menu-btn');
-  if (menuBtn) {
-  const rootTabs = ['all', 'tpl', 'people', 'settings'];
-  const needBack = !rootTabs.includes(tab);
-  if (needBack) {
-    menuBtn.style.display = '';
-    menuBtn.innerHTML = icons.back;
-    menuBtn.setAttribute('aria-label', 'Назад');
-    menuBtn.onclick = () => {
-      if (tab === 'search') go(state.searchPrevTab || 'all');
-      else if (tab === 'layout') go('settings');
-      else go('all');
-    };
-  } else {
-    menuBtn.style.display = 'none';
-  }
-}
-
-  state.tab = tab;
-  const titles = { all:'Чеклисты', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
-  $('topbar-title').textContent = titles[tab] || 'Чеклисты';
-  const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && can('users.create')));
-  renderBottomNav(); renderFolders(); renderSideMenu();
-  const screens = { all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
-  show(screens[tab] || renderAll);
-}
-
-$('plus-orb').innerHTML = icons.plus;
-const lqBackdrop = h('div', { class: 'lq-backdrop' }), lqSheet = h('div', { class: 'lq-sheet' });
-document.body.append(lqBackdrop, lqSheet);
-function openSheet(node) {
-  const r = $('plus-orb').getBoundingClientRect();
-  lqSheet.replaceChildren(h('div', { class: 'lq-grab' }), node);
-  lqSheet.style.transformOrigin = `${r.left + r.width / 2 - lqSheet.offsetLeft}px ${r.top + r.height / 2 - lqSheet.offsetTop}px`;
-  requestAnimationFrame(() => { lqSheet.classList.add('open'); lqBackdrop.classList.add('open'); });
-}
-function closeSheet() {
-  lqSheet.classList.remove('open'); lqBackdrop.classList.remove('open');
-  if (window.__addForm?.querySelector('.alert-success') && state.tab === 'people') go('people');
-}
-lqBackdrop.onclick = closeSheet;
-$('plus-orb').onclick = () => { if (window.__addForm) openSheet(window.__addForm); };
-// liquid press: squish + glint on every button
-const LQ = '.menu-pop button,.star-btn,.emoji-grid button,.btn,.chip,.choice,.choice-opt,.icon-btn,.topbar-btn,.fab,.float-back,.search-orb,.bottom-nav button,.folder,.lay-mv,.swatch';
-document.addEventListener('pointerdown', (e) => {
-  const el = e.target.closest(LQ); if (!el || el.disabled) return;
-  el.dataset.lq = '1';
-  if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
-  const r = el.getBoundingClientRect(), g = document.createElement('span');
-  g.className = 'lq-glint'; g.style.left = (e.clientX - r.left) + 'px'; g.style.top = (e.clientY - r.top) + 'px';
-  el.append(g); requestAnimationFrame(() => g.classList.add('grow'));
-  const up = () => { g.classList.add('out'); setTimeout(() => g.remove(), 450); removeEventListener('pointerup', up); removeEventListener('pointercancel', up); };
-  addEventListener('pointerup', up); addEventListener('pointercancel', up);
-});
-function saveLayout() { localStorage.setItem('layout', JSON.stringify(state.layout)); renderBottomNav(); renderFolders(); }
-function renderLayout() {
-  const block = (key, title, hint, max) => {
-    const list = state.layout[key];
-    const cur = list.filter(k => SECTIONS[k] && SECTIONS[k].ok());
-    const rest = Object.keys(SECTIONS).filter(k => !cur.includes(k) && SECTIONS[k].ok() && !(key === 'top' && k === 'settings'));
-    const move = (k, d) => { const i = list.indexOf(k), j = i + d; if (j < 0 || j >= list.length) return; [list[i], list[j]] = [list[j], list[i]]; saveLayout(); renderLayout(); };
-    const toggle = (k, on) => {
-      if (on) state.layout[key] = list.filter(x => x !== k);
-      else { if (max && cur.length >= max) return toast(`В консоли до ${max} разделов`, true); list.push(k); }
-      saveLayout(); renderLayout();
-    };
-    const row = (k, on) => h('div', { class: 'lay-row' },
-      h('span', { class: 'lay-ic', html: icons[SECTIONS[k].i] }), h('span', { class: 'lay-t' }, SECTIONS[k].t),
-      on && h('button', { class: 'lay-mv', type: 'button', html: icons.up, onclick: () => move(k, -1) }),
-      on && h('button', { class: 'lay-mv', type: 'button', html: icons.down, onclick: () => move(k, 1) }),
-      h('button', { class: 'lay-sw' + (on ? ' on' : ''), type: 'button', disabled: key === 'dock' && k === 'settings', onclick: () => toggle(k, on) }, h('i')));
-    return [h('h2', {}, title), h('div', { class: 'hint' }, hint), h('div', { class: 'card' }, ...cur.map(k => row(k, true)), ...rest.map(k => row(k, false)))];
-  };
-  setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. «Избранное» — шаблоны со звездой.'),
-    ...block('dock', 'Нижняя консоль', 'До 5 разделов, «Кабинет» всегда остаётся.', 5),
-    h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = DEFAULT_LAYOUT(); saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
-}
-
-async function firstOk(paths) {
-  let last;
-  for (const p of paths) { try { return arr(await api('GET', p)); } catch (e) { last = e; if (e.status === 401 || e.status === 403) throw e; } }
-  throw last;
-}
-const ACTION_RU = { LOGIN: 'Вход', LOGOUT: 'Выход', CREATE: 'Создание', UPDATE: 'Изменение', DELETE: 'Удаление', COMPLETE: 'Сдача', ASSIGN: 'Назначение', CANCEL: 'Отмена', ARCHIVE: 'Архивация' };
-function actionLabel(a) { const k = String(a || '').toUpperCase(); const hit = Object.keys(ACTION_RU).find(x => k.includes(x)); return hit ? ACTION_RU[hit] : (a || 'Действие'); }
-function loadFail(e, title, retry) {
-  const msg = e.status === 403 ? 'Недостаточно прав' : e.status === 404 ? 'Сервер пока не отдаёт этот раздел (адрес API не найден)' : (e.message || 'Ошибка');
-  setView(emptyState(title, msg), h('button', { class: 'btn btn-secondary', onclick: retry }, 'Повторить'));
-}
-async function renderAudit() {
-  let rows;
-  try { rows = await firstOk([`/audit?workspaceId=${state.wsId}&limit=500`, '/audit/logs?limit=500', '/audit-logs?limit=500', '/audit']); }
-  catch (e) { return loadFail(e, 'Журнал аудита', () => show(renderAudit)); }
-  const dt = (r) => new Date(r.createdAt || r.at || r.timestamp || 0);
-  const act = (r) => String(r.action || r.type || r.event || '');
-  const failed = (r) => /FAIL|DENIED|ERROR/i.test(String(r.result || r.status || ''));
-  rows = [...rows].sort((a, b) => dt(b) - dt(a));
-  const fails = {}; rows.forEach(r => { if (/LOGIN/i.test(act(r)) && failed(r)) { const k = r.ip || personName(r.actor); fails[k] = (fails[k] || 0) + 1; } });
-  const critical = (r) => /DELETE|ROLE|PERMISSION|EXPORT/i.test(act(r)) || (/LOGIN/i.test(act(r)) && failed(r) && (fails[r.ip || personName(r.actor)] || 0) >= 5);
-  const GROUPS = { all: ['Все', () => true], crit: ['Важное', critical], auth: ['Вход', r => /LOGIN|LOGOUT|PASSWORD|2FA/i.test(act(r))], data: ['Данные', r => /TEMPLATE|CHECKLIST|RUN|ITEM|FILE|COMMENT|ASSIGN|COMPLETE|CANCEL/i.test(act(r))], people: ['Люди', r => /USER|ROLE|PERMISSION/i.test(act(r))] };
-  const PERIODS = { all: ['Всё', 0], day: ['Сегодня', 1], week: ['7 дней', 7], month: ['30 дней', 30] };
-  let q = '', grp = 'all', per = 'all', shown = 30;
-  const who = (r) => personName(r.actor || r.user) || 'Система';
-  const filtered = () => rows.filter(r => GROUPS[grp][1](r) && (!PERIODS[per][1] || Date.now() - dt(r) < PERIODS[per][1] * 864e5)
-    && (!q || [act(r), who(r), r.entity || r.entityType, r.entityId].join(' ').toLowerCase().includes(q)));
-  const input = h('input', { type: 'search', placeholder: 'Поиск по действиям и людям…' });
-  const bar = h('div'), box = h('div');
-  const chips = (obj, cur, set) => h('div', { class: 'chips' }, ...Object.entries(obj).map(([k, v]) => h('button', { class: 'chip' + (cur === k ? ' active' : ''), type: 'button', onclick: () => { set(k); shown = 30; draw(); } }, v[0] + (obj === GROUPS && k === 'crit' ? ` · ${rows.filter(critical).length}` : ''))));
-  const exportCsv = () => {
-    const f = filtered(), esc = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    const csv = '\ufeff' + ['Дата;Действие;Кто;Объект;Результат;IP', ...f.map(r => [fmt(dt(r)), act(r), who(r), (r.entity || r.entityType || '') + ' ' + (r.entityId || ''), r.result || r.status || '', r.ip || ''].map(esc).join(';'))].join('\n');
-    const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'audit-' + new Date().toISOString().slice(0, 10) + '.csv';
-    document.body.append(a); a.click(); a.remove(); toast(`Экспорт: ${f.length} записей`);
-  };
-  const card = (r) => {
-    const det = h('div', { class: 'hidden audit-det' });
-    const info = [['Результат', r.result || r.status], ['IP', r.ip], ['Устройство', r.device || r.userAgent], ['Пространство', r.workspaceId]].filter(x => x[1]);
-    info.forEach(([k, v]) => det.append(h('div', { class: 'small' }, `${k}: ${v}`)));
-    const diff = r.before !== undefined || r.after !== undefined ? { до: r.before, после: r.after } : (r.details || r.meta);
-    if (diff && typeof diff === 'object') det.append(h('pre', {}, JSON.stringify(diff, null, 1)));
-    else if (diff) det.append(h('div', { class: 'small' }, String(diff)));
-    if (!det.children.length) det.append(h('div', { class: 'small' }, 'Подробностей нет'));
-    const ent = [r.entity || r.entityType, r.entityId && String(r.entityId).slice(0, 8)].filter(Boolean).join(' · ');
-    return h('div', { class: 'card click', onclick: () => det.classList.toggle('hidden') },
-      h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, actionLabel(act(r))), critical(r) ? h('span', { class: 'badge bad' }, 'Важное') : h('span', { class: 'badge neutral' }, fmt(dt(r)))),
-      h('div', { class: 'muted', style: 'margin-top:4px' }, who(r) + (critical(r) ? ' · ' + fmt(dt(r)) : '')), ent && h('div', { class: 'small', style: 'margin-top:4px' }, ent), det);
-  };
-  const draw = () => {
-    const f = filtered();
-    bar.replaceChildren(chips(GROUPS, grp, k => grp = k), chips(PERIODS, per, k => per = k),
-      h('div', { class: 'row', style: 'margin-bottom:8px' }, h('span', { class: 'small' }, `Записей: ${f.length} из ${rows.length}`), h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: exportCsv }, 'Экспорт CSV')));
-    const nodes = f.length ? f.slice(0, shown).map(card) : [emptyState(rows.length ? 'Ничего не найдено' : 'Записей пока нет')];
-    if (f.length > shown) nodes.push(h('button', { class: 'btn btn-secondary', onclick: () => { shown += 30; draw(); } }, `Показать ещё (${f.length - shown})`));
-    box.replaceChildren(...nodes);
-  };
-  input.addEventListener('input', () => { q = input.value.trim().toLowerCase(); shown = 30; draw(); });
-  draw();
-  setView(input, h('div', { style: 'height:10px' }), bar, box);
-}
-async function renderNotifications() {
-  let rows;
-  try { rows = await firstOk(['/notifications?limit=100', '/notifications']); }
-  catch (e) { return loadFail(e, 'Сообщения', () => show(renderNotifications)); }
-  rows = [...rows].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-  const isRead = (n) => !!(n.readAt || n.read || n.isRead);
-  let onlyNew = false;
-  const box = h('div');
-  const markRead = async (n) => {
-    if (isRead(n)) return;
-    n.readAt = new Date().toISOString();
-    try { await api('PATCH', `/notifications/${n.id}/read`); }
-    catch { try { await api('POST', `/notifications/${n.id}/read`); } catch {} }
-  };
-  const draw = () => {
-    const f = rows.filter(n => !onlyNew || !isRead(n));
-    const unread = rows.filter(n => !isRead(n)).length;
-    const head = h('div', { class: 'row', style: 'margin-bottom:10px' },
-      h('div', { class: 'chips', style: 'margin:0' },
-        h('button', { class: 'chip' + (!onlyNew ? ' active' : ''), onclick: () => { onlyNew = false; draw(); } }, 'Все'),
-        h('button', { class: 'chip' + (onlyNew ? ' active' : ''), onclick: () => { onlyNew = true; draw(); } }, `Новые · ${unread}`)),
-      unread > 0 && h('button', { class: 'btn btn-ghost', onclick: async () => { await Promise.all(rows.filter(n => !isRead(n)).map(markRead)); draw(); } }, 'Прочитать все'));
-    const list = f.length ? f.map(n => {
-      const runId = n.runId || n.data?.runId || n.payload?.runId;
-      return h('div', { class: 'card click', onclick: async () => { await markRead(n); if (runId) show(() => openRun(runId)); else draw(); } },
-        h('div', { class: 'row' },
-          h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, n.title || n.type || 'Уведомление'),
-          !isRead(n) && h('span', { class: 'badge' }, 'Новое')),
-        (n.body || n.message || n.text) && h('div', { class: 'muted', style: 'margin-top:4px' }, n.body || n.message || n.text),
-        n.createdAt && h('div', { class: 'small', style: 'margin-top:6px' }, fmt(n.createdAt)));
-    }) : [emptyState(onlyNew ? 'Новых сообщений нет' : 'Сообщений пока нет')];
-    box.replaceChildren(head, ...list);
-  };
-  draw();
-  setView(box);
-}
-async function renderFav() {
-  let t = []; try { t = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); } catch {}
-  t = t.filter(x => isFavorite(x.id));
-  setView(t.length ? t.map(x => h('div', { class: 'card click', onclick: () => show(() => showAssign(x)) }, h('strong', {}, x.title), x.description && h('div', { class: 'muted' }, x.description)))
-    : emptyState('Избранного нет', 'Отметьте шаблон звездой в разделе «Шаблоны»'));
-}
-$('search-btn').onclick = () => go('search');
-document.addEventListener('click', () => { document.querySelectorAll('.menu-pop').forEach(m => m.remove()); });
-function statusBadge(r) {
-  if (r.overdue) return h('span', { class: 'badge bad' }, 'Просрочен');
-  if (r.status === 'COMPLETED') return h('span', { class: 'badge ok' }, 'Завершён');
-  if (r.status === 'IN_PROGRESS') return h('span', { class: 'badge' }, 'В работе');
-  if (r.status === 'CANCELLED' || r.status === 'CANCELED') return h('span', { class: 'badge neutral' }, 'Отменён');
-  return h('span', { class: 'badge' }, statusName(r.status));
-}
-function runCard(r, withWho) {
-  const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
-  const who = personName(r.assignee);
-  const overdue = !!r.overdue;
-  const total = r.itemsCount ?? r.items?.length ?? r._count?.items ?? r.template?.items?.length ?? r.template?._count?.items;
-  const done = r.completedItemsCount ?? r.items?.filter?.(i => i.checked === true || i.textValue || i.numberValue != null || i.fileId)?.length;
-  let countLabel = '';
-  if (total != null && total !== '') {
-    countLabel = (done != null ? `${done} из ${pluralPunkty(total)}` : pluralPunkty(total));
-  }
-  return h('div', {
-    class: 'card click' + (overdue ? ' run-row-overdue' : ''),
-    onclick: () => show(() => openRun(r.id)),
-  },
-    h('div', { class: 'row' },
-      h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, title),
-      statusBadge(r)
-    ),
-    h('div', { class: 'row', style: 'margin-top:6px' },
-      h('div', { class: 'muted' },
-        (r.dueAt ? 'Срок: ' + fmt(r.dueAt) : '') +
-        (withWho && who ? ((r.dueAt ? ' · ' : '') + who) : '')
-      ),
-      countLabel && h('span', { class: 'badge neutral' }, countLabel)
-    )
-  );
-}
-function emptyState(title, desc) {
-  return h('div', { class: 'empty' }, h('div', { class: 'empty-icon', html: icons.empty }), h('div', { class: 'empty-title' }, title), desc && h('div', { class: 'empty-desc' }, desc));
-}
-const SORTS = { due: 'Срок', created: 'Назначен', progress: 'Выполнение', status: 'Статус', title: 'Название' };
-const runSort = (() => { try { return JSON.parse(localStorage.getItem('runSort') || 'null') || { key: 'due', dir: 'asc' }; } catch { return { key: 'due', dir: 'asc' }; } })();
-function sortRuns(list) {
-  const t = (r) => new Date(r.dueAt || 0).getTime() || null;
-  const c = (r) => new Date(r.createdAt || r.assignedAt || 0).getTime() || 0;
-  const pr = (r) => { const tot = r.itemsCount ?? r.items?.length ?? r._count?.items, dn = r.completedItemsCount; if (r.status === 'COMPLETED') return 1; return tot ? (dn || 0) / tot : 0; };
-  const ORD = { IN_PROGRESS: 1, ASSIGNED: 2, PENDING: 2, COMPLETED: 3, CANCELLED: 4, CANCELED: 4 };
-  const st = (r) => r.overdue ? 0 : (ORD[r.status] ?? 5);
-  const ttl = (r) => (r.title || r.template?.title || r.templateTitle || '').toLowerCase();
-  const k = runSort.key, m = runSort.dir === 'desc' ? -1 : 1;
-  return [...list].sort((a, b) => {
-    if (k === 'due') { const x = t(a), y = t(b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return (x - y) * m; }
-    if (k === 'created') return (c(a) - c(b)) * m;
-    if (k === 'progress') return (pr(a) - pr(b)) * m;
-    if (k === 'status') return (st(a) - st(b)) * m;
-    return ttl(a).localeCompare(ttl(b), 'ru') * m;
-  });
-}
-function sortBar(redraw) {
-  const save = () => { localStorage.setItem('runSort', JSON.stringify(runSort)); redraw(); };
-  return h('div', { class: 'chips sortbar' },
-    h('button', { class: 'chip sort-dir', type: 'button', title: 'Направление', html: runSort.dir === 'asc' ? icons.up : icons.down, onclick: () => { runSort.dir = runSort.dir === 'asc' ? 'desc' : 'asc'; save(); } }),
-    ...Object.entries(SORTS).map(([k, v]) => h('button', { class: 'chip' + (runSort.key === k ? ' active' : ''), type: 'button', onclick: () => { runSort.key = k; save(); } }, v)));
-}
-function runsScreen(d, withWho, head, emptyNode) {
-  const box = h('div');
-  const draw = () => { const sorted = sortRuns(d); box.replaceChildren(sortBar(draw), ...(sorted.length ? sorted.map(r => runCard(r, withWho)) : [emptyNode])); };
-  draw();
-  setView(head, box);
-}
-async function renderAll() {
-  const seeAll = can('checklists.runs.read_all');
-  const mineList = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  const mineIds = new Set(mineList.map(r => r.id));
-  let list = mineList;
-  if (seeAll) {
+  // --- АВТОРИЗАЦИЯ ---
+  $('login-btn').onclick = async () => {
+    const email = $('login-email').value.trim();
+    const password = $('login-password').value;
+    if (!email || !password) return showError('Заполните все поля');
+    
+    $('login-btn').disabled = true;
     try {
-      const others = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
-      const byId = new Map(others.map(r => [r.id, r]));
-      mineList.forEach(r => { if (!byId.has(r.id)) byId.set(r.id, r); });
-      list = [...byId.values()];
-    } catch (e) { if (e.status === 401) throw e; }
-  }
-  const f = state.filter;
-  const isDone = (r) => r.status === 'COMPLETED';
-  const view = list.filter(r => f === 'mine' ? mineIds.has(r.id) : f === 'overdue' ? !!r.overdue : f === 'done' ? isDone(r) : true);
-  const chips = [chip('', 'Все'), chip('mine', 'Мои чеклисты'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')];
-  runsScreen(view, true, h('div', { class: 'chips' }, ...chips), emptyState(f === 'mine' ? 'Нет задач' : 'Ничего не найдено', f === 'mine' ? 'Вам пока ничего не назначили' : undefined));
-}
-function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
-async function photoURL(id) {
-  const r = await fetch(API_BASE + '/files/' + id, { headers: authHeaders(), credentials: 'include' });
-  if (!r.ok) throw new Error('Не удалось загрузить фото');
-  return URL.createObjectURL(await r.blob());
-}
-function itemNode(run, it, editable) {
-  const status = h('div', { class: 'small', style: 'margin-top:6px' });
-  const flag = h('div', { class: 'flag' });
-  const mark = () => { flag.textContent = it.flagged ? '⚠ Отмечено как проблема' : ''; };
-  mark();
-  const save = async (body) => {
-    try {
-      status.textContent = 'Сохраняю…';
-      const r = await api('PUT', `/checklists/runs/${run.id}/items/${it.id}`, body);
-      if (r && typeof r === 'object' && 'flagged' in r) it.flagged = r.flagged;
-      Object.assign(it, body);
-      status.textContent = 'Сохранено ✓'; mark(); return true;
-    } catch (e) { status.textContent = ''; toast(e.message, true); return false; }
+      const data = await api('POST', '/auth/login', { email, password });
+      if (data.twoFactorRequired) return showError('2FA пока не поддерживается');
+      
+      state.token = data.sessionToken;
+      state.csrf = data.csrfToken;
+      localStorage.setItem('token', state.token);
+      
+      await initApp();
+    } catch (e) {
+      showError(e.message);
+    } finally {
+      $('login-btn').disabled = false;
+    }
   };
 
-  const choiceMeta = parseChoiceUnit(it.unit);
-  let control;
-  if (choiceMeta && (it.type === 'TEXT' || it.type === 'CHOICE' || it.type === 'MULTI')) {
-    const multi = choiceMeta.mode === 'multi';
-    let selected = [];
-    try {
-      if (it.textValue) {
-        const parsed = JSON.parse(it.textValue);
-        selected = Array.isArray(parsed) ? parsed : [String(it.textValue)];
-      }
-    } catch {
-      if (it.textValue) selected = multi ? it.textValue.split(' | ') : [it.textValue];
-    }
-    const box = h('div', {});
-    const renderOpts = () => {
-      box.replaceChildren(...choiceMeta.options.map(opt => {
-        const on = selected.includes(opt);
-        return h('div', {
-          class: 'choice-opt' + (on ? ' on' : ''),
-          onclick: async () => {
-            if (!editable) return;
-            if (multi) {
-              if (on) selected = selected.filter(x => x !== opt);
-              else selected = [...selected, opt];
-            } else {
-              selected = [opt];
-            }
-            renderOpts();
-            await save({ textValue: multi ? JSON.stringify(selected) : (selected[0] || '') });
-          },
-        }, (on ? (multi ? '☑ ' : '● ') : (multi ? '☐ ' : '○ ')) + opt);
-      }));
-    };
-    renderOpts();
-    control = h('div', {},
-      h('div', { class: 'small', style: 'margin-bottom:4px' }, multi ? 'Можно выбрать несколько' : 'Выберите один вариант'),
-      box
-    );
-  } else if (it.type === 'CHECK') {
-    const yes = h('button', { class: 'choice yes', disabled: !editable }, 'Да');
-    const no = h('button', { class: 'choice no', disabled: !editable }, 'Нет');
-    const upd = () => { yes.classList.toggle('on', it.checked === true); no.classList.toggle('on', it.checked === false); };
-    yes.onclick = async () => { if (await save({ checked: true })) upd(); };
-    no.onclick = async () => { if (await save({ checked: false })) upd(); };
-    upd();
-    control = h('div', { class: 'choices' }, yes, no);
-  } else if (it.type === 'NUMBER') {
-    const num = h('input', { type: 'number', step: 'any', inputmode: 'decimal', value: it.numberValue ?? '', disabled: !editable });
-    const com = h('input', { type: 'text', placeholder: 'Комментарий', value: it.comment ?? '', disabled: !editable });
-    const send = () => {
-      if (num.value === '') return;
-      const b = { numberValue: Number(num.value) };
-      if (com.value.trim()) b.comment = com.value.trim();
-      save(b);
-    };
-    num.addEventListener('change', send); com.addEventListener('change', send);
-    const hasRange = it.minValue != null || it.maxValue != null;
-    control = h('div', {},
-      (hasRange || it.unit) && h('div', { class: 'small', style: 'margin-bottom:6px' },
-        (hasRange ? `Норма: ${it.minValue ?? '…'} – ${it.maxValue ?? '…'} ` : '') + (it.unit || '')),
-      num, h('div', { style: 'height:8px' }), com);
-  } else if (it.type === 'TEXT') {
-    const ta = h('textarea', { rows: 3, disabled: !editable }, it.textValue || '');
-    ta.addEventListener('change', () => save({ textValue: ta.value }));
-    control = ta;
-  } else if (it.type === 'PHOTO') {
-    const img = h('img', { class: 'photo hidden' });
-    const fid = it.fileId || it.file?.id;
-    if (fid) photoURL(fid).then(u => { img.src = u; img.classList.remove('hidden'); }).catch(() => {});
-    const inp = h('input', { type: 'file', accept: 'image/*', disabled: !editable });
-    inp.onchange = async () => {
-      const f = inp.files[0]; if (!f) return;
-      try {
-        status.textContent = 'Загружаю…';
-        const fd = new FormData();
-        fd.append('workspaceId', run.workspaceId || state.wsId);
-        fd.append('file', f);
-        const up = await api('POST', '/files', fd);
-        if (await save({ fileId: up.id })) { img.src = URL.createObjectURL(f); img.classList.remove('hidden'); }
-      } catch (e) { status.textContent = ''; toast(e.message, true); }
-    };
-    control = h('div', {}, inp, img);
-  } else control = h('div', { class: 'muted' }, 'Тип: ' + it.type);
-
-  return h('div', { class: 'card' },
-    h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, it.title), it.required && h('span', { class: 'badge' }, 'обязательно')),
-    h('div', { style: 'margin-top:12px' }, control), flag, status);
-}
-
-async function openRun(id) {
-  const run = await api('GET', `/checklists/runs/${id}`);
-  const closed = ['COMPLETED', 'CANCELLED', 'CANCELED'].includes(run.status);
-  const mine = !run.assigneeId || run.assigneeId === state.me.id || run.assignee?.id === state.me.id;
-  const editable = !closed && mine;
-  const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
-  const templateId = run.templateId || run.template?.id;
-
-  $('topbar-title').textContent = title;
-
-  // Кнопка назад в шапке + меню ⋯ для вторичных действий
-  const actions = $('topbar-actions');
-  const extra = h('div', { style: 'display:flex;align-items:center;gap:0;position:relative' });
-  const backBtn = h('button', {
-    class: 'topbar-btn muted', type: 'button', title: 'Назад',
-    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'all') : (rootSet().includes(state.tab) ? state.tab : 'all')),
-  });
-  backBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-  const moreBtn = h('button', { class: 'topbar-btn muted', type: 'button', title: 'Ещё' });
-  moreBtn.textContent = '⋯';
-  moreBtn.onclick = (e) => {
-    e.stopPropagation();
-    const old = extra.querySelector('.menu-pop');
-    if (old) { old.remove(); return; }
-    const items = [];
-    if (!closed && can('checklists.assign')) {
-      items.push(h('button', { type: 'button', class: 'danger', onclick: async () => {
-        extra.querySelector('.menu-pop')?.remove();
-        if (!confirm('Отменить этот чеклист?')) return;
-        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go('all'); }
-        catch (err) { toast(err.message, true); }
-      } }, 'Отменить чеклист'));
-    }
-    if (templateId && can('checklists.templates.manage')) {
-      items.push(h('button', { type: 'button', onclick: async () => {
-        extra.querySelector('.menu-pop')?.remove();
-        try {
-          let t = run.template;
-          if (!t || !t.items) {
-            const list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
-            t = list.find(x => x.id === templateId) || t;
-          }
-          if (!t) return toast('Шаблон не найден', true);
-          const itemsMap = (t.items || run.items || []).map(it => {
-            const parsed = parseChoiceUnit(it.unit);
-            return {
-              title: it.title || '',
-              type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
-              required: !!it.required,
-              unit: it.unit || '',
-              minValue: it.minValue ?? '',
-              maxValue: it.maxValue ?? '',
-              options: parsed ? parsed.options : ['Вариант 1', 'Вариант 2'],
-            };
-          });
-          showBuilder({
-            title: (t.title || title) + ' (копия)',
-            description: t.description || '',
-            items: itemsMap.length ? itemsMap : [{ title: '', type: 'CHECK', required: true, options: [''] }],
-          });
-        } catch (err) { toast(err.message, true); }
-      } }, 'Копировать как шаблон'));
-    }
-    if (!items.length) {
-      items.push(h('button', { type: 'button', onclick: () => extra.querySelector('.menu-pop')?.remove() }, 'Нет действий'));
-    }
-    const pop = h('div', { class: 'menu-pop', style: 'right:0;top:44px' }, ...items);
-    extra.append(pop);
-  };
-
-  // rebuild topbar right: keep search hidden on run detail, show back+more
-  const ws = $('ws-select');
-  const search = $('search-btn');
-  extra.append(moreBtn);
-  // insert back before title area via menu-btn side - put back next to menu
-  const menuBtn = $('menu-btn');
-  // temporary replace menu with back while in run
-  const prevMenuHandler = menuBtn.onclick;
-  menuBtn.onclick = () => go(rootSet().includes(state.tab) ? state.tab : 'all');
-  menuBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  menuBtn.setAttribute('aria-label', 'Назад');
-  search.classList.add('hidden');
-  const moreHost = h('div', { style: 'position:relative;display:flex' }, moreBtn);
-  // place more into topbar-actions
-  const keepWs = ws && !ws.classList.contains('hidden') ? ws : null;
-  actions.replaceChildren(...[keepWs, moreHost].filter(Boolean));
-
-  const restoreChrome = () => {
-    menuBtn.onclick = openMenu;
-    menuBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
-    menuBtn.setAttribute('aria-label', 'Меню');
-    search.classList.remove('hidden');
-    renderWsSelect();
-    // restore search button
-    const acc = $('topbar-actions');
-    if (!$('search-btn')) {
-      /* search is same node if only class hidden */
-    }
-    if (!acc.contains(search)) acc.append(search);
-    const lbt = $('layout-btn'); if (lbt && !acc.contains(lbt)) acc.prepend(lbt);
-  };
-
-  const commentField = h('textarea', { rows: 2, placeholder: 'Комментарий к сдаче (необязательно)' });
-  const itemTotal = (run.items || []).length;
-  const nodes = [
-    h('div', { class: 'muted', style: 'margin-bottom:12px' },
-      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '') +
-      (itemTotal ? ` · ${pluralPunkty(itemTotal)}` : '')
-    ),
-    ...(run.items || []).map(it => itemNode(run, it, editable)),
-  ];
-
-  if (editable) {
-    nodes.push(h('div', { class: 'card' }, h('label', { style: 'margin-top:0' }, 'Комментарий'), commentField));
-    nodes.push(h('button', {
-      class: 'btn btn-primary',
-      onclick: async (e) => {
-        e.target.disabled = true;
-        try {
-          const body = {};
-          const c = commentField.value.trim();
-          if (c) body.comment = c;
-          const r = await api('POST', `/checklists/runs/${run.id}/complete`, Object.keys(body).length ? body : undefined);
-          toast(`Сдано. Проблем: ${r?.flaggedCount ?? 0}`);
-          restoreChrome();
-          go(rootSet().includes(state.tab) ? state.tab : 'all');
-        } catch (err) { toast(err.message, true); e.target.disabled = false; }
-      },
-    }, 'Сдать чеклист'));
+  function showError(msg) {
+    const el = $('login-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
   }
 
-  nodes.push(commentsBlock(run, closed, mine));
-  setView(nodes);
+  function logout() {
+    state.token = null; state.csrf = null; state.me = null;
+    localStorage.removeItem('token');
+    $('login-screen').classList.remove('hidden');
+    $('app-screen').classList.add('hidden');
+  }
 
-  // When leaving via go(), chrome restores on next renderBottomNav/topbar title — hook restore into go wrapper once
-  openRun._restore = restoreChrome;
-}
-
-
-function compressImage(file) {
-  return new Promise((res, rej) => {
-    if (!file.type.startsWith('image/')) return rej(new Error('Нужно изображение'));
-    if (file.size > 10 * 1048576) return rej(new Error('Фото больше 10 МБ'));
-    const img = new Image(), u = URL.createObjectURL(file);
-    img.onload = () => {
-      const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
-      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);   // перекодирование убирает EXIF и геометку
-      c.toBlob(b => b ? res(b) : rej(new Error('Не удалось обработать фото')), 'image/jpeg', .82);
-    };
-    img.onerror = () => rej(new Error('Не удалось открыть фото'));
-    img.src = u;
-  });
-}
-const toDataUrl = (blob) => new Promise(r => { const f = new FileReader(); f.onload = () => r(String(f.result)); f.readAsDataURL(blob); });
-function commentsBlock(run, closed, mine) {
-  const key = 'cm_' + run.id, manager = can('checklists.assign');
-  const canWrite = closed ? manager : (mine || manager);
-  let rows = [], local = false, photos = [], itemIdx = '';
-  const list = h('div'), box = h('div', { class: 'card' });
-  const readLocal = () => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } };
-  const writeLocal = () => { try { localStorage.setItem(key, JSON.stringify(rows)); } catch { toast('Память заполнена — уберите фото', true); } };
-  const mineMsg = (c) => (c.author?.id || c.authorId) === state.me.id;
-  const draw = () => {
-    const vis = rows.filter(c => !c.deleted);
-    list.replaceChildren(...(vis.length ? vis.map(c => {
-      const ph = h('div', { class: 'cm-photos' });
-      (c.localPhotos || []).forEach(u => ph.append(h('img', { src: u })));
-      (c.fileIds || c.files?.map(f => f.id || f) || []).forEach(id => { const im = h('img'); photoURL(id).then(u => im.src = u).catch(() => {}); ph.append(im); });
-      const canEdit = mineMsg(c) && Date.now() - new Date(c.createdAt) < 15 * 60000;
-      return h('div', { class: 'cm' },
-        h('div', { class: 'row' }, h('strong', { style: 'font-size:14px' }, personName(c.author) || 'Система'), h('span', { class: 'small' }, fmt(c.createdAt) + (c.editedAt ? ' · изменено' : ''))),
-        c.itemIndex != null && c.itemIndex !== '' && h('span', { class: 'badge neutral', style: 'margin-top:4px' }, '#' + (Number(c.itemIndex) + 1)),
-        h('div', { style: 'margin-top:4px;white-space:pre-wrap' }, c.text), ph,
-        (canEdit || mineMsg(c) || manager) && h('div', { class: 'gap', style: 'margin-top:6px' },
-          canEdit && h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: async () => {
-            const t = prompt('Изменить сообщение', c.text); if (t == null || !t.trim()) return;
-            c.text = t.trim().slice(0, 2000); c.editedAt = new Date().toISOString();
-            if (local) writeLocal(); else try { await api('PATCH', `/checklists/runs/${run.id}/comments/${c.id}`, { text: c.text }); } catch (e) { toast(e.message, true); }
-            draw();
-          } }, 'Изменить'),
-          (mineMsg(c) || manager) && h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: async () => {
-            if (!confirm('Удалить сообщение? Оно будет скрыто, оригинал останется в аудите.')) return;
-            c.deleted = true;
-            if (local) writeLocal(); else try { await api('DELETE', `/checklists/runs/${run.id}/comments/${c.id}`); } catch (e) { c.deleted = false; toast(e.message, true); }
-            draw();
-          } }, 'Удалить')));
-    }) : [h('div', { class: 'muted', style: 'padding:6px 0' }, 'Сообщений пока нет')]));
-  };
-  (async () => {
-    try { rows = arr(await api('GET', `/checklists/runs/${run.id}/comments`)); }
-    catch (e) { if (e.status === 401) return; local = true; rows = readLocal(); }
-    draw();
-    if (local) box.prepend(h('div', { class: 'small', style: 'margin-bottom:6px' }, 'Сервер пока не принимает сообщения — они хранятся на этом устройстве'));
-  })();
-  box.append(h('strong', {}, 'Сообщения'), list);
-  if (!canWrite) { box.append(h('div', { class: 'small', style: 'margin-top:8px' }, closed ? 'Чеклист сдан: комментировать может только руководитель' : 'Писать может исполнитель или руководитель')); return box; }
-  const ta = h('textarea', { rows: 2, maxlength: '2000', placeholder: 'Сообщение. @ — отметить сотрудника' });
-  const cnt = h('div', { class: 'small', style: 'text-align:right' }, '0/2000');
-  const sug = h('div', { class: 'chips', style: 'margin:6px 0 0' });
-  const prev = h('div', { class: 'cm-photos' });
-  const sel = h('select', {}, h('option', { value: '' }, 'Без привязки к пункту'), ...(run.items || []).map((it, i) => h('option', { value: String(i) }, `#${i + 1} ${it.title || ''}`.slice(0, 50))));
-  sel.onchange = () => { itemIdx = sel.value; };
-  let users = null;
-  ta.addEventListener('input', async () => {
-    cnt.textContent = ta.value.length + '/2000';
-    const m = /@([^\s@]*)$/.exec(ta.value); sug.replaceChildren(); if (!m) return;
-    if (!users) users = can('users.read') ? await loadUsers() : [];
-    users.filter(u => personName(u).toLowerCase().includes(m[1].toLowerCase())).slice(0, 5).forEach(u =>
-      sug.append(h('button', { class: 'chip', type: 'button', onclick: () => { ta.value = ta.value.replace(/@[^\s@]*$/, '@' + personName(u).replace(/\s+/g, '_') + ' '); sug.replaceChildren(); ta.focus(); } }, personName(u))));
-  });
-  const inp = h('input', { type: 'file', accept: 'image/*', multiple: true, class: 'hidden' });
-  const drawPrev = () => prev.replaceChildren(...photos.map((b, i) => { const im = h('img', { src: URL.createObjectURL(b), onclick: () => { photos.splice(i, 1); drawPrev(); } }); return im; }));
-  inp.onchange = async () => {
-    for (const f of [...inp.files]) {
-      if (photos.length >= 5) { toast('Не больше 5 фото', true); break; }
-      try { photos.push(await compressImage(f)); } catch (e) { toast(e.message, true); }
-    }
-    inp.value = ''; drawPrev();
-  };
-  const send = h('button', { class: 'btn btn-primary btn-sm', type: 'button' }, 'Отправить');
-  send.onclick = async () => {
-    const text = ta.value.trim(); if (!text && !photos.length) return toast('Введите текст или добавьте фото', true);
-    send.disabled = true;
-    const mentions = (text.match(/@[^\s@]+/g) || []).map(x => x.slice(1).replace(/_/g, ' '));
+  async function initApp() {
     try {
-      let msg;
-      if (!local) {
-        const fileIds = [];
-        for (const b of photos) { const fd = new FormData(); fd.append('workspaceId', run.workspaceId || state.wsId); fd.append('file', b, 'photo.jpg'); fileIds.push((await api('POST', '/files', fd)).id); }
-        msg = await api('POST', `/checklists/runs/${run.id}/comments`, { text, fileIds, mentions, itemIndex: itemIdx === '' ? undefined : Number(itemIdx) });
-        if (!msg || !msg.id) msg = { id: 'n' + Date.now(), text, fileIds, createdAt: new Date().toISOString(), author: state.me };
-      } else {
-        msg = { id: 'l' + Date.now(), text, author: state.me, authorId: state.me.id, createdAt: new Date().toISOString(), itemIndex: itemIdx === '' ? null : Number(itemIdx), localPhotos: await Promise.all(photos.map(toDataUrl)) };
-      }
-      if (!msg.author) msg.author = state.me;
-      rows.push(msg); if (local) writeLocal();
-      ta.value = ''; cnt.textContent = '0/2000'; photos = []; drawPrev(); draw();
-    } catch (e) { toast(e.message, true); }
-    send.disabled = false;
-  };
-  box.append(h('div', { class: 'itemrow' }), ta, cnt, sug, h('label', {}, 'Пункт'), sel, prev,
-    h('div', { class: 'gap' }, h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => inp.click() }, 'Фото (до 5)'), send), inp);
-  return box;
-}
-async function loadUsers() { try { return arr(await api('GET', '/users')); } catch { return []; } }
-async function renderTemplates() {
-  let list;
-  try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
-  catch (e) { if (e.status === 400) list = arr(await api('GET', '/checklists/templates')); else throw e; }
-  const manage = can('checklists.templates.manage');
-  const favIds = new Set(state.favorites || []);
-  const sorted = [...list].sort((a, b) => (favIds.has(b.id) ? 1 : 0) - (favIds.has(a.id) ? 1 : 0));
-  let openMenuId = null;
-  const nodes = [];
-
-  if (!sorted.length) {
-    nodes.push(emptyState('Шаблонов пока нет', manage ? 'Создайте первый шаблон кнопкой +' : 'Попросите администратора добавить шаблоны'));
-  } else {
-    sorted.forEach(t => {
-      const fav = isFavorite(t.id);
-      const head = h('div', { class: 'card-head row' },
-        h('div', { style: 'min-width:0;flex:1' },
-          h('strong', { style: 'font-size:15px' }, t.title),
-          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
-          h('div', { class: 'small', style: 'margin-top:6px' }, (t.items?.length != null || t._count?.items != null) ? pluralPunkty(t.items?.length ?? t._count?.items) : '—')
-        ),
-        h('button', {
-          class: 'star-btn', type: 'button', title: fav ? 'Убрать из избранного' : 'В избранное',
-          onclick: (e) => { e.stopPropagation(); toggleFavorite(t.id); go('tpl'); },
-        }, fav ? '★' : '☆'),
-        manage && h('button', {
-          class: 'icon-btn', type: 'button', title: 'Ещё',
-          onclick: (e) => {
-            e.stopPropagation();
-            document.querySelectorAll('.menu-pop').forEach(m => m.remove());
-            if (openMenuId === t.id) { openMenuId = null; return; }
-            openMenuId = t.id;
-            const pop = h('div', { class: 'menu-pop' },
-              can('checklists.assign') && h('button', { type: 'button', onclick: () => { openMenuId = null; show(() => showAssign(t)); } }, 'Назначить'),
-              h('button', { type: 'button', onclick: () => {
-                openMenuId = null;
-                const items = (t.items || []).map(it => {
-                  const parsed = parseChoiceUnit(it.unit);
-                  return {
-                    title: it.title || '',
-                    type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
-                    required: !!it.required,
-                    unit: it.unit || '',
-                    minValue: it.minValue ?? '',
-                    maxValue: it.maxValue ?? '',
-                    options: parsed ? parsed.options : (it.options || ['']),
-                  };
-                });
-                showBuilder({
-                  title: (t.title || '') + ' (копия)',
-                  description: t.description || '',
-                  items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
-                });
-              } }, 'Копировать'),
-              h('button', { type: 'button', class: 'danger', onclick: async () => {
-                openMenuId = null;
-                if (!confirm('Архивировать «' + t.title + '»?')) return;
-                try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); }
-                catch (err) { toast(err.message, true); }
-              } }, 'Архивировать')
-            );
-            head.append(pop);
-          },
-        }, '⋯')
-      );
-
-      const actions = [];
-      if (can('checklists.assign') && !manage) {
-        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
-      } else if (can('checklists.assign')) {
-        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+      state.me = await api('GET', '/auth/me');
+      state.csrf = state.me.csrfToken;
+      
+      const workspaces = await api('GET', '/workspaces');
+      if (!state.wsId && workspaces.length > 0) {
+        state.wsId = workspaces[0].id;
+        localStorage.setItem('wsId', state.wsId);
       }
 
-      nodes.push(h('div', { class: 'card' },
-        head,
-        actions.length ? h('div', { class: 'gap' }, ...actions) : null
-      ));
+      $('login-screen').classList.add('hidden');
+      $('app-screen').classList.remove('hidden');
+      
+      renderBottomNav();
+      navigate('checklists');
+    } catch (e) {
+      logout();
+    }
+  }
+
+  // --- НАВИГАЦИЯ ---
+  const icons = {
+    checklists: '<svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+    templates: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>',
+    people: '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+    settings: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>',
+    back: '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>'
+  };
+
+  function renderBottomNav() {
+    const nav = $('bottom-nav');
+    nav.innerHTML = '';
+    
+    const tabs = [
+      { id: 'checklists', title: 'Чеклисты', icon: icons.checklists },
+      { id: 'templates', title: 'Шаблоны', icon: icons.templates },
+      { id: 'people', title: 'Команда', icon: icons.people },
+      { id: 'settings', title: 'Кабинет', icon: icons.settings },
+    ];
+
+    tabs.forEach(tab => {
+      const btn = document.createElement('button');
+      btn.className = state.currentTab === tab.id ? 'active' : '';
+      btn.innerHTML = tab.icon;
+      btn.title = tab.title;
+      btn.onclick = () => navigate(tab.id);
+      nav.appendChild(btn);
     });
   }
 
-  if (manage) {
-    nodes.push(h('button', { class: 'fab', type: 'button', title: 'Новый шаблон', onclick: () => showBuilder() }, '+'));
+  function navigate(tab) {
+    state.currentTab = tab;
+    $('back-btn').classList.toggle('hidden', tab === 'checklists');
+    $('back-btn').innerHTML = icons.back;
+    $('back-btn').onclick = () => navigate('checklists');
+    
+    const titles = { checklists: 'Чеклисты', templates: 'Шаблоны', people: 'Команда', settings: 'Кабинет' };
+    $('topbar-title').textContent = titles[tab] || 'Чеклисты';
+    
+    renderBottomNav();
+    
+    if (tab === 'checklists') renderChecklists();
+    if (tab === 'templates') renderTemplates();
+    if (tab === 'people') renderPeople();
+    if (tab === 'settings') renderSettings();
   }
-  setView(...nodes);
-}
 
-async function showAssign(t) {
-  const users = await loadUsers();
-  const selected = new Set();
-  const listBox = h('div', { class: 'stack', style: 'margin-top:8px' });
-  const due = h('input', { type: 'datetime-local' });
-
-  const renderList = () => {
-    listBox.replaceChildren(...(users.length ? users.map(u => {
-      const id = u.id;
-      const on = selected.has(id);
-      return h('div', {
-        class: 'choice-opt' + (on ? ' on' : ''),
-        onclick: () => { if (selected.has(id)) selected.delete(id); else selected.add(id); renderList(); },
-      }, (on ? '✓ ' : '') + personName(u) + (u.nickname ? ` (@${u.nickname})` : ''));
-    }) : [h('div', { class: 'alert alert-error' }, 'Нет сотрудников')]));
-  };
-  renderList();
-
-  setView(
-    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
-    h('h1', {}, 'Назначить'),
-    h('p', { class: 'page-desc' }, t.title),
-    h('label', {}, 'Исполнители (можно несколько)'),
-    listBox,
-    h('label', {}, 'Срок'), due,
-    h('button', { class: 'btn btn-primary', onclick: async (e) => {
-      if (!selected.size) return toast('Выберите хотя бы одного', true);
-      e.target.disabled = true;
-      let ok = 0, fail = 0;
-      for (const assigneeId of selected) {
-        const body = { templateId: t.id, assigneeId };
-        if (due.value) body.dueAt = new Date(due.value).toISOString();
-        try { await api('POST', '/checklists/runs', body); ok++; }
-        catch { fail++; }
-      }
-      if (ok) toast(`Назначено: ${ok}` + (fail ? `, ошибок: ${fail}` : ''));
-      else toast('Не удалось назначить', true);
-      if (ok) go('tpl'); else e.target.disabled = false;
-    } }, 'Назначить')
-  );
-}
-
-function showBuilder(draft) {
-  draft = draft || { title: '', description: '', items: [{ title: '', type: 'CHECK', required: true, options: ['Вариант 1', 'Вариант 2'] }] };
-  const again = () => showBuilder(draft);
-  const typeNames = {
-    CHECK: 'Да / нет',
-    NUMBER: 'Число',
-    TEXT: 'Текст',
-    PHOTO: 'Фото',
-    CHOICE: 'Один из вариантов',
-    MULTI: 'Несколько вариантов',
-  };
-
-  const rows = draft.items.map((it, i) => {
-    if (!it.options) it.options = ['Вариант 1', 'Вариант 2'];
-    const isChoice = it.type === 'CHOICE' || it.type === 'MULTI';
-    return h('div', { class: 'itemrow' },
-      h('input', { type: 'text', placeholder: 'Название пункта', value: it.title, oninput: (e) => { it.title = e.target.value; } }),
-      h('select', { style: 'margin-top:8px', onchange: (e) => { it.type = e.target.value; again(); } },
-        Object.entries(typeNames).map(([k, v]) => h('option', { value: k, selected: it.type === k }, v))),
-      it.type === 'NUMBER' && h('div', { class: 'gap', style: 'margin-top:8px' },
-        h('input', { type: 'text', placeholder: 'Ед.', value: it.unit || '', style: 'flex:1', oninput: (e) => { it.unit = e.target.value; } }),
-        h('input', { type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '', style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; } }),
-        h('input', { type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '', style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; } })),
-      isChoice && h('div', { style: 'margin-top:10px' },
-        h('div', { class: 'small' }, 'Варианты ответа'),
-        ...(it.options.map((opt, oi) => h('div', { class: 'option-row' },
-          h('input', { type: 'text', value: opt, placeholder: 'Вариант ' + (oi + 1), oninput: (e) => { it.options[oi] = e.target.value; } }),
-          it.options.length > 2 && h('button', { class: 'btn btn-danger btn-sm', type: 'button', onclick: () => { it.options.splice(oi, 1); again(); } }, '×')
-        ))),
-        h('button', { class: 'btn btn-secondary btn-sm', style: 'margin-top:8px', type: 'button', onclick: () => { it.options.push(''); again(); } }, '+ Вариант')
-      ),
-      h('div', { class: 'row', style: 'margin-top:10px' },
-        h('label', { style: 'margin:0;display:flex;gap:8px;align-items:center;font-weight:400' },
-          h('input', { type: 'checkbox', checked: it.required, onchange: (e) => { it.required = e.target.checked; } }), 'Обязательный'),
-        draft.items.length > 1 && h('button', { class: 'btn btn-danger btn-sm', onclick: () => { draft.items.splice(i, 1); again(); } }, 'Удалить'))
-    );
-  });
-
-  setView(
-    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
-    h('h1', {}, 'Новый шаблон'),
-    h('label', {}, 'Название'), h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
-    h('label', {}, 'Описание'), h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
-    h('h2', {}, 'Пункты'), ...rows,
-    h('button', { class: 'btn btn-secondary', onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false, options: ['Вариант 1', 'Вариант 2'] }); again(); } }, '+ Пункт'),
-    h('button', { class: 'btn btn-primary', onclick: async (e) => {
-      if (!draft.title.trim()) return toast('Введите название', true);
-      if (draft.items.some(it => !it.title.trim())) return toast('Названия пунктов обязательны', true);
-      for (const it of draft.items) {
-        if ((it.type === 'CHOICE' || it.type === 'MULTI') && it.options.filter(o => o.trim()).length < 2)
-          return toast('Нужно минимум 2 варианта ответа', true);
-      }
-      const items = draft.items.map(it => {
-        if (it.type === 'CHOICE' || it.type === 'MULTI') {
-          const opts = it.options.map(o => o.trim()).filter(Boolean);
-          return {
-            title: it.title.trim(),
-            type: 'TEXT',
-            required: !!it.required,
-            unit: encodeChoiceUnit(it.type === 'MULTI' ? 'multi' : 'single', opts),
-          };
-        }
-        const o = { title: it.title.trim(), type: it.type, required: !!it.required };
-        if (it.type === 'NUMBER') {
-          if (it.unit?.trim()) o.unit = it.unit.trim();
-          if (it.minValue !== '' && it.minValue != null) o.minValue = Number(it.minValue);
-          if (it.maxValue !== '' && it.maxValue != null) o.maxValue = Number(it.maxValue);
-        }
-        return o;
-      });
-      const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
-      if (draft.description.trim()) body.description = draft.description.trim();
-      e.target.disabled = true;
-      try { await api('POST', '/checklists/templates', body); toast('Создан'); go('tpl'); }
-      catch (err) { toast(err.message, true); e.target.disabled = false; }
-    } }, 'Сохранить')
-  );
-}
-
-async function deleteUser(u) {
-  try { await api('DELETE', `/users/${u.id}`); toast('Удалён'); return true; }
-  catch (err) {
-    const msg = String(err.message || '');
-    if (err.status === 404 || err.status === 405 || /cannot\s+delete|not\s+allowed|method/i.test(msg)) toast('Удаление пока недоступно на сервере', true);
-    else if (err.status === 403) toast('Недостаточно прав', true);
-    else toast(msg || 'Ошибка', true);
-    return false;
-  }
-}
-function genPassword(len = 12) {
-  const sets = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnpqrstuvwxyz', '23456789', '!@#$%*?'];
-  const all = sets.join(''), rnd = (n) => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
-  const out = sets.map(x => x[rnd(x.length)]);
-  while (out.length < len) out.push(all[rnd(all.length)]);
-  for (let i = out.length - 1; i > 0; i--) { const j = rnd(i + 1); [out[i], out[j]] = [out[j], out[i]]; }
-  return out.join('');
-}
-async function copyText(t) {
-  try { await navigator.clipboard.writeText(t); toast('Скопировано'); return; } catch {}
-  const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.append(ta); ta.select();
-  try { document.execCommand('copy'); toast('Скопировано'); } catch { toast('Выделите пароль и скопируйте вручную', true); } ta.remove();
-}
-async function renderPeople() {
-  const users = can('users.read') ? await loadUsers() : [];
-  const out = h('div'); const nodes = [];
-  if (can('users.create')) {
-    const f = {
-      nick: h('input', { type: 'text', placeholder: 'nickname', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false' }),
-      first: h('input', { type: 'text', placeholder: 'Имя' }),
-      last: h('input', { type: 'text', placeholder: 'Фамилия' }),
-      role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
-    };
-    const manual = h('input', { type: 'text', placeholder: 'Не короче 8 символов', autocomplete: 'off', style: 'font-family:monospace' });
-    const mode = h('select', {}, h('option', { value: 'auto' }, 'Сервер создаст пароль'), h('option', { value: 'manual' }, 'Задать временный пароль'));
-    const manualRow = h('div', { class: 'hidden' }, h('label', {}, 'Временный пароль'), manual,
-      h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { manual.value = genPassword(); } }, 'Сгенерировать'));
-    mode.onchange = () => { manualRow.classList.toggle('hidden', mode.value !== 'manual'); if (mode.value === 'manual' && !manual.value) manual.value = genPassword(); };
-    window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
-      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Никнейм (для входа)'), f.nick, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
-      h('label', {}, 'Пароль'), mode, manualRow,
-      h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
-        const btn = e.currentTarget, nickname = f.nick.value.trim().replace(/^@/, ''), pw = mode.value === 'manual' ? manual.value.trim() : '';
-        if (!NICK_RE.test(nickname)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
-        if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
-        btn.disabled = true;
-        const base = { nickname, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
-        const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
-        try {
-          let r, last;
-          for (const b of tries) { try { r = await api('POST', '/users', b); break; } catch (err) { last = err; if (err.status !== 400 && err.status !== 422) throw err; } }
-          if (!r) throw last;
-          const shown = pw || r?.temporaryPassword || r?.tempPassword || r?.initialPassword || r?.password || r?.data?.temporaryPassword;
-          const box = h('div', { class: 'alert alert-success' }, h('div', {}, 'Сотрудник создан'));
-          if (shown) box.append(h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, shown),
-            h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(shown) }, 'Копировать'),
-            h('div', { class: 'small', style: 'margin-top:6px' }, 'Временный пароль: при первом входе сотрудник задаст свой'));
-          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Создайте сотрудника с временным паролем, заданным вручную'));
-          out.replaceChildren(box);
-          f.nick.value = f.first.value = f.last.value = manual.value = '';
-        } catch (err) { toast(err.message || 'Не удалось создать сотрудника', true); }
-        btn.disabled = false;
-      } }, 'Создать'), out));
-  }
-  if (can('users.read')) {
-    nodes.push(h('div', { class: 'section-label' }, 'Список'));
-    if (users.length) {
-      const group = h('div', { class: 'list-group' });
-      const canDelete = can('users.create') || can('users.delete') || can('users.manage') || can('users.update');
-      const closeAll = (ex) => group.querySelectorAll('.list-row.open').forEach(r => { if (r !== ex) r.classList.remove('open'); });
-      users.forEach(u => {
-        const isMe = u.id === state.me?.id;
-        const roleLabel = u.roleCode || u.role || u.roleName || '';
-        const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
-        const row = h('div', { class: 'list-row' });
-        const inner = h('div', { class: 'list-row-inner' },
-          h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
-          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, atNick(u))),
-          showRole && h('span', { class: 'badge neutral' }, roleLabel));
-        if (!isMe && canDelete) {
-          const actions = h('div', { class: 'list-row-actions' }, h('button', { class: 'act-delete', type: 'button', onclick: async (e) => {
-            e.stopPropagation();
-            if (!confirm(`Удалить «${personName(u)}»?`)) { row.classList.remove('open'); return; }
-            if (await deleteUser(u)) go('people'); else row.classList.remove('open');
-          } }, 'Удалить'));
-          row.append(actions, inner);
-          let startX = 0, currentX = 0, dragging = false;
-          inner.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentX = startX; dragging = true; closeAll(row); }, { passive: true });
-          inner.addEventListener('touchmove', (e) => { if (!dragging) return; currentX = e.touches[0].clientX; const dx = currentX - startX; if (dx < 0) { inner.style.transition = 'none'; inner.style.transform = `translateX(${Math.max(dx, -88)}px)`; } }, { passive: true });
-          inner.addEventListener('touchend', () => { if (!dragging) return; dragging = false; inner.style.transition = ''; if (currentX - startX < -40) { row.classList.add('open'); inner.style.transform = ''; } else { row.classList.remove('open'); inner.style.transform = ''; } });
-          inner.addEventListener('click', () => { if (row.classList.contains('open')) row.classList.remove('open'); });
-        } else row.append(inner);
-        group.append(row);
-      });
-      nodes.push(group);
-      if (!localStorage.getItem('hintSwipe')) {
-        nodes.push(h('div', { class: 'hint' }, 'Подсказка: смахните строку влево, чтобы удалить'));
-        localStorage.setItem('hintSwipe', '1');
-      }
-    } else nodes.push(emptyState('Список пуст'));
-  }
-  if (!nodes.length) nodes.push(emptyState('Недостаточно прав'));
-  setView(nodes);
-}
-async function changePassword(current, next) {
-  const variants = [{ currentPassword: current, newPassword: next }, { oldPassword: current, newPassword: next }, { password: current, newPassword: next }];
-  let last;
-  for (const body of variants) {
-    try { return await api('POST', '/auth/password/change', body); }
-    catch (e) { last = e; if (e.status === 400 && /should not exist|property/i.test(e.message || '')) continue; throw e; }
-  }
-  throw last;
-}
-async function renderProfile() {
-  const me = state.me;
-  const first = h('input', { type: 'text', value: me.firstName || '', placeholder: 'Имя' });
-  const last = h('input', { type: 'text', value: me.lastName || '', placeholder: 'Фамилия' });
-  const nick = h('input', { type: 'text', value: me.nickname || '', placeholder: 'Никнейм' });
-  const cur = h('input', { type: 'password', autocomplete: 'current-password' });
-  const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
-  const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
-  const avatarBox = h('div', { class: 'avatar-lg' });
-  if (state.avatarDataUrl) { const img = document.createElement('img'); img.src = state.avatarDataUrl; avatarBox.append(img); }
-  else if (state.avatarEmoji) avatarBox.textContent = state.avatarEmoji;
-  else { avatarBox.textContent = initials(me); avatarBox.style.fontSize = '22px'; }
-  const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'hidden' });
-  fileInput.onchange = () => {
-    const f = fileInput.files?.[0]; if (!f) return;
-    if (f.size > 2 * 1024 * 1024) return toast('До 2 МБ', true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      state.avatarDataUrl = String(reader.result); state.avatarEmoji = '';
-      localStorage.setItem('avatarDataUrl', state.avatarDataUrl); localStorage.removeItem('avatarEmoji');
-      updateSideUser(); go('me');
-    };
-    reader.readAsDataURL(f);
-  };
-  let emojiOpen = false;
-  const emojiPanel = h('div', { class: 'hidden' });
-  const emojiBtn = h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => { emojiOpen = !emojiOpen; emojiPanel.classList.toggle('hidden', !emojiOpen); } }, 'Выбрать эмодзи');
-  const grid = h('div', { class: 'emoji-grid' });
-  EMOJIS.forEach(em => grid.append(h('button', { type: 'button', class: state.avatarEmoji === em ? 'on' : '', onclick: () => {
-    state.avatarEmoji = em; state.avatarDataUrl = '';
-    localStorage.setItem('avatarEmoji', em); localStorage.removeItem('avatarDataUrl');
-    updateSideUser(); go('me');
-  } }, em)));
-  emojiPanel.append(grid);
-  setView(
-    me.requirePasswordChange && h('div', { class: 'alert alert-info' }, 'Нужно сменить пароль.'),
-    h('div', { class: 'card' },
-      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, atNick(me)))),
-      h('div', { class: 'gap', style: 'margin-top:14px' },
-        h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: () => fileInput.click() }, 'Фото'),
-        emojiBtn,
-        (state.avatarDataUrl || state.avatarEmoji) && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => {
-          state.avatarDataUrl = ''; state.avatarEmoji = '';
-          localStorage.removeItem('avatarDataUrl'); localStorage.removeItem('avatarEmoji');
-          updateSideUser(); go('me');
-        } }, 'Сбросить')
-      ), fileInput, emojiPanel
-    ),
-    h('h2', {}, 'Данные'),
-    h('div', { class: 'card' },
-      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм (для входа)'), nick,
-      h('button', { class: 'btn btn-primary', onclick: async (e) => {
-        const btn = e.currentTarget;
-        const nickV = nick.value.trim().replace(/^@/, '');
-        if (!NICK_RE.test(nickV)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
-        const body = { firstName: first.value.trim(), lastName: last.value.trim(), nickname: nickV };
-        btn.disabled = true;
-        try {
-          let onServer = true;
-          try { await api('PATCH', '/users/me', body); }
-          catch (err) {
-            const msg = String(err.message || '');
-            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) onServer = false;
-            else throw err;
-          }
-          if (onServer) {
-            localStorage.removeItem('profileLocal');
-            try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; }
-            catch { Object.assign(state.me, body); }
-            toast('Профиль сохранён');
-          } else {
-            Object.assign(state.me, body);
-            localStorage.setItem('profileLocal', JSON.stringify({ id: me.id, ...body }));
-            toast('Сохранено на этом устройстве: сервер не принимает изменения профиля', true);
-          }
-          localStorage.setItem('lastNick', state.me.nickname || nickV);
-          updateSideUser(); go('me');
-        } catch (err) { toast(err.message || 'Не удалось сохранить', true); }
-        finally { btn.disabled = false; }
-      } }, 'Сохранить профиль')
-    ),
-    h('h2', {}, 'Пароль'),
-    h('div', { class: 'card' },
-      h('label', { style: 'margin-top:0' }, 'Текущий'), cur, h('label', {}, 'Новый'), n1, h('label', {}, 'Повтор'), n2,
-      h('button', { class: 'btn btn-primary', onclick: async (e) => {
-        if (!cur.value || !n1.value) return toast('Заполните поля', true);
-        if (n1.value !== n2.value) return toast('Пароли не совпадают', true);
-        e.target.disabled = true;
-        try {
-          await changePassword(cur.value, n1.value); toast('Пароль изменён');
-          try { state.me = await api('GET', '/auth/me'); go('me'); } catch { toLogin('Войдите с новым паролем'); }
-        } catch (err) { toast(err.message, true); e.target.disabled = false; }
-      } }, 'Сменить пароль')
-    ),
-    h('div', { class: 'divider' }),
-    h('button', { class: 'btn btn-secondary', onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); } }, 'Выйти')
-  );
-}
-function renderSettings() {
-  const me = state.me;
-  const accents = [
-    { id: 'blue', color: '#2AABEE' }, { id: 'violet', color: '#8b5cf6' }, { id: 'teal', color: '#14b8a6' },
-    { id: 'orange', color: '#f97316' }, { id: 'pink', color: '#ec4899' }, { id: 'green', color: '#22c55e' },
-  ];
-  setView(
-    h('div', { class: 'card click', onclick: () => go('me') },
-      h('div', { class: 'row' },
-        h('div', { style: 'display:flex;gap:12px;align-items:center;min-width:0' },
-          h('div', { class: 'avatar-lg', style: 'width:48px;height:48px;font-size:16px' },
-            state.avatarEmoji || initials(me)
-          ),
-          h('div', { style: 'min-width:0' },
-            h('strong', { style: 'font-size:16px' }, personName(me) || 'Профиль'),
-            h('div', { class: 'muted' }, atNick(me)),
-            h('div', { class: 'small' }, 'Открыть профиль')
-          )
-        ),
-        h('span', { class: 'muted' }, '›')
-      )
-    ),
-    h('div', { class: 'card click', style: 'margin-top:12px', onclick: () => go('layout') },
-      h('div', { class: 'row' },
-        h('div', { style: 'display:flex;gap:12px;align-items:center' },
-          h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
-          h('div', {}, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль'))),
-        h('span', { class: 'muted' }, '›'))),
-    h('h2', {}, 'Оформление'),
-    h('div', { class: 'card' },
-      h('strong', {}, 'Тема'),
-      h('div', { class: 'gap', style: 'margin-top:12px' },
-        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.theme = 'light'; applyAppearance(); go('settings'); }, e) }, 'Светлая'),
-        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.theme = 'dark'; applyAppearance(); go('settings'); }, e) }, 'Тёмная')
-      )
-    ),
-    h('div', { class: 'card' },
-      h('strong', {}, 'Цвет'),
-      h('div', { class: 'swatches' },
-        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: (e) => changeAppearance(() => { state.accent = a.id; applyAppearance(); go('settings'); }, e) }))
-      )
-    ),
-    h('div', { class: 'card' },
-      h('strong', {}, 'Контраст'),
-      h('div', { class: 'gap', style: 'margin-top:12px' },
-        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.contrast = 'normal'; applyAppearance(); go('settings'); }, e) }, 'Обычный'),
-        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.contrast = 'high'; applyAppearance(); go('settings'); }, e) }, 'Высокий')
-      )
-    ),
-    h('button', {
-      class: 'btn btn-secondary', style: 'margin-top:20px',
-      onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); },
-    }, 'Выйти из аккаунта')
-  );
-}
-
-async function renderSearch() {
-  const sticky = h('div', { class: 'search-sticky pulse' });
-  const inputWrap = h('div', { style: 'position:relative' });
-  const input = h('input', {
-    type: 'search',
-    placeholder: 'Найти задачи, шаблоны, людей…',
-    value: state.searchQuery || '',
-  });
-  const clearBtn = h('button', {
-    class: 'topbar-btn', type: 'button',
-    style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
-    onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'all'); },
-  });
-  clearBtn.innerHTML = icons.back ? icons.back.replace('M15 18l-6-6 6-6', 'M18 6L6 18M6 6l12 12') : '×';
-  // X icon
-  clearBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>`;
-  inputWrap.append(input, clearBtn);
-  sticky.append(inputWrap);
-  const resultsBox = h('div', { id: 'search-results' });
-  setView(sticky, resultsBox);
-  input.focus();
-  setTimeout(() => sticky.classList.remove('pulse'), 700);
-
-  const setResults = (...nodes) => {
-    resultsBox.replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
-  };
-  const runSearch = async () => {
-    state.searchQuery = input.value;
-    const query = input.value.trim().toLowerCase();
-    if (!query) { setResults(emptyState('Поиск', 'Введите запрос')); return; }
-    setResults(h('div', { class: 'skeleton', style: 'height:64px' }));
-    const results = [];
+  // --- ЭКРАНЫ ---
+  async function renderChecklists() {
+    $('view').innerHTML = '<div class="empty">Загрузка...</div>';
     try {
-      const runs = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
-      runs.filter(r => ((r.title || r.template?.title || r.templateTitle || '') + personName(r.assignee)).toLowerCase().includes(query))
-        .forEach(r => results.push({ type: 'run', data: r }));
-    } catch {}
-    try {
-      let templates = [];
-      try { templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
-      catch (e) { if (e.status === 400) templates = arr(await api('GET', '/checklists/templates')); }
-      templates.filter(t => ((t.title || '') + ' ' + (t.description || '')).toLowerCase().includes(query))
-        .forEach(t => results.push({ type: 'tpl', data: t }));
-    } catch {}
-    if (can('users.read')) {
-      try {
-        const users = arr(await api('GET', '/users'));
-        users.filter(u => (personName(u) + ' ' + (u.nickname || '')).toLowerCase().includes(query))
-          .forEach(u => results.push({ type: 'user', data: u }));
-      } catch {}
+      const runs = await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`);
+      if (!runs.length) return $('view').innerHTML = '<div class="empty">Чеклистов пока нет</div>';
+      
+      const html = runs.map(run => `
+        <div class="list-row" onclick="alert('Открытие чеклиста в разработке')">
+          <div class="info">
+            <div class="info-title">${run.template?.title || 'Чеклист'}</div>
+            <div class="info-sub">${new Date(run.createdAt).toLocaleDateString()}</div>
+          </div>
+          <span class="badge ${run.status === 'COMPLETED' ? 'ok' : 'pending'}">${run.status}</span>
+        </div>
+      `).join('');
+      
+      $('view').innerHTML = `<h1>Чеклисты</h1><p class="page-desc">Все назначенные чеклисты</p><div class="list-group">${html}</div>`;
+    } catch (e) {
+      $('view').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
     }
-    if (!results.length) { setResults(emptyState('Ничего не найдено')); return; }
-    const nodes = [];
-    const runs = results.filter(r => r.type === 'run');
-    const tpls = results.filter(r => r.type === 'tpl');
-    const users = results.filter(r => r.type === 'user');
-    if (runs.length) {
-      nodes.push(h('div', { class: 'section-label' }, 'Задачи'));
-      runs.forEach(({ data: r }) => nodes.push(runCard(r, true)));
-    }
-    if (tpls.length) {
-      nodes.push(h('div', { class: 'section-label' }, 'Шаблоны'));
-      tpls.forEach(({ data: t }) => {
-        const cnt = t.items?.length ?? t._count?.items;
-        nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) },
-          h('strong', {}, t.title),
-          t.description && h('div', { class: 'muted' }, t.description),
-          cnt != null && h('div', { class: 'small', style: 'margin-top:6px' }, pluralPunkty(cnt))
-        ));
-      });
-    }
-    if (users.length) {
-      nodes.push(h('div', { class: 'section-label' }, 'Команда'));
-      users.forEach(({ data: u }) => {
-        nodes.push(h('div', { class: 'card' },
-          h('div', { class: 'row' },
-            h('div', { style: 'display:flex;gap:12px;align-items:center' },
-              h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
-              h('div', {},
-                h('strong', {}, personName(u)),
-                h('div', { class: 'muted' }, atNick(u))
-              )
-            )
-          )
-        ));
-      });
-    }
-    setResults(...nodes);
-  };
-  let debounce;
-  input.addEventListener('input', () => {
-    clearTimeout(debounce);
-    sticky.classList.add('pulse');
-    setTimeout(() => sticky.classList.remove('pulse'), 500);
-    debounce = setTimeout(runSearch, 280);
-  });
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'all'); }
-  });
-  await runSearch();
-}
+  }
 
-function renderStub(title, description, iconHtml) {
-  setView(h('div', { class: 'empty', style: 'padding-top:56px' }, h('div', { class: 'stub-icon', html: iconHtml }), h('div', { class: 'empty-title' }, title), h('div', { class: 'empty-desc' }, description), h('p', { class: 'small', style: 'margin-top:18px' }, 'Раздел подготовлен')));
-}
-function renderAuditStub() { renderStub('Журнал аудита', 'История действий', icons.audit); }
-function renderNotificationsStub() {
-  setView(
-    h('div', { class: 'empty', style: 'padding-top:40px' },
-      h('div', { class: 'stub-icon', html: icons.msg }),
-      h('div', { class: 'empty-title' }, 'Сообщения'),
-      h('div', { class: 'empty-desc' }, 'Здесь будут уведомления и комментарии к выполненным чеклистам')
-    ),
-    h('div', { class: 'card' },
-      h('strong', {}, 'Комментарии'),
-      h('div', { class: 'muted', style: 'margin-top:8px;font-size:14px' },
-        'После сдачи чеклиста можно оставить комментарий для руководителя. Лента сообщений появится, когда на сервере будет API уведомлений.')
-    )
-  );
-}
-(async () => { try { await afterLogin(); } catch { toLogin(); } })();
+  async function renderTemplates() {
+    $('view').innerHTML = '<div class="empty">Загрузка...</div>';
+    try {
+      const templates = await api('GET', `/checklists/templates?workspaceId=${state.wsId}`);
+      if (!templates.length) return $('view').innerHTML = '<div class="empty">Шаблонов пока нет</div>';
+      
+      const html = templates.map(t => `
+        <div class="list-row">
+          <div class="info">
+            <div class="info-title">${t.title}</div>
+            <div class="info-sub">${t.items?.length || 0} пунктов</div>
+          </div>
+        </div>
+      `).join('');
+      
+      $('view').innerHTML = `<h1>Шаблоны</h1><p class="page-desc">Шаблоны для чеклистов</p><div class="list-group">${html}</div>`;
+    } catch (e) {
+      $('view').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+    }
+  }
+
+  async function renderPeople() {
+    $('view').innerHTML = '<div class="empty">Загрузка...</div>';
+    try {
+      const users = await api('GET', `/users?workspaceId=${state.wsId}`);
+      if (!users.length) return $('view').innerHTML = '<div class="empty">Сотрудников пока нет</div>';
+      
+      const html = users.map(u => `
+        <div class="list-row" onclick="alert('Назначение задачи для ${u.email} в разработке')">
+          <div class="avatar">${(u.firstName?.[0] || '') + (u.lastName?.[0] || '')}</div>
+          <div class="info">
+            <div class="info-title">${u.firstName || ''} ${u.lastName || ''}</div>
+            <div class="info-sub">${u.email}</div>
+          </div>
+        </div>
+      `).join('');
+      
+      $('view').innerHTML = `<h1>Команда</h1><p class="page-desc">Список сотрудников</p><div class="list-group">${html}</div>`;
+    } catch (e) {
+      $('view').innerHTML = `<div class="alert alert-error">${e.message}</div>`;
+    }
+  }
+
+  function renderSettings() {
+    $('view').innerHTML = `
+      <h1>Кабинет</h1>
+      <p class="page-desc">${state.me?.email}</p>
+      <button class="btn btn-secondary" onclick="logout()" style="color:var(--danger)">Выйти из аккаунта</button>
+    `;
+  }
+
+  // --- СТАРТ ---
+  if (state.token) {
+    initApp();
+  } else {
+    $('login-screen').classList.remove('hidden');
+  }
 </script>
 </body>
 </html>
