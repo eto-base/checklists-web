@@ -37,6 +37,7 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     --ease: cubic-bezier(.25, .1, .25, 1);
+    /* aliases used by existing markup */
     --bg-card: var(--surface);
     --bg-input: var(--surface);
     --primary: var(--accent);
@@ -1038,6 +1039,7 @@
   .lay-sw.on:active i { transform: translateX(14px); }
   .lay-sw:disabled { opacity: .45; }
 
+  /* ===== v3: bigger dock (up to 5), round buttons, grow animations, menu fix ===== */
   .dock { gap: 8px; padding: 0 10px; bottom: calc(16px + var(--safe-bottom)); }
   .bottom-nav { height: 66px; border-radius: 33px; padding: 4px; max-width: calc(100% - 76px); }
   .dock:has(.plus-orb:not(.hidden)) .bottom-nav { max-width: calc(100% - 144px); }
@@ -1049,12 +1051,18 @@
   .fab { bottom: calc(66px + var(--safe-bottom) + 34px); }
   .toast { bottom: calc(66px + var(--safe-bottom) + 30px); }
 
+  /* round buttons everywhere */
   .btn, .btn-sm, .btn-ghost, .chip, .choice, .icon-btn, .star-btn, .float-back, .lay-mv, .emoji-grid button { border-radius: 999px; }
   .choice-opt { border-radius: 26px; }
   .icon-btn, .star-btn { width: 40px; height: 40px; padding: 0; border-radius: 50%; }
   .emoji-grid button { border-radius: 50%; }
   .menu-pop button { border-radius: 999px; }
 
+  /* search-like pulse ring on every press */
+  .lq-ring { animation: lqRing .6s ease-out; }
+  @keyframes lqRing { 0% { box-shadow: 0 0 0 0 var(--accent-glow); } 70% { box-shadow: 0 0 0 10px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+  /* sub-items grow where they appear */
   @keyframes popGrow { 0% { transform: scale(.3); opacity: 0; } 70% { transform: scale(1.05); opacity: 1; } 100% { transform: scale(1); } }
   .menu-pop, .emoji-grid button, .choice-opt, .option-row, .alert, .lay-row { animation: popGrow .42s cubic-bezier(.34,1.4,.5,1) both; }
   .menu-pop { transform-origin: top right; min-width: 200px; padding: 8px; border-radius: 26px; background: var(--lg-bg), var(--surface);
@@ -1064,17 +1072,21 @@
   .menu-pop button:nth-child(2) { animation-delay: .06s; } .menu-pop button:nth-child(3) { animation-delay: .12s; }
   .menu-pop button:hover, .menu-pop button:active { background: var(--accent-soft); }
 
+  /* menu no longer slides under the next card */
   .card, .list-group { overflow: visible; }
   .card:has(.menu-pop) { position: relative; z-index: 60; }
   .card-head { position: relative; }
 
+  /* v4: perfectly round dock buttons */
   .bottom-nav { --d: min(58px, calc((100vw - 28px - 68px) / var(--n, 3))); height: calc(var(--d) + 8px); width: auto !important; max-width: none; padding: 4px; }
   .dock:has(.plus-orb:not(.hidden)) .bottom-nav { --d: min(58px, calc((100vw - 28px - 136px) / var(--n, 3))); max-width: none; }
   .bottom-nav button { flex: 0 0 var(--d); width: var(--d); height: var(--d); min-width: 0; max-width: none; padding: 0; border-radius: 50%; }
   .bottom-nav button svg { width: calc(var(--d) * .46); height: calc(var(--d) * .46); }
   .nav-blob { border-radius: 50%; }
 
+  /* ===== v5: soft local press effect, orbs column ===== */
   [data-lq].lq-down { transform: none !important; border-radius: inherit !important; }
+  .lq-ring { animation: none !important; }
   .lq-glint { position: absolute; width: 10px; height: 10px; margin: -5px; border-radius: 50%; pointer-events: none; animation: none;
     background: radial-gradient(circle, rgba(255,255,255,.55), rgba(255,255,255,0) 70%); opacity: .8; transform: scale(1);
     transition: transform .5s cubic-bezier(.2,.7,.2,1), opacity .45s ease; }
@@ -1090,32 +1102,20 @@
   .orbs { display: flex; flex-direction: column; gap: 8px; align-items: center; }
   .dock:has(.plus-orb:not(.hidden)) .bottom-nav { --d: min(58px, calc((100vw - 28px - 68px) / var(--n, 3))); }
 
+  /* messages + audit */
   .cm { padding: 10px 0; border-top: .5px solid var(--border); animation: popGrow .28s ease-out both; }
   .cm-photos { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
   .cm-photos img { width: 72px; height: 72px; object-fit: cover; border-radius: 18px; border: 1px solid var(--lg-bd); }
   .audit-det { margin-top: 8px; padding-top: 8px; border-top: .5px dashed var(--border); }
   .audit-det pre { font-size: 12px; white-space: pre-wrap; word-break: break-all; color: var(--text-secondary); margin-top: 6px; }
 
+  /* sorting + compact date */
   .sortbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding: 2px 2px 6px; margin-bottom: 6px; }
   .sortbar::-webkit-scrollbar { display: none; }
   .sortbar .chip { flex: 0 0 auto; white-space: nowrap; }
   .sort-dir { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
   .sort-dir svg { width: 16px; height: 16px; }
   input[type="datetime-local"] { width: auto; min-width: 200px; max-width: 100%; height: 40px; min-height: 40px; padding: 6px 14px; font-size: 14px; border-radius: 999px; display: block; }
-
-  .bottom-nav, .folders-track { position: relative; }
-  .nav-blob, .folder-blob { display: none !important; }
-  .water-goo { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: url(#goo); opacity: .66; transition: opacity .5s ease; }
-  .water-shine { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity .5s ease; }
-  .water-body, .water-drop, .ws-pill, .ws-spark { position: absolute; left: 0; top: 0; pointer-events: none; }
-  .water-body { border-radius: 999px; will-change: transform, width; background: linear-gradient(165deg, var(--accent), var(--accent-hover)); }
-  .water-drop { width: 16px; height: 16px; border-radius: 50%; transform: translate(0,0) scale(0); background: var(--accent); will-change: transform; }
-  .ws-pill { border-radius: 999px; will-change: transform, width; }
-  .ws-arc { position: absolute; left: 14%; right: 14%; top: 7%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,0)); opacity: .62; }
-  .ws-dot { position: absolute; left: 17%; top: 17%; width: 9px; height: 6px; border-radius: 50%; background: #fff; transform: rotate(-24deg); }
-  .ws-dot2 { position: absolute; left: calc(17% + 12px); top: calc(17% + 5px); width: 3px; height: 3px; border-radius: 50%; background: #fff; opacity: .8; }
-  .ws-spark { width: 4px; height: 4px; border-radius: 50%; background: #fff; opacity: 0; }
-  .bottom-nav button, .folder { z-index: 1; }
 </style>
 </head>
 <body>
@@ -1125,8 +1125,8 @@
       <div class="login-logo">✓</div>
       <h1>Чеклисты</h1>
       <p class="subtitle">Войдите в аккаунт</p>
-      <label for="login-id">Email</label>
-      <input type="email" id="login-id" placeholder="you@example.com" autocomplete="username">
+      <label for="login-id">Email или никнейм</label>
+      <input type="text" id="login-id" placeholder="you@example.com или nickname" autocomplete="username">
       <label for="password">Пароль</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       <button class="btn btn-primary" id="login-btn">Войти</button>
@@ -1199,14 +1199,6 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-  <filter id="goo" x="-20%" y="-70%" width="140%" height="240%" color-interpolation-filters="sRGB">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="b"/>
-    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="g"/>
-    <feComposite in="SourceGraphic" in2="g" operator="atop"/>
-  </filter>
-</defs></svg>
-
 <script type="module">
 const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
 const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
@@ -1264,6 +1256,7 @@ function pluralPunkty(n) {
   if (n10 >= 2 && n10 <= 4 && (n100 < 12 || n100 > 14)) return x + ' пункта';
   return x + ' пунктов';
 }
+
 function h(tag, props, ...kids) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(props || {})) {
@@ -1303,7 +1296,7 @@ async function api(method, path, body) {
   if (body instanceof FormData) payload = body;
   else if (body !== undefined) { headers['content-type'] = 'application/json'; payload = JSON.stringify(body); }
   let res;
-  try { res = await fetch(API_BASE + path, { method, headers, body: payload }); }
+  try { res = await fetch(API_BASE + path, { method, headers, credentials: 'include', body: payload }); }
   catch { throw new Error('Нет связи с сервером'); }
   const text = await res.text();
   let data = null;
@@ -1377,10 +1370,10 @@ function renderWsSelect() {
 $('login-btn').onclick = async () => {
   $('login-error').classList.add('hidden');
   const id = $('login-id').value.trim(); const password = $('password').value;
-  if (!id || !password) { toLogin('Заполните email и пароль'); return; }
+  if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
   $('login-btn').disabled = true;
   try {
-    const payload = { email: id, password };
+    const payload = id.includes('@') ? { email: id, password } : { email: id, password, nickname: id };
     const data = await api('POST', '/auth/login', payload);
     if (data.twoFactorRequired) {
       showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
@@ -1465,6 +1458,7 @@ function renderFolders() {
 }
 function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
   if (!blob) return;
+  // start from previous selected position (surface tension: elongate across path)
   const a = fromLeft != null ? fromLeft : toLeft;
   const aw = fromWidth != null ? fromWidth : toWidth;
   blob.style.transition = 'none';
@@ -1472,18 +1466,21 @@ function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
   blob.style.width = aw + 'px';
   blob.style.borderRadius = '999px';
   blob.style.transform = 'scale(1)';
+  // force reflow
   void blob.offsetWidth;
   const goingRight = toLeft >= a;
   const stretchLeft = Math.min(a, toLeft);
   const stretchRight = Math.max(a + aw, toLeft + toWidth);
   const stretchW = stretchRight - stretchLeft;
   blob.style.transition = 'left .38s cubic-bezier(.2,.8,.2,1), width .38s cubic-bezier(.2,.8,.2,1), border-radius .38s ease, transform .38s ease';
+  // phase 1 — pull like water film
   blob.style.left = stretchLeft + 'px';
   blob.style.width = stretchW + 'px';
   blob.style.borderRadius = goingRight ? '40% 55% 55% 40% / 50% 50% 50% 50%' : '55% 40% 40% 55% / 50% 50% 50% 50%';
   blob.style.transform = 'scaleY(0.88)';
   clearTimeout(blob._t1); clearTimeout(blob._t2);
   blob._t1 = setTimeout(() => {
+    // phase 2 — settle on target
     blob.style.left = toLeft + 'px';
     blob.style.width = toWidth + 'px';
     blob.style.borderRadius = '999px';
@@ -1494,6 +1491,8 @@ function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
 function renderBottomNav() {
   const tabs = state.layout.dock.filter(k => SECTIONS[k] && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s, icon: icons[SECTIONS[k].i] }));
   if (!tabs.some(x => x.k === 'settings')) tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
+  // search is separate orb
+
   const nav = $('bottom-nav');
   const fromLeft = nav._blobLeft;
   const fromWidth = nav._blobWidth;
@@ -1562,6 +1561,7 @@ function parseChoiceUnit(unit) {
 function go(tab) {
   if (typeof openRun !== 'undefined' && openRun._restore) { try { openRun._restore(); } catch {} openRun._restore = null; }
   if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
+  // Кнопка назад в шапке
   const menuBtn = $('menu-btn');
   if (menuBtn) {
     const rootTabs = rootSet();
@@ -1606,6 +1606,7 @@ function closeSheet() {
 }
 lqBackdrop.onclick = closeSheet;
 $('plus-orb').onclick = () => { if (window.__addForm) openSheet(window.__addForm); };
+// liquid press: squish + glint on every button
 const LQ = '.menu-pop button,.star-btn,.emoji-grid button,.btn,.chip,.choice,.choice-opt,.icon-btn,.topbar-btn,.fab,.float-back,.search-orb,.bottom-nav button,.folder,.lay-mv,.swatch';
 document.addEventListener('pointerdown', (e) => {
   const el = e.target.closest(LQ); if (!el || el.disabled) return;
@@ -1827,7 +1828,7 @@ async function renderAll() {
 }
 function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
 async function photoURL(id) {
-  const r = await fetch(API_BASE + '/files/' + id, { headers: authHeaders() });
+  const r = await fetch(API_BASE + '/files/' + id, { headers: authHeaders(), credentials: 'include' });
   if (!r.ok) throw new Error('Не удалось загрузить фото');
   return URL.createObjectURL(await r.blob());
 }
@@ -1913,102 +1914,861 @@ function itemNode(run, it, editable) {
     control = ta;
   } else if (it.type === 'PHOTO') {
     const img = h('img', { class: 'photo hidden' });
-    const fid = it.fileId;
+    const fid = it.fileId || it.file?.id;
     if (fid) photoURL(fid).then(u => { img.src = u; img.classList.remove('hidden'); }).catch(() => {});
-    const inp = h('input', { type: 'file', accept: 'image/*', capture: 'environment', disabled: !editable });
-    inp.addEventListener('change', async () => {
-      if (!inp.files?.length) return;
+    const inp = h('input', { type: 'file', accept: 'image/*', disabled: !editable });
+    inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return;
       try {
-        const fd = new FormData(); fd.append('file', inp.files[0]); fd.append('workspaceId', state.wsId);
         status.textContent = 'Загружаю…';
-        const file = await api('POST', '/files', fd);
-        await save({ fileId: file.id });
-        img.src = URL.createObjectURL(inp.files[0]); img.classList.remove('hidden');
+        const fd = new FormData();
+        fd.append('workspaceId', run.workspaceId || state.wsId);
+        fd.append('file', f);
+        const up = await api('POST', '/files', fd);
+        if (await save({ fileId: up.id })) { img.src = URL.createObjectURL(f); img.classList.remove('hidden'); }
       } catch (e) { status.textContent = ''; toast(e.message, true); }
-    });
+    };
     control = h('div', {}, inp, img);
-  } else {
-    control = h('div', { class: 'small' }, 'Неизвестный тип: ' + it.type);
+  } else control = h('div', { class: 'muted' }, 'Тип: ' + it.type);
+
+  return h('div', { class: 'card' },
+    h('div', { class: 'row' }, h('strong', { style: 'font-size:15px' }, it.title), it.required && h('span', { class: 'badge' }, 'обязательно')),
+    h('div', { style: 'margin-top:12px' }, control), flag, status);
+}
+
+async function openRun(id) {
+  const run = await api('GET', `/checklists/runs/${id}`);
+  const closed = ['COMPLETED', 'CANCELLED', 'CANCELED'].includes(run.status);
+  const mine = !run.assigneeId || run.assigneeId === state.me.id || run.assignee?.id === state.me.id;
+  const editable = !closed && mine;
+  const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
+  const templateId = run.templateId || run.template?.id;
+
+  $('topbar-title').textContent = title;
+
+  // Кнопка назад в шапке + меню ⋯ для вторичных действий
+  const actions = $('topbar-actions');
+  const extra = h('div', { style: 'display:flex;align-items:center;gap:0;position:relative' });
+  const backBtn = h('button', {
+    class: 'topbar-btn muted', type: 'button', title: 'Назад',
+    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'mine') : (rootSet().includes(state.tab) ? state.tab : 'mine')),
+  });
+  backBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+  const moreBtn = h('button', { class: 'topbar-btn muted', type: 'button', title: 'Ещё' });
+  moreBtn.textContent = '⋯';
+  moreBtn.onclick = (e) => {
+    e.stopPropagation();
+    const old = extra.querySelector('.menu-pop');
+    if (old) { old.remove(); return; }
+    const items = [];
+    if (!closed && can('checklists.assign')) {
+      items.push(h('button', { type: 'button', class: 'danger', onclick: async () => {
+        extra.querySelector('.menu-pop')?.remove();
+        if (!confirm('Отменить этот чеклист?')) return;
+        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go('mine'); }
+        catch (err) { toast(err.message, true); }
+      } }, 'Отменить чеклист'));
+    }
+    if (templateId && can('checklists.templates.manage')) {
+      items.push(h('button', { type: 'button', onclick: async () => {
+        extra.querySelector('.menu-pop')?.remove();
+        try {
+          let t = run.template;
+          if (!t || !t.items) {
+            const list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
+            t = list.find(x => x.id === templateId) || t;
+          }
+          if (!t) return toast('Шаблон не найден', true);
+          const itemsMap = (t.items || run.items || []).map(it => {
+            const parsed = parseChoiceUnit(it.unit);
+            return {
+              title: it.title || '',
+              type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
+              required: !!it.required,
+              unit: it.unit || '',
+              minValue: it.minValue ?? '',
+              maxValue: it.maxValue ?? '',
+              options: parsed ? parsed.options : ['Вариант 1', 'Вариант 2'],
+            };
+          });
+          showBuilder({
+            title: (t.title || title) + ' (копия)',
+            description: t.description || '',
+            items: itemsMap.length ? itemsMap : [{ title: '', type: 'CHECK', required: true, options: [''] }],
+          });
+        } catch (err) { toast(err.message, true); }
+      } }, 'Копировать как шаблон'));
+    }
+    if (!items.length) {
+      items.push(h('button', { type: 'button', onclick: () => extra.querySelector('.menu-pop')?.remove() }, 'Нет действий'));
+    }
+    const pop = h('div', { class: 'menu-pop', style: 'right:0;top:44px' }, ...items);
+    extra.append(pop);
+  };
+
+  // rebuild topbar right: keep search hidden on run detail, show back+more
+  const ws = $('ws-select');
+  const search = $('search-btn');
+  extra.append(moreBtn);
+  // insert back before title area via menu-btn side - put back next to menu
+  const menuBtn = $('menu-btn');
+  // temporary replace menu with back while in run
+  const prevMenuHandler = menuBtn.onclick;
+  menuBtn.onclick = () => go(rootSet().includes(state.tab) ? state.tab : 'mine');
+  menuBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  menuBtn.setAttribute('aria-label', 'Назад');
+  search.classList.add('hidden');
+  const moreHost = h('div', { style: 'position:relative;display:flex' }, moreBtn);
+  // place more into topbar-actions
+  const keepWs = ws && !ws.classList.contains('hidden') ? ws : null;
+  actions.replaceChildren(...[keepWs, moreHost].filter(Boolean));
+
+  const restoreChrome = () => {
+    menuBtn.onclick = openMenu;
+    menuBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
+    menuBtn.setAttribute('aria-label', 'Меню');
+    search.classList.remove('hidden');
+    renderWsSelect();
+    // restore search button
+    const acc = $('topbar-actions');
+    if (!$('search-btn')) {
+      /* search is same node if only class hidden */
+    }
+    if (!acc.contains(search)) acc.append(search);
+    const lbt = $('layout-btn'); if (lbt && !acc.contains(lbt)) acc.prepend(lbt);
+  };
+
+  const commentField = h('textarea', { rows: 2, placeholder: 'Комментарий к сдаче (необязательно)' });
+  const itemTotal = (run.items || []).length;
+  const nodes = [
+    h('div', { class: 'muted', style: 'margin-bottom:12px' },
+      statusName(run.status) + (run.dueAt ? ' · срок ' + fmt(run.dueAt) : '') +
+      (itemTotal ? ` · ${pluralPunkty(itemTotal)}` : '')
+    ),
+    ...(run.items || []).map(it => itemNode(run, it, editable)),
+  ];
+
+  if (editable) {
+    nodes.push(h('div', { class: 'card' }, h('label', { style: 'margin-top:0' }, 'Комментарий'), commentField));
+    nodes.push(h('button', {
+      class: 'btn btn-primary',
+      onclick: async (e) => {
+        e.target.disabled = true;
+        try {
+          const body = {};
+          const c = commentField.value.trim();
+          if (c) body.comment = c;
+          const r = await api('POST', `/checklists/runs/${run.id}/complete`, Object.keys(body).length ? body : undefined);
+          toast(`Сдано. Проблем: ${r?.flaggedCount ?? 0}`);
+          restoreChrome();
+          go(rootSet().includes(state.tab) ? state.tab : 'mine');
+        } catch (err) { toast(err.message, true); e.target.disabled = false; }
+      },
+    }, 'Сдать чеклист'));
   }
 
-  return h('div', { class: 'itemrow' },
-    h('div', { style: 'font-weight:600;font-size:15px;margin-bottom:8px' }, it.title || it.text || it.name || 'Пункт'),
-    it.description && h('div', { class: 'muted', style: 'margin-bottom:8px' }, it.description),
-    control, status, flag
-  );
+  nodes.push(commentsBlock(run, closed, mine));
+  setView(nodes);
+
+  // When leaving via go(), chrome restores on next renderBottomNav/topbar title — hook restore into go wrapper once
+  openRun._restore = restoreChrome;
 }
-async function openRun(id) {
-  const r = await api('GET', `/checklists/runs/${id}`);
-  const editable = r.status !== 'COMPLETED' && r.status !== 'CANCELLED' && r.status !== 'CANCELED';
-  const items = (r.items || []).sort((a, b) => (a.position ?? a.order ?? 0) - (b.position ?? b.order ?? 0));
-  const finishBtn = h('button', { class: 'btn btn-primary', style: 'margin-top:24px', disabled: !editable }, 'Завершить чеклист');
-  finishBtn.onclick = async () => {
-    if (!confirm('Завершить? После этого изменить ответы будет нельзя.')) return;
-    finishBtn.disabled = true; finishBtn.textContent = 'Завершаю…';
-    try {
-      const res = await api('POST', `/checklists/runs/${id}/complete`);
-      toast(res.flaggedCount ? `Готово. Проблем: ${res.flaggedCount}` : 'Чеклист завершён');
-      show(() => openRun(id));
-    } catch (e) { toast(e.message, true); finishBtn.disabled = false; finishBtn.textContent = 'Завершить чеклист'; }
+
+
+function compressImage(file) {
+  return new Promise((res, rej) => {
+    if (!file.type.startsWith('image/')) return rej(new Error('Нужно изображение'));
+    if (file.size > 10 * 1048576) return rej(new Error('Фото больше 10 МБ'));
+    const img = new Image(), u = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u);   // перекодирование убирает EXIF и геометку
+      c.toBlob(b => b ? res(b) : rej(new Error('Не удалось обработать фото')), 'image/jpeg', .82);
+    };
+    img.onerror = () => rej(new Error('Не удалось открыть фото'));
+    img.src = u;
+  });
+}
+const toDataUrl = (blob) => new Promise(r => { const f = new FileReader(); f.onload = () => r(String(f.result)); f.readAsDataURL(blob); });
+function commentsBlock(run, closed, mine) {
+  const key = 'cm_' + run.id, manager = can('checklists.assign');
+  const canWrite = closed ? manager : (mine || manager);
+  let rows = [], local = false, photos = [], itemIdx = '';
+  const list = h('div'), box = h('div', { class: 'card' });
+  const readLocal = () => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } };
+  const writeLocal = () => { try { localStorage.setItem(key, JSON.stringify(rows)); } catch { toast('Память заполнена — уберите фото', true); } };
+  const mineMsg = (c) => (c.author?.id || c.authorId) === state.me.id;
+  const draw = () => {
+    const vis = rows.filter(c => !c.deleted);
+    list.replaceChildren(...(vis.length ? vis.map(c => {
+      const ph = h('div', { class: 'cm-photos' });
+      (c.localPhotos || []).forEach(u => ph.append(h('img', { src: u })));
+      (c.fileIds || c.files?.map(f => f.id || f) || []).forEach(id => { const im = h('img'); photoURL(id).then(u => im.src = u).catch(() => {}); ph.append(im); });
+      const canEdit = mineMsg(c) && Date.now() - new Date(c.createdAt) < 15 * 60000;
+      return h('div', { class: 'cm' },
+        h('div', { class: 'row' }, h('strong', { style: 'font-size:14px' }, personName(c.author) || 'Система'), h('span', { class: 'small' }, fmt(c.createdAt) + (c.editedAt ? ' · изменено' : ''))),
+        c.itemIndex != null && c.itemIndex !== '' && h('span', { class: 'badge neutral', style: 'margin-top:4px' }, '#' + (Number(c.itemIndex) + 1)),
+        h('div', { style: 'margin-top:4px;white-space:pre-wrap' }, c.text), ph,
+        (canEdit || mineMsg(c) || manager) && h('div', { class: 'gap', style: 'margin-top:6px' },
+          canEdit && h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: async () => {
+            const t = prompt('Изменить сообщение', c.text); if (t == null || !t.trim()) return;
+            c.text = t.trim().slice(0, 2000); c.editedAt = new Date().toISOString();
+            if (local) writeLocal(); else try { await api('PATCH', `/checklists/runs/${run.id}/comments/${c.id}`, { text: c.text }); } catch (e) { toast(e.message, true); }
+            draw();
+          } }, 'Изменить'),
+          (mineMsg(c) || manager) && h('button', { class: 'btn btn-ghost btn-sm', type: 'button', onclick: async () => {
+            if (!confirm('Удалить сообщение? Оно будет скрыто, оригинал останется в аудите.')) return;
+            c.deleted = true;
+            if (local) writeLocal(); else try { await api('DELETE', `/checklists/runs/${run.id}/comments/${c.id}`); } catch (e) { c.deleted = false; toast(e.message, true); }
+            draw();
+          } }, 'Удалить')));
+    }) : [h('div', { class: 'muted', style: 'padding:6px 0' }, 'Сообщений пока нет')]));
   };
-  setView(
-    h('button', { class: 'float-back', onclick: () => go(state.tab) }, '← Назад'),
-    h('h1', {}, r.title || r.template?.title || 'Чеклист'),
-    h('div', { class: 'muted', style: 'margin-bottom:12px' },
-      statusBadge(r),
-      r.dueAt ? ' · Срок: ' + fmt(r.dueAt) : '',
-      r.assignee ? ' · ' + personName(r.assignee) : ''
-    ),
-    ...items.map(it => itemNode(r, it, editable)),
-    editable && finishBtn
-  );
+  (async () => {
+    try { rows = arr(await api('GET', `/checklists/runs/${run.id}/comments`)); }
+    catch (e) { if (e.status === 401) return; local = true; rows = readLocal(); }
+    draw();
+    if (local) box.prepend(h('div', { class: 'small', style: 'margin-bottom:6px' }, 'Сервер пока не принимает сообщения — они хранятся на этом устройстве'));
+  })();
+  box.append(h('strong', {}, 'Сообщения'), list);
+  if (!canWrite) { box.append(h('div', { class: 'small', style: 'margin-top:8px' }, closed ? 'Чеклист сдан: комментировать может только руководитель' : 'Писать может исполнитель или руководитель')); return box; }
+  const ta = h('textarea', { rows: 2, maxlength: '2000', placeholder: 'Сообщение. @ — отметить сотрудника' });
+  const cnt = h('div', { class: 'small', style: 'text-align:right' }, '0/2000');
+  const sug = h('div', { class: 'chips', style: 'margin:6px 0 0' });
+  const prev = h('div', { class: 'cm-photos' });
+  const sel = h('select', {}, h('option', { value: '' }, 'Без привязки к пункту'), ...(run.items || []).map((it, i) => h('option', { value: String(i) }, `#${i + 1} ${it.title || ''}`.slice(0, 50))));
+  sel.onchange = () => { itemIdx = sel.value; };
+  let users = null;
+  ta.addEventListener('input', async () => {
+    cnt.textContent = ta.value.length + '/2000';
+    const m = /@([^\s@]*)$/.exec(ta.value); sug.replaceChildren(); if (!m) return;
+    if (!users) users = can('users.read') ? await loadUsers() : [];
+    users.filter(u => personName(u).toLowerCase().includes(m[1].toLowerCase())).slice(0, 5).forEach(u =>
+      sug.append(h('button', { class: 'chip', type: 'button', onclick: () => { ta.value = ta.value.replace(/@[^\s@]*$/, '@' + personName(u).replace(/\s+/g, '_') + ' '); sug.replaceChildren(); ta.focus(); } }, personName(u))));
+  });
+  const inp = h('input', { type: 'file', accept: 'image/*', multiple: true, class: 'hidden' });
+  const drawPrev = () => prev.replaceChildren(...photos.map((b, i) => { const im = h('img', { src: URL.createObjectURL(b), onclick: () => { photos.splice(i, 1); drawPrev(); } }); return im; }));
+  inp.onchange = async () => {
+    for (const f of [...inp.files]) {
+      if (photos.length >= 5) { toast('Не больше 5 фото', true); break; }
+      try { photos.push(await compressImage(f)); } catch (e) { toast(e.message, true); }
+    }
+    inp.value = ''; drawPrev();
+  };
+  const send = h('button', { class: 'btn btn-primary btn-sm', type: 'button' }, 'Отправить');
+  send.onclick = async () => {
+    const text = ta.value.trim(); if (!text && !photos.length) return toast('Введите текст или добавьте фото', true);
+    send.disabled = true;
+    const mentions = (text.match(/@[^\s@]+/g) || []).map(x => x.slice(1).replace(/_/g, ' '));
+    try {
+      let msg;
+      if (!local) {
+        const fileIds = [];
+        for (const b of photos) { const fd = new FormData(); fd.append('workspaceId', run.workspaceId || state.wsId); fd.append('file', b, 'photo.jpg'); fileIds.push((await api('POST', '/files', fd)).id); }
+        msg = await api('POST', `/checklists/runs/${run.id}/comments`, { text, fileIds, mentions, itemIndex: itemIdx === '' ? undefined : Number(itemIdx) });
+        if (!msg || !msg.id) msg = { id: 'n' + Date.now(), text, fileIds, createdAt: new Date().toISOString(), author: state.me };
+      } else {
+        msg = { id: 'l' + Date.now(), text, author: state.me, authorId: state.me.id, createdAt: new Date().toISOString(), itemIndex: itemIdx === '' ? null : Number(itemIdx), localPhotos: await Promise.all(photos.map(toDataUrl)) };
+      }
+      if (!msg.author) msg.author = state.me;
+      rows.push(msg); if (local) writeLocal();
+      ta.value = ''; cnt.textContent = '0/2000'; photos = []; drawPrev(); draw();
+    } catch (e) { toast(e.message, true); }
+    send.disabled = false;
+  };
+  box.append(h('div', { class: 'itemrow' }), ta, cnt, sug, h('label', {}, 'Пункт'), sel, prev,
+    h('div', { class: 'gap' }, h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => inp.click() }, 'Фото (до 5)'), send), inp);
+  return box;
 }
+async function loadUsers() { try { return arr(await api('GET', '/users')); } catch { return []; } }
 async function renderTemplates() {
-  const d = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
+  let list;
+  try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
+  catch (e) { if (e.status === 400) list = arr(await api('GET', '/checklists/templates')); else throw e; }
+  const manage = can('checklists.templates.manage');
+  const favIds = new Set(state.favorites || []);
+  const sorted = [...list].sort((a, b) => (favIds.has(b.id) ? 1 : 0) - (favIds.has(a.id) ? 1 : 0));
+  let openMenuId = null;
+  const nodes = [];
+
+  if (!sorted.length) {
+    nodes.push(emptyState('Шаблонов пока нет', manage ? 'Создайте первый шаблон кнопкой +' : 'Попросите администратора добавить шаблоны'));
+  } else {
+    sorted.forEach(t => {
+      const fav = isFavorite(t.id);
+      const head = h('div', { class: 'card-head row' },
+        h('div', { style: 'min-width:0;flex:1' },
+          h('strong', { style: 'font-size:15px' }, t.title),
+          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
+          h('div', { class: 'small', style: 'margin-top:6px' }, (t.items?.length != null || t._count?.items != null) ? pluralPunkty(t.items?.length ?? t._count?.items) : '—')
+        ),
+        h('button', {
+          class: 'star-btn', type: 'button', title: fav ? 'Убрать из избранного' : 'В избранное',
+          onclick: (e) => { e.stopPropagation(); toggleFavorite(t.id); go('tpl'); },
+        }, fav ? '★' : '☆'),
+        manage && h('button', {
+          class: 'icon-btn', type: 'button', title: 'Ещё',
+          onclick: (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.menu-pop').forEach(m => m.remove());
+            if (openMenuId === t.id) { openMenuId = null; return; }
+            openMenuId = t.id;
+            const pop = h('div', { class: 'menu-pop' },
+              can('checklists.assign') && h('button', { type: 'button', onclick: () => { openMenuId = null; show(() => showAssign(t)); } }, 'Назначить'),
+              h('button', { type: 'button', onclick: () => {
+                openMenuId = null;
+                const items = (t.items || []).map(it => {
+                  const parsed = parseChoiceUnit(it.unit);
+                  return {
+                    title: it.title || '',
+                    type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
+                    required: !!it.required,
+                    unit: it.unit || '',
+                    minValue: it.minValue ?? '',
+                    maxValue: it.maxValue ?? '',
+                    options: parsed ? parsed.options : (it.options || ['']),
+                  };
+                });
+                showBuilder({
+                  title: (t.title || '') + ' (копия)',
+                  description: t.description || '',
+                  items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
+                });
+              } }, 'Копировать'),
+              h('button', { type: 'button', class: 'danger', onclick: async () => {
+                openMenuId = null;
+                if (!confirm('Архивировать «' + t.title + '»?')) return;
+                try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); }
+                catch (err) { toast(err.message, true); }
+              } }, 'Архивировать')
+            );
+            head.append(pop);
+          },
+        }, '⋯')
+      );
+
+      const actions = [];
+      if (can('checklists.assign') && !manage) {
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+      } else if (can('checklists.assign')) {
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+      }
+
+      nodes.push(h('div', { class: 'card' },
+        head,
+        actions.length ? h('div', { class: 'gap' }, ...actions) : null
+      ));
+    });
+  }
+
+  if (manage) {
+    nodes.push(h('button', { class: 'fab', type: 'button', title: 'Новый шаблон', onclick: () => showBuilder() }, '+'));
+  }
+  setView(...nodes);
+}
+
+async function showAssign(t) {
+  const users = await loadUsers();
+  const selected = new Set();
+  const listBox = h('div', { class: 'stack', style: 'margin-top:8px' });
+  const due = h('input', { type: 'datetime-local' });
+
+  const renderList = () => {
+    listBox.replaceChildren(...(users.length ? users.map(u => {
+      const id = u.id;
+      const on = selected.has(id);
+      return h('div', {
+        class: 'choice-opt' + (on ? ' on' : ''),
+        onclick: () => { if (selected.has(id)) selected.delete(id); else selected.add(id); renderList(); },
+      }, (on ? '✓ ' : '') + personName(u) + (u.email ? ` (${u.email})` : ''));
+    }) : [h('div', { class: 'alert alert-error' }, 'Нет сотрудников')]));
+  };
+  renderList();
+
   setView(
-    h('h1', {}, 'Шаблоны'),
-    d.length ? d.map(t => h('div', { class: 'card click' },
-      h('div', { class: 'row' }, h('strong', { html: (isFavorite(t.id) ? '★ ' : '') + t.title }), h('span', { class: 'small' }, pluralPunkty(t.itemsCount ?? t._count?.items ?? 0))),
-      t.description && h('div', { class: 'muted', style: 'margin-top:6px' }, t.description),
-      h('div', { class: 'gap' },
-        can('checklists.assign') && h('button', { class: 'btn btn-secondary btn-sm', onclick: (e) => { e.stopPropagation(); show(() => showAssign(t)); } }, 'Назначить'),
-        h('button', { class: 'btn btn-ghost btn-sm', onclick: (e) => { e.stopPropagation(); toggleFavorite(t.id); renderTemplates(); } }, isFavorite(t.id) ? 'Убрать из избранного' : 'В избранное')
-      )
-    )) : emptyState('Нет шаблонов', 'Создайте первый шаблон')
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
+    h('h1', {}, 'Назначить'),
+    h('p', { class: 'page-desc' }, t.title),
+    h('label', {}, 'Исполнители (можно несколько)'),
+    listBox,
+    h('label', {}, 'Срок'), due,
+    h('button', { class: 'btn btn-primary', onclick: async (e) => {
+      if (!selected.size) return toast('Выберите хотя бы одного', true);
+      e.target.disabled = true;
+      let ok = 0, fail = 0;
+      for (const assigneeId of selected) {
+        const body = { templateId: t.id, assigneeId };
+        if (due.value) body.dueAt = new Date(due.value).toISOString();
+        try { await api('POST', '/checklists/runs', body); ok++; }
+        catch { fail++; }
+      }
+      if (ok) toast(`Назначено: ${ok}` + (fail ? `, ошибок: ${fail}` : ''));
+      else toast('Не удалось назначить', true);
+      if (ok) go('tpl'); else e.target.disabled = false;
+    } }, 'Назначить')
   );
 }
-async function showAssign(template) {
-  let users = [];
-  try { users = arr(await api('GET', '/users')); } catch (e) {
-    if (e.status === 403) users = [{ id: state.me.id, email: state.me.email, firstName: state.me.firstName, lastName: state.me.lastName }];
-    else throw e;
-  }
-  const sel = h('select', {}, ...users.map(u => h('option', { value: u.id }, personName(u) + ' (' + u.email + ')')));
-  const dt = h('input', { type: 'datetime-local' });
-  const btn = h('button', { class: 'btn btn-primary', style: 'margin-top:16px' }, 'Назначить');
-  btn.onclick = async () => {
-    btn.disabled = true;
-    try {
-      await api('POST', '/checklists/runs', { templateId: template.id, assigneeId: sel.value, dueAt: dt.value ? new Date(dt.value).toISOString() : undefined });
-      toast('Чеклист назначен'); closeSheet(); go('mine');
-    } catch (e) { toast(e.message, true); btn.disabled = false; }
+
+function showBuilder(draft) {
+  draft = draft || { title: '', description: '', items: [{ title: '', type: 'CHECK', required: true, options: ['Вариант 1', 'Вариант 2'] }] };
+  const again = () => showBuilder(draft);
+  const typeNames = {
+    CHECK: 'Да / нет',
+    NUMBER: 'Число',
+    TEXT: 'Текст',
+    PHOTO: 'Фото',
+    CHOICE: 'Один из вариантов',
+    MULTI: 'Несколько вариантов',
   };
-  openSheet(h('div', {}, h('h2', { style: 'margin-top:8px' }, 'Назначить'), h('div', { class: 'muted', style: 'margin-bottom:12px' }, template.title), h('label', {}, 'Кому'), sel, h('label', {}, 'Срок'), dt, btn));
+
+  const rows = draft.items.map((it, i) => {
+    if (!it.options) it.options = ['Вариант 1', 'Вариант 2'];
+    const isChoice = it.type === 'CHOICE' || it.type === 'MULTI';
+    return h('div', { class: 'itemrow' },
+      h('input', { type: 'text', placeholder: 'Название пункта', value: it.title, oninput: (e) => { it.title = e.target.value; } }),
+      h('select', { style: 'margin-top:8px', onchange: (e) => { it.type = e.target.value; again(); } },
+        Object.entries(typeNames).map(([k, v]) => h('option', { value: k, selected: it.type === k }, v))),
+      it.type === 'NUMBER' && h('div', { class: 'gap', style: 'margin-top:8px' },
+        h('input', { type: 'text', placeholder: 'Ед.', value: it.unit || '', style: 'flex:1', oninput: (e) => { it.unit = e.target.value; } }),
+        h('input', { type: 'number', step: 'any', placeholder: 'Мин.', value: it.minValue ?? '', style: 'flex:1', oninput: (e) => { it.minValue = e.target.value; } }),
+        h('input', { type: 'number', step: 'any', placeholder: 'Макс.', value: it.maxValue ?? '', style: 'flex:1', oninput: (e) => { it.maxValue = e.target.value; } })),
+      isChoice && h('div', { style: 'margin-top:10px' },
+        h('div', { class: 'small' }, 'Варианты ответа'),
+        ...(it.options.map((opt, oi) => h('div', { class: 'option-row' },
+          h('input', { type: 'text', value: opt, placeholder: 'Вариант ' + (oi + 1), oninput: (e) => { it.options[oi] = e.target.value; } }),
+          it.options.length > 2 && h('button', { class: 'btn btn-danger btn-sm', type: 'button', onclick: () => { it.options.splice(oi, 1); again(); } }, '×')
+        ))),
+        h('button', { class: 'btn btn-secondary btn-sm', style: 'margin-top:8px', type: 'button', onclick: () => { it.options.push(''); again(); } }, '+ Вариант')
+      ),
+      h('div', { class: 'row', style: 'margin-top:10px' },
+        h('label', { style: 'margin:0;display:flex;gap:8px;align-items:center;font-weight:400' },
+          h('input', { type: 'checkbox', checked: it.required, onchange: (e) => { it.required = e.target.checked; } }), 'Обязательный'),
+        draft.items.length > 1 && h('button', { class: 'btn btn-danger btn-sm', onclick: () => { draft.items.splice(i, 1); again(); } }, 'Удалить'))
+    );
+  });
+
+  setView(
+    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
+    h('h1', {}, 'Новый шаблон'),
+    h('label', {}, 'Название'), h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
+    h('label', {}, 'Описание'), h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
+    h('h2', {}, 'Пункты'), ...rows,
+    h('button', { class: 'btn btn-secondary', onclick: () => { draft.items.push({ title: '', type: 'CHECK', required: false, options: ['Вариант 1', 'Вариант 2'] }); again(); } }, '+ Пункт'),
+    h('button', { class: 'btn btn-primary', onclick: async (e) => {
+      if (!draft.title.trim()) return toast('Введите название', true);
+      if (draft.items.some(it => !it.title.trim())) return toast('Названия пунктов обязательны', true);
+      for (const it of draft.items) {
+        if ((it.type === 'CHOICE' || it.type === 'MULTI') && it.options.filter(o => o.trim()).length < 2)
+          return toast('Нужно минимум 2 варианта ответа', true);
+      }
+      const items = draft.items.map(it => {
+        if (it.type === 'CHOICE' || it.type === 'MULTI') {
+          const opts = it.options.map(o => o.trim()).filter(Boolean);
+          return {
+            title: it.title.trim(),
+            type: 'TEXT',
+            required: !!it.required,
+            unit: encodeChoiceUnit(it.type === 'MULTI' ? 'multi' : 'single', opts),
+          };
+        }
+        const o = { title: it.title.trim(), type: it.type, required: !!it.required };
+        if (it.type === 'NUMBER') {
+          if (it.unit?.trim()) o.unit = it.unit.trim();
+          if (it.minValue !== '' && it.minValue != null) o.minValue = Number(it.minValue);
+          if (it.maxValue !== '' && it.maxValue != null) o.maxValue = Number(it.maxValue);
+        }
+        return o;
+      });
+      const body = { workspaceId: state.wsId, title: draft.title.trim(), items };
+      if (draft.description.trim()) body.description = draft.description.trim();
+      e.target.disabled = true;
+      try { await api('POST', '/checklists/templates', body); toast('Создан'); go('tpl'); }
+      catch (err) { toast(err.message, true); e.target.disabled = false; }
+    } }, 'Сохранить')
+  );
+}
+
+async function deleteUser(u) {
+  try { await api('DELETE', `/users/${u.id}`); toast('Удалён'); return true; }
+  catch (err) {
+    const msg = String(err.message || '');
+    if (err.status === 404 || err.status === 405 || /cannot\s+delete|not\s+allowed|method/i.test(msg)) toast('Удаление пока недоступно на сервере', true);
+    else if (err.status === 403) toast('Недостаточно прав', true);
+    else toast(msg || 'Ошибка', true);
+    return false;
+  }
+}
+function genPassword(len = 12) {
+  const sets = ['ABCDEFGHJKLMNPQRSTUVWXYZ', 'abcdefghijkmnpqrstuvwxyz', '23456789', '!@#$%*?'];
+  const all = sets.join(''), rnd = (n) => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0] % n; };
+  const out = sets.map(x => x[rnd(x.length)]);
+  while (out.length < len) out.push(all[rnd(all.length)]);
+  for (let i = out.length - 1; i > 0; i--) { const j = rnd(i + 1); [out[i], out[j]] = [out[j], out[i]]; }
+  return out.join('');
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); toast('Скопировано'); return; } catch {}
+  const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.append(ta); ta.select();
+  try { document.execCommand('copy'); toast('Скопировано'); } catch { toast('Выделите пароль и скопируйте вручную', true); } ta.remove();
 }
 async function renderPeople() {
-  const d = arr(await api('GET', '/users'));
-  setView(h('h1', {}, 'Команда'), d.map(u => h('div', { class: 'card' }, h('strong', {}, personName(u)), h('div', { class: 'muted' }, u.email))));
+  const users = can('users.read') ? await loadUsers() : [];
+  const out = h('div'); const nodes = [];
+  if (can('users.create')) {
+    const f = {
+      email: h('input', { type: 'email', placeholder: 'email@company.com' }),
+      first: h('input', { type: 'text', placeholder: 'Имя' }),
+      last: h('input', { type: 'text', placeholder: 'Фамилия' }),
+      role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
+    };
+    const manual = h('input', { type: 'text', placeholder: 'Не короче 8 символов', autocomplete: 'off', style: 'font-family:monospace' });
+    const mode = h('select', {}, h('option', { value: 'auto' }, 'Сервер создаст пароль'), h('option', { value: 'manual' }, 'Задать временный пароль'));
+    const manualRow = h('div', { class: 'hidden' }, h('label', {}, 'Временный пароль'), manual,
+      h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { manual.value = genPassword(); } }, 'Сгенерировать'));
+    mode.onchange = () => { manualRow.classList.toggle('hidden', mode.value !== 'manual'); if (mode.value === 'manual' && !manual.value) manual.value = genPassword(); };
+    window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
+      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+      h('label', {}, 'Пароль'), mode, manualRow,
+      h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
+        const btn = e.currentTarget, email = f.email.value.trim(), pw = mode.value === 'manual' ? manual.value.trim() : '';
+        if (!email) return toast('Укажите email', true);
+        if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
+        btn.disabled = true;
+        const base = { email, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
+        const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
+        try {
+          let r, last;
+          for (const b of tries) { try { r = await api('POST', '/users', b); break; } catch (err) { last = err; if (err.status !== 400 && err.status !== 422) throw err; } }
+          if (!r) throw last;
+          const shown = pw || r?.temporaryPassword || r?.tempPassword || r?.initialPassword || r?.password || r?.data?.temporaryPassword;
+          const box = h('div', { class: 'alert alert-success' }, h('div', {}, 'Сотрудник создан'));
+          if (shown) box.append(h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, shown),
+            h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(shown) }, 'Копировать'),
+            h('div', { class: 'small', style: 'margin-top:6px' }, 'Временный пароль: при первом входе сотрудник задаст свой'));
+          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Сотрудник может нажать «Забыли пароль?» при входе'));
+          out.replaceChildren(box);
+          f.email.value = f.first.value = f.last.value = manual.value = '';
+        } catch (err) { toast(err.message || 'Не удалось создать сотрудника', true); }
+        btn.disabled = false;
+      } }, 'Создать'), out));
+  }
+  if (can('users.read')) {
+    nodes.push(h('div', { class: 'section-label' }, 'Список'));
+    if (users.length) {
+      const group = h('div', { class: 'list-group' });
+      const canDelete = can('users.create') || can('users.delete') || can('users.manage') || can('users.update');
+      const closeAll = (ex) => group.querySelectorAll('.list-row.open').forEach(r => { if (r !== ex) r.classList.remove('open'); });
+      users.forEach(u => {
+        const isMe = u.id === state.me?.id;
+        const roleLabel = u.roleCode || u.role || u.roleName || '';
+        const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
+        const row = h('div', { class: 'list-row' });
+        const inner = h('div', { class: 'list-row-inner' },
+          h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
+          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, u.email || '')),
+          showRole && h('span', { class: 'badge neutral' }, roleLabel));
+        if (!isMe && canDelete) {
+          const actions = h('div', { class: 'list-row-actions' }, h('button', { class: 'act-delete', type: 'button', onclick: async (e) => {
+            e.stopPropagation();
+            if (!confirm(`Удалить «${personName(u)}»?`)) { row.classList.remove('open'); return; }
+            if (await deleteUser(u)) go('people'); else row.classList.remove('open');
+          } }, 'Удалить'));
+          row.append(actions, inner);
+          let startX = 0, currentX = 0, dragging = false;
+          inner.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentX = startX; dragging = true; closeAll(row); }, { passive: true });
+          inner.addEventListener('touchmove', (e) => { if (!dragging) return; currentX = e.touches[0].clientX; const dx = currentX - startX; if (dx < 0) { inner.style.transition = 'none'; inner.style.transform = `translateX(${Math.max(dx, -88)}px)`; } }, { passive: true });
+          inner.addEventListener('touchend', () => { if (!dragging) return; dragging = false; inner.style.transition = ''; if (currentX - startX < -40) { row.classList.add('open'); inner.style.transform = ''; } else { row.classList.remove('open'); inner.style.transform = ''; } });
+          inner.addEventListener('click', () => { if (row.classList.contains('open')) row.classList.remove('open'); });
+        } else row.append(inner);
+        group.append(row);
+      });
+      nodes.push(group);
+      if (!localStorage.getItem('hintSwipe')) {
+        nodes.push(h('div', { class: 'hint' }, 'Подсказка: смахните строку влево, чтобы удалить'));
+        localStorage.setItem('hintSwipe', '1');
+      }
+    } else nodes.push(emptyState('Список пуст'));
+  }
+  if (!nodes.length) nodes.push(emptyState('Недостаточно прав'));
+  setView(nodes);
+}
+async function changePassword(current, next) {
+  const variants = [{ currentPassword: current, newPassword: next }, { oldPassword: current, newPassword: next }, { password: current, newPassword: next }];
+  let last;
+  for (const body of variants) {
+    try { return await api('POST', '/auth/password/change', body); }
+    catch (e) { last = e; if (e.status === 400 && /should not exist|property/i.test(e.message || '')) continue; throw e; }
+  }
+  throw last;
 }
 async function renderProfile() {
-  const me = state.me || {};
-  setView(h('h1', {}, 'Профиль'), h('pre', { class: 'card' }, JSON.stringify(me, null, 2)));
+  const me = state.me;
+  const first = h('input', { type: 'text', value: me.firstName || '', placeholder: 'Имя' });
+  const last = h('input', { type: 'text', value: me.lastName || '', placeholder: 'Фамилия' });
+  const nick = h('input', { type: 'text', value: me.nickname || '', placeholder: 'Никнейм' });
+  const email = h('input', { type: 'email', value: me.email || '', placeholder: 'email@company.com' });
+  const cur = h('input', { type: 'password', autocomplete: 'current-password' });
+  const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
+  const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
+  const avatarBox = h('div', { class: 'avatar-lg' });
+  if (state.avatarDataUrl) { const img = document.createElement('img'); img.src = state.avatarDataUrl; avatarBox.append(img); }
+  else if (state.avatarEmoji) avatarBox.textContent = state.avatarEmoji;
+  else { avatarBox.textContent = initials(me); avatarBox.style.fontSize = '22px'; }
+  const fileInput = h('input', { type: 'file', accept: 'image/*', class: 'hidden' });
+  fileInput.onchange = () => {
+    const f = fileInput.files?.[0]; if (!f) return;
+    if (f.size > 2 * 1024 * 1024) return toast('До 2 МБ', true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.avatarDataUrl = String(reader.result); state.avatarEmoji = '';
+      localStorage.setItem('avatarDataUrl', state.avatarDataUrl); localStorage.removeItem('avatarEmoji');
+      updateSideUser(); go('me');
+    };
+    reader.readAsDataURL(f);
+  };
+  let emojiOpen = false;
+  const emojiPanel = h('div', { class: 'hidden' });
+  const emojiBtn = h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => { emojiOpen = !emojiOpen; emojiPanel.classList.toggle('hidden', !emojiOpen); } }, 'Выбрать эмодзи');
+  const grid = h('div', { class: 'emoji-grid' });
+  EMOJIS.forEach(em => grid.append(h('button', { type: 'button', class: state.avatarEmoji === em ? 'on' : '', onclick: () => {
+    state.avatarEmoji = em; state.avatarDataUrl = '';
+    localStorage.setItem('avatarEmoji', em); localStorage.removeItem('avatarDataUrl');
+    updateSideUser(); go('me');
+  } }, em)));
+  emojiPanel.append(grid);
+  setView(
+    me.requirePasswordChange && h('div', { class: 'alert alert-info' }, 'Нужно сменить пароль.'),
+    h('div', { class: 'card' },
+      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, me.email), me.nickname && h('div', { class: 'small' }, '@' + me.nickname))),
+      h('div', { class: 'gap', style: 'margin-top:14px' },
+        h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: () => fileInput.click() }, 'Фото'),
+        emojiBtn,
+        (state.avatarDataUrl || state.avatarEmoji) && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => {
+          state.avatarDataUrl = ''; state.avatarEmoji = '';
+          localStorage.removeItem('avatarDataUrl'); localStorage.removeItem('avatarEmoji');
+          updateSideUser(); go('me');
+        } }, 'Сбросить')
+      ), fileInput, emojiPanel
+    ),
+    h('h2', {}, 'Данные'),
+    h('div', { class: 'card' },
+      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм'), nick, h('label', {}, 'Email'), email,
+      h('button', { class: 'btn btn-primary', onclick: async (e) => {
+        const body = { firstName: first.value.trim(), lastName: last.value.trim() };
+        if (nick.value.trim()) body.nickname = nick.value.trim();
+        if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
+        e.target.disabled = true;
+        try {
+          try { await api('PATCH', `/users/${me.id}`, body); toast('Профиль обновлён'); }
+          catch (err) {
+            const msg = String(err.message || '');
+            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) {
+              Object.assign(state.me, body);
+              localStorage.setItem('profileLocal', JSON.stringify({ firstName: state.me.firstName, lastName: state.me.lastName, nickname: state.me.nickname || '' }));
+              toast('Сохранено локально (сервер пока без API)', true);
+            } else throw err;
+          }
+          try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; } catch { Object.assign(state.me, body); }
+          updateSideUser(); go('me');
+        } catch (err) { toast(err.message || 'Ошибка', true); e.target.disabled = false; }
+      } }, 'Сохранить профиль')
+    ),
+    h('h2', {}, 'Пароль'),
+    h('div', { class: 'card' },
+      h('label', { style: 'margin-top:0' }, 'Текущий'), cur, h('label', {}, 'Новый'), n1, h('label', {}, 'Повтор'), n2,
+      h('button', { class: 'btn btn-primary', onclick: async (e) => {
+        if (!cur.value || !n1.value) return toast('Заполните поля', true);
+        if (n1.value !== n2.value) return toast('Пароли не совпадают', true);
+        e.target.disabled = true;
+        try {
+          await changePassword(cur.value, n1.value); toast('Пароль изменён');
+          try { state.me = await api('GET', '/auth/me'); go('me'); } catch { toLogin('Войдите с новым паролем'); }
+        } catch (err) { toast(err.message, true); e.target.disabled = false; }
+      } }, 'Сменить пароль')
+    ),
+    h('div', { class: 'divider' }),
+    h('button', { class: 'btn btn-secondary', onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); } }, 'Выйти')
+  );
 }
-async function renderSettings() {
-  setView(h('h1', {}, 'Кабинет'), h('button', { class: 'btn btn-secondary', onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); } }, 'Выйти'));
+function renderSettings() {
+  const me = state.me;
+  const accents = [
+    { id: 'blue', color: '#2AABEE' }, { id: 'violet', color: '#8b5cf6' }, { id: 'teal', color: '#14b8a6' },
+    { id: 'orange', color: '#f97316' }, { id: 'pink', color: '#ec4899' }, { id: 'green', color: '#22c55e' },
+  ];
+  setView(
+    h('div', { class: 'card click', onclick: () => go('me') },
+      h('div', { class: 'row' },
+        h('div', { style: 'display:flex;gap:12px;align-items:center;min-width:0' },
+          h('div', { class: 'avatar-lg', style: 'width:48px;height:48px;font-size:16px' },
+            state.avatarEmoji || initials(me)
+          ),
+          h('div', { style: 'min-width:0' },
+            h('strong', { style: 'font-size:16px' }, personName(me) || 'Профиль'),
+            h('div', { class: 'muted' }, me?.email || ''),
+            h('div', { class: 'small' }, 'Открыть профиль')
+          )
+        ),
+        h('span', { class: 'muted' }, '›')
+      )
+    ),
+    h('div', { class: 'card click', style: 'margin-top:12px', onclick: () => go('layout') },
+      h('div', { class: 'row' },
+        h('div', { style: 'display:flex;gap:12px;align-items:center' },
+          h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+          h('div', {}, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль'))),
+        h('span', { class: 'muted' }, '›'))),
+    h('h2', {}, 'Оформление'),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Тема'),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'light'; applyAppearance(); go('settings'); } }, 'Светлая'),
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'dark'; applyAppearance(); go('settings'); } }, 'Тёмная')
+      )
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Цвет'),
+      h('div', { class: 'swatches' },
+        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: () => { state.accent = a.id; applyAppearance(); go('settings'); } }))
+      )
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Контраст'),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'normal'; applyAppearance(); go('settings'); } }, 'Обычный'),
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'high'; applyAppearance(); go('settings'); } }, 'Высокий')
+      )
+    ),
+    h('button', {
+      class: 'btn btn-secondary', style: 'margin-top:20px',
+      onclick: async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); },
+    }, 'Выйти из аккаунта')
+  );
 }
+
 async function renderSearch() {
-  setView(h('h1', {}, 'Поиск'), h('input', { type: 'search', placeholder: 'Найти...' }));
+  const sticky = h('div', { class: 'search-sticky pulse' });
+  const inputWrap = h('div', { style: 'position:relative' });
+  const input = h('input', {
+    type: 'search',
+    placeholder: 'Найти задачи, шаблоны, людей…',
+    value: state.searchQuery || '',
+  });
+  const clearBtn = h('button', {
+    class: 'topbar-btn', type: 'button',
+    style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
+    onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); },
+  });
+  clearBtn.innerHTML = icons.back ? icons.back.replace('M15 18l-6-6 6-6', 'M18 6L6 18M6 6l12 12') : '×';
+  // X icon
+  clearBtn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>`;
+  inputWrap.append(input, clearBtn);
+  sticky.append(inputWrap);
+  const resultsBox = h('div', { id: 'search-results' });
+  setView(sticky, resultsBox);
+  input.focus();
+  setTimeout(() => sticky.classList.remove('pulse'), 700);
+
+  const setResults = (...nodes) => {
+    resultsBox.replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
+  };
+  const runSearch = async () => {
+    state.searchQuery = input.value;
+    const query = input.value.trim().toLowerCase();
+    if (!query) { setResults(emptyState('Поиск', 'Введите запрос')); return; }
+    setResults(h('div', { class: 'skeleton', style: 'height:64px' }));
+    const results = [];
+    try {
+      const runs = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
+      runs.filter(r => ((r.title || r.template?.title || r.templateTitle || '') + personName(r.assignee)).toLowerCase().includes(query))
+        .forEach(r => results.push({ type: 'run', data: r }));
+    } catch {}
+    try {
+      let templates = [];
+      try { templates = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
+      catch (e) { if (e.status === 400) templates = arr(await api('GET', '/checklists/templates')); }
+      templates.filter(t => ((t.title || '') + ' ' + (t.description || '')).toLowerCase().includes(query))
+        .forEach(t => results.push({ type: 'tpl', data: t }));
+    } catch {}
+    if (can('users.read')) {
+      try {
+        const users = arr(await api('GET', '/users'));
+        users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query))
+          .forEach(u => results.push({ type: 'user', data: u }));
+      } catch {}
+    }
+    if (!results.length) { setResults(emptyState('Ничего не найдено')); return; }
+    const nodes = [];
+    const runs = results.filter(r => r.type === 'run');
+    const tpls = results.filter(r => r.type === 'tpl');
+    const users = results.filter(r => r.type === 'user');
+    if (runs.length) {
+      nodes.push(h('div', { class: 'section-label' }, 'Задачи'));
+      runs.forEach(({ data: r }) => nodes.push(runCard(r, true)));
+    }
+    if (tpls.length) {
+      nodes.push(h('div', { class: 'section-label' }, 'Шаблоны'));
+      tpls.forEach(({ data: t }) => {
+        const cnt = t.items?.length ?? t._count?.items;
+        nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) },
+          h('strong', {}, t.title),
+          t.description && h('div', { class: 'muted' }, t.description),
+          cnt != null && h('div', { class: 'small', style: 'margin-top:6px' }, pluralPunkty(cnt))
+        ));
+      });
+    }
+    if (users.length) {
+      nodes.push(h('div', { class: 'section-label' }, 'Команда'));
+      users.forEach(({ data: u }) => {
+        nodes.push(h('div', { class: 'card' },
+          h('div', { class: 'row' },
+            h('div', { style: 'display:flex;gap:12px;align-items:center' },
+              h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
+              h('div', {},
+                h('strong', {}, personName(u)),
+                h('div', { class: 'muted' }, u.email || '')
+              )
+            )
+          )
+        ));
+      });
+    }
+    setResults(...nodes);
+  };
+  let debounce;
+  input.addEventListener('input', () => {
+    clearTimeout(debounce);
+    sticky.classList.add('pulse');
+    setTimeout(() => sticky.classList.remove('pulse'), 500);
+    debounce = setTimeout(runSearch, 280);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); }
+  });
+  await runSearch();
 }
+
+function renderStub(title, description, iconHtml) {
+  setView(h('div', { class: 'empty', style: 'padding-top:56px' }, h('div', { class: 'stub-icon', html: iconHtml }), h('div', { class: 'empty-title' }, title), h('div', { class: 'empty-desc' }, description), h('p', { class: 'small', style: 'margin-top:18px' }, 'Раздел подготовлен')));
+}
+function renderAuditStub() { renderStub('Журнал аудита', 'История действий', icons.audit); }
+function renderNotificationsStub() {
+  setView(
+    h('div', { class: 'empty', style: 'padding-top:40px' },
+      h('div', { class: 'stub-icon', html: icons.msg }),
+      h('div', { class: 'empty-title' }, 'Сообщения'),
+      h('div', { class: 'empty-desc' }, 'Здесь будут уведомления и комментарии к выполненным чеклистам')
+    ),
+    h('div', { class: 'card' },
+      h('strong', {}, 'Комментарии'),
+      h('div', { class: 'muted', style: 'margin-top:8px;font-size:14px' },
+        'После сдачи чеклиста можно оставить комментарий для руководителя. Лента сообщений появится, когда на сервере будет API уведомлений.')
+    )
+  );
+}
+(async () => { try { await afterLogin(); } catch { toLogin(); } })();
 </script>
 </body>
 </html>
