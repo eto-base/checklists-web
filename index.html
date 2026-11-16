@@ -1344,7 +1344,23 @@ function h(tag, props, ...kids) {
   return e;
 }
 const arr = (d) => Array.isArray(d) ? d : (d && (d.items || d.data || d.runs || d.templates || d.users)) || [];
-const can = (p) => !!state.me?.permissions?.includes(p);
+// Права владельца не должны зависеть от неполного массива permissions,
+ // который может вернуть сервер после сбоя/миграции.
+const can = (p) => {
+  const role = String(
+    state.me?.roleCode ||
+    state.me?.role?.code ||
+    state.me?.role?.name ||
+    state.me?.role ||
+    state.me?.roleName ||
+    state.me?.roles?.[0]?.code ||
+    state.me?.roles?.[0]?.name ||
+    ''
+  ).toUpperCase();
+  if (role === 'OWNER') return true;
+  return Array.isArray(state.me?.permissions) &&
+    state.me.permissions.includes(p);
+};
 const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
 const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
 const statusName = (s) => STATUS[s] || s || '';
@@ -3138,6 +3154,7 @@ function renderNotificationsStub() {
     )
   );
 }
+Can’t find variable: renderTemplates
 (async () => { try { await afterLogin(); } catch { toLogin(); } })();
 </script>
 </body>
