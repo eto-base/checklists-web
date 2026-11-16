@@ -398,11 +398,22 @@ function renderNav() {
   const nav = $('bottom-nav');
   nav.innerHTML = '';
   
-  const b1 = h('button', { class: currentTab === 'all' ? 'active' : '', onclick: () => go('all') }, icons.all);
-  const b2 = h('button', { class: currentTab === 'settings' ? 'active' : '', onclick: () => go('settings') }, icons.settings);
+  // Создаём кнопки
+  const b1 = document.createElement('button');
+  b1.className = currentTab === 'all' ? 'active' : '';
+  b1.innerHTML = icons.all;
+  b1.onclick = () => go('all');
+  
+  const b2 = document.createElement('button');
+  b2.className = currentTab === 'settings' ? 'active' : '';
+  b2.innerHTML = icons.settings;
+  b2.onclick = () => go('settings');
   
   // Вставляем элементы воды
-  const water = h('div', { class: 'water-goo' }, h('div', { class: 'water-body' }), h('div', { class: 'water-drop' }));
+  const water = document.createElement('div');
+  water.className = 'water-goo';
+  water.innerHTML = '<div class="water-body"></div><div class="water-drop"></div>';
+  
   nav.append(water, b1, b2);
 }
 
