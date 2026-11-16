@@ -1145,6 +1145,32 @@
   #register-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); }
   .code-chip { font: 600 17px ui-monospace, Menlo, monospace; letter-spacing: .04em; user-select: all; }
   @media (prefers-reduced-motion: reduce) { #view > *, .menu-pop, .skeleton { animation: none !important; } * { transition-duration: .01s !important; } }
+
+  /* ===== Liquid Glass: texture, rim light, iridescence ===== */
+  @keyframes lgSheen { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: .05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .card, .menu-pop, .bottom-nav, .folders-track, .lq-sheet, .toast {
+    background-image: linear-gradient(135deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,.07) 100%), radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.07), inset 1px 0 0 rgba(255,255,255,.12), 0 10px 30px rgba(0,0,0,.14);
+  }
+  .btn-primary, .chip.active, .folder-blob {
+    background-image: linear-gradient(115deg, rgba(255,255,255,.34), rgba(255,255,255,0) 35%, rgba(120,220,255,.25) 60%, rgba(255,160,230,.18) 80%, rgba(255,255,255,.28));
+    background-size: 260% 260%; animation: lgSheen 9s ease-in-out infinite;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -2px 6px rgba(255,255,255,.12), 0 8px 24px var(--accent-glow);
+  }
+  .btn-secondary, .chip:not(.active), .choice-opt:not(.on) {
+    background-image: linear-gradient(160deg, rgba(255,255,255,.26), rgba(255,255,255,0) 55%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(255,255,255,.06);
+  }
+  .bottom-nav button { position: relative; }
+  .unread-dot { position: absolute; top: 5px; right: 8px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #ef4444; color: #fff; font: 700 10px/17px system-ui, sans-serif; text-align: center; box-shadow: 0 0 0 2px rgba(0,0,0,.25); animation: lgPop .5s var(--gel) both; }
+  .dialog { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px 2px 10px; }
+  .bubble { max-width: 82%; padding: 8px 12px; border-radius: 18px; font-size: 15px; word-break: break-word; animation: lgPop .45s var(--gel) both; }
+  .bubble .small { margin-top: 2px; opacity: .65; font-size: 11px; }
+  .bubble.me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+  .bubble.them { align-self: flex-start; background: var(--surface-2); border-bottom-left-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) { .btn-primary, .chip.active, .folder-blob { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -1392,7 +1418,7 @@ async function afterLogin() {
     if (local && state.me) {
       if (local.firstName) state.me.firstName = local.firstName;
       if (local.lastName) state.me.lastName = local.lastName;
-      if (local.nickname) state.me.nickname = local.nickname;
+      if (local.nickname && !state.me.nickname) state.me.nickname = local.nickname;
     }
   } catch {}
   state.workspaces = arr(await api('GET', '/workspaces'));
@@ -1424,7 +1450,7 @@ $('login-btn').onclick = async () => {
   if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
   $('login-btn').disabled = true;
   try {
-    const nick = id.replace(/^@/, ''); const payload = (id.includes('@') && !id.startsWith('@')) ? { email: id, password } : { email: nick, password, nickname: nick };
+    const nick = id.replace(/^@/, ''); const payload = (id.includes('@') && !id.startsWith('@')) ? { email: id, password } : { nickname: nick, password };
     const data = await api('POST', '/auth/login', payload);
     if (data.twoFactorRequired) {
       showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
@@ -1677,6 +1703,22 @@ function setTopMore(items) {
   };
   slot.append(btn);
 }
+let _unreadAt = 0;
+async function refreshUnread(force) {
+  if (!state.me || (!force && Date.now() - _unreadAt < 10000)) return;
+  _unreadAt = Date.now();
+  let n = null;
+  try { const r = await api('GET', '/messages/unread-count'); n = typeof r === 'number' ? r : (r?.count ?? r?.unread ?? null); } catch {}
+  if (n == null) { try { n = arr(await api('GET', '/notifications?limit=100')).filter(x => !(x.readAt || x.read || x.isRead)).length; } catch {} }
+  state.unread = n || 0; paintUnread();
+}
+function paintUnread() {
+  const b = document.querySelector('#bottom-nav button[data-tab="notifications"]'); if (!b) return;
+  let d = b.querySelector('.unread-dot');
+  if ((state.unread || 0) > 0) { if (!d) { d = document.createElement('span'); d.className = 'unread-dot'; b.append(d); } d.textContent = state.unread > 9 ? '9+' : state.unread; }
+  else if (d) d.remove();
+}
+setInterval(() => { if (state.me) refreshUnread(true); }, 30000);
 function renderCur() {
   const d = state.cur, tab = d.tab;
   const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout, codes:renderCodes };
@@ -1686,7 +1728,7 @@ function renderCur() {
   updateBack();
   $('topbar-title').textContent = d.sub ? '' : (TITLES[tab] || 'Чеклисты');
   const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && !d.sub && can('users.create')));
-  renderBottomNav(); renderFolders();
+  renderBottomNav(); renderFolders(); paintUnread(); refreshUnread();
   try { window.scrollTo(0, 0); } catch {}
   show(d.render || screens[tab] || renderMine);
 }
@@ -2489,8 +2531,9 @@ async function copyText(t) {
   try { document.execCommand('copy'); toast('Скопировано'); } catch { toast('Выделите пароль и скопируйте вручную', true); } ta.remove();
 }
 
-const ROLE_RU = { ADMIN: 'Администратор', MANAGER: 'Руководитель', MEMBER: 'Исполнитель', VIEWER: 'Наблюдатель' };
-const userRoleCode = (u) => { const r = u.roleCode || u.role?.code || u.role?.name || u.role || u.roleName || ''; return typeof r === 'string' ? r : ''; };
+const ROLE_RU = { OWNER: 'Владелец', ADMIN: 'Администратор', MANAGER: 'Менеджер', MEMBER: 'Сотрудник', VIEWER: 'Наблюдатель' };
+const RANK = { OWNER: 4, ADMIN: 3, MANAGER: 2, MEMBER: 1, VIEWER: 0 };
+const userRoleCode = (u) => { const r = u.roleCode || u.role?.code || u.role?.name || u.role || u.roleName || u.roles?.[0]?.code || u.roles?.[0]?.name || ''; return typeof r === 'string' ? r : ''; };
 const roleRu = (c) => ROLE_RU[String(c || '').toUpperCase()] || c || '';
 async function updateUserRole(u, code) {
   const tries = [
@@ -2532,7 +2575,13 @@ async function openUser(id) {
   const u = users.find(x => x.id === id);
   if (!u) { setView(emptyState('Сотрудник не найден')); return; }
   const isMe = u.id === state.me?.id;
-  const canRole = !isMe && (can('users.update') || can('users.manage') || can('users.create'));
+  const myRole = userRoleCode(state.me || {}).toUpperCase();
+  const outranks = !myRole || myRole === 'OWNER' || (RANK[myRole] ?? 0) > (RANK[userRoleCode(u).toUpperCase()] ?? 0);
+  const assignable = (c) => c !== 'OWNER' && (!myRole || myRole === 'OWNER' || (RANK[c] ?? 0) < (RANK[myRole] ?? 0));
+  const canRole = !isMe && outranks && (can('users.update') || can('users.manage') || can('users.create'));
+  const canAcc = !isMe && outranks && (can('users.manage') || can('users.update'));
+  const blocked = u.isActive === false || u.blocked === true || u.disabled === true || /BLOCK|DISABLED/i.test(String(u.status || ''));
+  const tempBox = h('div');
   const canDel = !isMe && (can('users.delete') || can('users.manage') || can('users.update') || can('users.create'));
   const canAssign = can('checklists.assign');
   const role = userRoleCode(u).toUpperCase();
@@ -2545,12 +2594,30 @@ async function openUser(id) {
     h('span', { class: 'lay-t' }, t),
     h('button', { class: 'lay-sw' + (perms.has(k) ? ' on' : ''), type: 'button', onclick: () => { if (perms.has(k)) perms.delete(k); else perms.add(k); drawPerms(); } }, h('i')))));
   drawPerms();
-  const msgField = h('textarea', { rows: 3, placeholder: 'Сообщение сотруднику…' });
+  const msgField = h('textarea', { rows: 2, placeholder: 'Сообщение сотруднику…' });
+  const thread = h('div', { class: 'dialog' });
+  let msgs = [];
+  const drawThread = () => {
+    thread.replaceChildren(...(msgs.length ? msgs.map(m => h('div', { class: 'bubble ' + (((m.senderId || m.fromId || m.sender?.id) === state.me.id) ? 'me' : 'them') },
+      h('div', {}, m.text || m.body || m.message || ''), h('div', { class: 'small' }, m.createdAt ? fmt(m.createdAt) : ''))) : [h('div', { class: 'muted' }, 'Сообщений пока нет')]));
+    thread.scrollTop = thread.scrollHeight;
+  };
+  const loadThread = async () => {
+    try {
+      const r = await tryApi([['GET', `/messages?withUserId=${u.id}`], ['GET', `/messages/dialogs/${u.id}`], ['GET', `/messages/with/${u.id}`]]);
+      msgs = (Array.isArray(r) ? r : (r?.messages || arr(r))).slice().sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      drawThread();
+    } catch { if (!msgs.length) thread.replaceChildren(h('div', { class: 'small' }, 'История переписки пока недоступна на сервере')); }
+  };
+  if (!isMe) {
+    await loadThread();
+    const timer = setInterval(() => { if (state.cur?.userId !== id) clearInterval(timer); else loadThread(); }, 8000);
+  }
 
   // полномочия
   let newRole = ROLE_RU[role] ? role : '';
   const roleBox = h('div', { class: 'stack', style: 'margin-top:8px' });
-  const drawRoles = () => roleBox.replaceChildren(...Object.entries(ROLE_RU).map(([c, t]) => h('div', {
+  const drawRoles = () => roleBox.replaceChildren(...Object.entries(ROLE_RU).filter(([c]) => assignable(c)).map(([c, t]) => h('div', {
     class: 'choice-opt' + (newRole === c ? ' on' : ''),
     onclick: () => { newRole = c; drawRoles(); },
   }, (newRole === c ? '✓ ' : '') + t)));
@@ -2585,6 +2652,7 @@ async function openUser(id) {
         h('strong', { style: 'font-size:17px' }, personName(u) || 'Без имени'),
         u.email && h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis' }, u.email),
         u.nickname && h('div', { class: 'small' }, '@' + u.nickname)),
+      blocked && h('span', { class: 'badge bad' }, 'Заблокирован'),
       role && h('span', { class: 'badge neutral' }, roleRu(role)))),
 
     canAssign && h('h2', {}, 'Назначить чеклист'),
@@ -2634,13 +2702,43 @@ async function openUser(id) {
         catch (err) { toast(err.status === 403 ? 'Недостаточно прав' : (err.status === 404 || err.status === 405) ? 'Управление правами пока недоступно на сервере' : (err.message || 'Ошибка'), true); btn.disabled = false; }
       } }, 'Сохранить права')),
 
+    canAcc && h('h2', {}, 'Аккаунт'),
+    canAcc && h('div', { class: 'card' },
+      h('div', { class: 'muted' }, blocked ? 'Аккаунт заблокирован: войти нельзя.' : 'Аккаунт активен.'),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-sm ' + (blocked ? 'btn-primary' : 'btn-danger'), type: 'button', onclick: async (e) => {
+          if (!blocked && !confirm(`Заблокировать «${personName(u)}»? Он не сможет войти.`)) return;
+          const btn = e.currentTarget; btn.disabled = true;
+          try {
+            await tryApi([['PATCH', `/users/${u.id}`, { isActive: blocked }], ['POST', `/users/${u.id}/${blocked ? 'unblock' : 'block'}`, {}]]);
+            const fresh = (await loadUsers()).find(x => x.id === u.id);
+            const nowBlocked = fresh && (fresh.isActive === false || fresh.blocked === true || fresh.disabled === true || /BLOCK|DISABLED/i.test(String(fresh.status || '')));
+            if (fresh && nowBlocked === blocked) { toast('Сервер принял запрос, но статус не изменился', true); btn.disabled = false; }
+            else { toast(blocked ? 'Аккаунт разблокирован' : 'Аккаунт заблокирован'); show(() => openUser(id)); }
+          } catch (err) { toast(err.status === 404 || err.status === 405 ? 'Блокировка пока недоступна на сервере' : (err.message || 'Ошибка'), true); btn.disabled = false; }
+        } }, blocked ? 'Разблокировать' : 'Заблокировать'),
+        h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: async (e) => {
+          if (!confirm(`Сбросить пароль «${personName(u)}»? Старый пароль перестанет работать.`)) return;
+          const btn = e.currentTarget; btn.disabled = true;
+          try {
+            const r = await tryApi([['POST', `/users/${u.id}/reset-password`, {}], ['POST', `/users/${u.id}/password/reset`, {}], ['POST', '/auth/password/admin-reset', { userId: u.id }]]);
+            const pw = r?.temporaryPassword || r?.tempPassword || r?.password || r?.data?.temporaryPassword;
+            tempBox.replaceChildren(h('div', { class: 'alert alert-success', style: 'margin-top:12px' },
+              h('div', {}, pw ? 'Временный пароль (при входе сотрудник задаст свой):' : 'Сброс запущен. Сотрудник получит ссылку для нового пароля.'),
+              pw && h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, pw),
+              pw && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(pw) }, 'Копировать')));
+          } catch (err) { toast(err.status === 404 || err.status === 405 ? 'Сброс пароля пока недоступен на сервере' : (err.message || 'Ошибка'), true); }
+          btn.disabled = false;
+        } }, 'Сбросить пароль')),
+      tempBox),
+
     !isMe && h('h2', {}, 'Написать сотруднику'),
-    !isMe && h('div', { class: 'card' }, msgField,
+    !isMe && h('div', { class: 'card' }, thread, msgField,
       h('div', { class: 'gap', style: 'margin-top:12px' },
         h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: async (e) => {
           const text = msgField.value.trim(); if (!text) return toast('Введите текст сообщения', true);
           const btn = e.currentTarget; btn.disabled = true;
-          try { await sendMessage(u, text); msgField.value = ''; toast('Сообщение отправлено'); }
+          try { await sendMessage(u, text); msgField.value = ''; msgs.push({ id: 'tmp' + Date.now(), senderId: state.me.id, text, createdAt: new Date().toISOString() }); drawThread(); loadThread(); }
           catch (err) { toast(err.status === 404 || err.status === 405 ? 'Сообщения пока недоступны на сервере' : (err.message || 'Не удалось отправить'), true); }
           btn.disabled = false;
         } }, 'Отправить'),
