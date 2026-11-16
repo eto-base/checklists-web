@@ -1116,6 +1116,52 @@
   .sort-dir { width: 34px; padding: 0; display: flex; align-items: center; justify-content: center; }
   .sort-dir svg { width: 16px; height: 16px; }
   input[type="datetime-local"] { width: auto; min-width: 200px; max-width: 100%; height: 40px; min-height: 40px; padding: 6px 14px; font-size: 14px; border-radius: 999px; display: block; }
+
+  /* ===== v6: water pill — вода, капли, реакция на тему ===== */
+  :root {
+    --w1: color-mix(in srgb, var(--accent) 34%, #ffffff);
+    --w2: color-mix(in srgb, var(--accent) 74%, #ffffff);
+    --w-op: .66; --w-hi: rgba(255,255,255,.95);
+  }
+  [data-theme="dark"] {
+    --w1: color-mix(in srgb, var(--accent) 52%, #0d131b);
+    --w2: color-mix(in srgb, var(--accent) 88%, #0d131b);
+    --w-op: .58; --w-hi: rgba(255,255,255,.6);
+  }
+  [data-contrast="high"] { --w-op: .92; }
+  .bottom-nav, .folders-track { position: relative; }
+  .nav-blob, .folder-blob { display: none !important; }
+  .water-goo { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: url(#goo); opacity: var(--w-op); transition: opacity .5s ease; }
+  .water-shine { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity .5s ease; }
+  .water-body, .water-drop, .ws-pill, .ws-spark { position: absolute; left: 0; top: 0; pointer-events: none; }
+  .water-body {
+    border-radius: 999px; will-change: transform, width;
+    background-image:
+      radial-gradient(42% 75% at 24% 28%, rgba(255,255,255,.5), transparent 72%),
+      radial-gradient(36% 62% at 76% 72%, rgba(255,255,255,.26), transparent 72%),
+      linear-gradient(165deg, var(--w2), var(--w1));
+    background-size: 220% 100%, 220% 100%, 100% 100%;
+    background-repeat: no-repeat;
+    animation: waterCaustic 6s ease-in-out infinite alternate;
+    transition: filter .5s ease;
+  }
+  .water-drop { width: 16px; height: 16px; border-radius: 50%; transform: translate(0,0) scale(0); background: linear-gradient(165deg, var(--w2), var(--w1)); will-change: transform; }
+  @keyframes waterCaustic { from { background-position: 0% 0, 100% 0, 0 0; } to { background-position: 100% 0, 0% 0, 0 0; } }
+  .ws-pill { border-radius: 999px; will-change: transform, width; box-shadow: inset 0 -5px 10px -4px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--w-hi) 45%, transparent); }
+  .ws-arc { position: absolute; left: 14%; right: 14%; top: 7%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, var(--w-hi), rgba(255,255,255,0)); opacity: .62; animation: wsPulse 4.2s ease-in-out infinite alternate; }
+  .ws-dot { position: absolute; left: 17%; top: 17%; width: 9px; height: 6px; border-radius: 50%; background: var(--w-hi); transform: rotate(-24deg); box-shadow: 0 0 6px var(--w-hi); }
+  .ws-dot2 { position: absolute; left: calc(17% + 12px); top: calc(17% + 5px); width: 3px; height: 3px; border-radius: 50%; background: var(--w-hi); opacity: .8; }
+  .ws-spark { width: 4px; height: 4px; border-radius: 50%; background: var(--w-hi); opacity: 0; box-shadow: 0 0 5px var(--w-hi); }
+  @keyframes wsPulse { from { opacity: .5; } to { opacity: .8; } }
+  [data-theme="dark"] .ws-arc { opacity: .42; }
+  .bottom-nav button, .folder { z-index: 1; }
+  .bottom-nav button.active, .folder.active { color: var(--text); transition: color .35s ease; }
+  .theme-ring { position: fixed; z-index: 200; width: 40px; height: 40px; border-radius: 50%; pointer-events: none; transform: translate(-50%,-50%) scale(0);
+    border: 1px solid var(--accent); box-shadow: inset 0 0 10px var(--accent-glow), 0 0 12px var(--accent-glow); }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  ::view-transition-new(root) { z-index: 2; }
+  ::view-transition-old(root) { z-index: 1; }
+  @media (prefers-reduced-motion: reduce) { .water-body, .ws-arc { animation: none; } }
 </style>
 </head>
 <body>
@@ -1125,12 +1171,12 @@
       <div class="login-logo">✓</div>
       <h1>Чеклисты</h1>
       <p class="subtitle">Войдите в аккаунт</p>
-      <label for="login-id">Email или никнейм</label>
-      <input type="text" id="login-id" placeholder="you@example.com или nickname" autocomplete="username">
+      <label for="login-id">Никнейм</label>
+      <input type="text" id="login-id" placeholder="nickname" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
       <label for="password">Пароль</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       <button class="btn btn-primary" id="login-btn">Войти</button>
-      <button class="btn btn-ghost" id="forgot-btn" style="width:100%;margin-top:12px;justify-content:center">Забыли пароль?</button>
+      <p class="small" style="margin-top:14px;text-align:center">Забыли пароль? Попросите администратора выдать новый.</p>
       <div id="login-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
@@ -1146,18 +1192,6 @@
       <div id="tfa-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
-  <div id="forgot-screen" class="hidden">
-    <div class="login-card">
-      <div class="login-logo">✉</div>
-      <h1>Восстановление</h1>
-      <p class="subtitle">Укажите email</p>
-      <label for="forgot-email">Email</label>
-      <input type="email" id="forgot-email" placeholder="you@example.com">
-      <button class="btn btn-primary" id="forgot-submit">Отправить</button>
-      <button class="btn btn-ghost" id="forgot-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
-      <div id="forgot-msg" class="hidden" style="margin-top:16px"></div>
-    </div>
-  </div>
   <div id="app-screen" class="hidden">
     <header class="topbar">
       <button class="topbar-btn" id="menu-btn" aria-label="Меню">
@@ -1166,7 +1200,6 @@
       <div class="topbar-title" id="topbar-title">Чеклисты</div>
       <div class="topbar-actions" id="topbar-actions">
         <select id="ws-select" class="ws-select hidden"></select>
-        <button class="topbar-btn muted" id="layout-btn" aria-label="Настроить панели"></button>
         <button class="topbar-btn muted" id="search-btn" aria-label="Поиск">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
         </button>
@@ -1183,7 +1216,6 @@
         <div class="side-profile-text">
           <div class="side-profile-name" id="side-name">—</div>
           <div class="side-profile-sub" id="side-role">Профиль</div>
-          <div class="side-profile-mail" id="side-email">—</div>
         </div>
       </div>
       <nav class="sidemenu-nav" id="sidemenu-nav"></nav>
@@ -1199,23 +1231,40 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <filter id="goo" x="-20%" y="-70%" width="140%" height="240%" color-interpolation-filters="sRGB">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="b"/>
+    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="g"/>
+    <feComposite in="SourceGraphic" in2="g" operator="atop"/>
+  </filter>
+</defs></svg>
 <script type="module">
 const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
-const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
+const onApiHost = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port === '3000';
+const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : (onApiHost ? '' : 'http://localhost:3000');
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 const $ = (id) => document.getElementById(id);
 let csrfToken = null;
+const DEFAULT_LAYOUT = () => ({ top: ['all','tpl','people'], dock: ['all','settings'] });
+function normLayout(l) {
+  const fix = (a) => [...new Set(a.map(k => k === 'mine' ? 'all' : k))];
+  return { top: fix(l.top).filter(k => k !== 'settings'), dock: fix(l.dock) };
+}
+function loadLayout() {
+  try { const l = JSON.parse(localStorage.getItem('layout') || 'null'); if (l && Array.isArray(l.top) && Array.isArray(l.dock)) return normLayout(l); } catch {}
+  return DEFAULT_LAYOUT();
+}
 const state = {
   me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null,
-  tab: 'mine', filter: '', searchQuery: '', searchPrevTab: 'mine',
+  tab: 'all', filter: '', searchQuery: '', searchPrevTab: 'all',
   theme: localStorage.getItem('theme') || 'light',
   accent: localStorage.getItem('accent') || 'blue',
   contrast: localStorage.getItem('contrast') || 'normal',
   avatarEmoji: localStorage.getItem('avatarEmoji') || '',
   avatarDataUrl: localStorage.getItem('avatarDataUrl') || '',
   favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
-  layout: (() => { try { const l = JSON.parse(localStorage.getItem('layout') || 'null'); if (l && Array.isArray(l.top) && Array.isArray(l.dock)) return l; } catch {} return { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; })(),
+  layout: loadLayout(),
 };
 const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
 const S = (d) => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
@@ -1239,8 +1288,7 @@ const icons = {
   down: S('<path d="M6 10l6 6 6-6"/>'),
 };
 const SECTIONS = {
-  mine: { t: 'Мои задачи', s: 'Мои', i: 'list', ok: () => true },
-  all: { t: 'Все задачи', s: 'Все', i: 'all', ok: () => can('checklists.runs.read_all') },
+  all: { t: 'Чеклисты', s: 'Все', i: 'all', ok: () => true },
   tpl: { t: 'Шаблоны', s: 'Шаблоны', i: 'template', ok: () => can('checklists.templates.read') },
   people: { t: 'Команда', s: 'Команда', i: 'people', ok: () => can('users.create') || can('users.read') },
   fav: { t: 'Избранное', s: 'Избранное', i: 'star', ok: () => can('checklists.templates.read') },
@@ -1248,7 +1296,7 @@ const SECTIONS = {
   audit: { t: 'Журнал аудита', s: 'Журнал', i: 'audit', ok: () => true },
   settings: { t: 'Кабинет', s: 'Кабинет', i: 'settings', ok: () => true },
 };
-const rootSet = () => [...new Set(['mine', ...state.layout.top, ...state.layout.dock])].filter(k => k !== 'settings');
+const rootSet = () => [...new Set(['all', ...state.layout.top, ...state.layout.dock])].filter(k => k !== 'settings');
 function pluralPunkty(n) {
   const x = Math.abs(Number(n)) || 0;
   const n10 = x % 10, n100 = x % 100;
@@ -1276,7 +1324,9 @@ const can = (p) => !!state.me?.permissions?.includes(p);
 const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
 const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
 const statusName = (s) => STATUS[s] || s || '';
-const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || u.email || '') : '';
+const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || '') : '';
+const atNick = (u) => u?.nickname ? '@' + u.nickname : '';
+const NICK_RE = /^[A-Za-z0-9._-]{3,32}$/;
 const initials = (u) => { const n = personName(u); if (!n) return '?'; return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); };
 function setView(...nodes) { $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType)); }
 function toast(msg, bad = false) {
@@ -1327,7 +1377,7 @@ function applyAppearance() {
   try { tg?.setBackgroundColor?.(state.theme === 'dark' ? '#0a0c10' : '#eef1f5'); } catch {}
 }
 applyAppearance();
-function showScreen(id) { ['login-screen','tfa-screen','forgot-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
+function showScreen(id) { ['login-screen','tfa-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
 function toLogin(msg) {
   csrfToken = null; state.me = null; localStorage.removeItem('token'); showScreen('login-screen');
   const el = $('login-error');
@@ -1338,7 +1388,7 @@ async function afterLogin() {
   csrfToken = state.me.csrfToken || csrfToken;
   try {
     const local = JSON.parse(localStorage.getItem('profileLocal') || 'null');
-    if (local && state.me) {
+    if (local && state.me && local.id === state.me.id) {
       if (local.firstName) state.me.firstName = local.firstName;
       if (local.lastName) state.me.lastName = local.lastName;
       if (local.nickname) state.me.nickname = local.nickname;
@@ -1347,8 +1397,21 @@ async function afterLogin() {
   state.workspaces = arr(await api('GET', '/workspaces'));
   if (!state.workspaces.find(w => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
   localStorage.setItem('wsId', state.wsId || '');
-  showScreen('app-screen'); updateSideUser(); renderWsSelect(); renderSideMenu(); renderBottomNav(); renderFolders();
-  go(state.me.requirePasswordChange ? 'me' : 'mine');
+  try { localStorage.setItem('lastNick', state.me.nickname || ''); } catch {}
+  showScreen('app-screen');
+  updateSideUser();
+  renderWsSelect();
+  renderSideMenu();
+  renderBottomNav();
+  renderFolders();
+
+  // ПРАВКА: если нужно сменить пароль — принудительно на профиль
+  if (state.me.requirePasswordChange) {
+    go('me');
+    toast('Смените пароль, чтобы продолжить');
+  } else {
+    go('all');
+  }
 }
 function updateSideUser() {
   const me = state.me; const av = $('side-avatar'); av.innerHTML = '';
@@ -1357,8 +1420,7 @@ function updateSideUser() {
   else { av.textContent = initials(me); av.style.fontSize = ''; }
   const online = document.createElement('span'); online.className = 'online'; av.append(online);
   $('side-name').textContent = personName(me) || 'Пользователь';
-  $('side-role').textContent = me?.nickname ? '@' + me.nickname : 'Профиль';
-  $('side-email').textContent = '✉ ' + (me?.email || '');
+  $('side-role').textContent = atNick(me) || 'Профиль';
 }
 function renderWsSelect() {
   const sel = $('ws-select');
@@ -1367,13 +1429,14 @@ function renderWsSelect() {
   sel.replaceChildren(...state.workspaces.map(w => h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)));
   sel.onchange = () => { state.wsId = sel.value; localStorage.setItem('wsId', state.wsId); go(state.tab); };
 }
+try { const ln = localStorage.getItem('lastNick'); if (ln) $('login-id').value = ln; } catch {}
 $('login-btn').onclick = async () => {
   $('login-error').classList.add('hidden');
   const id = $('login-id').value.trim(); const password = $('password').value;
   if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
   $('login-btn').disabled = true;
   try {
-    const payload = id.includes('@') ? { email: id, password } : { email: id, password, nickname: id };
+    const payload = id.includes('@') ? { email: id, password } : { nickname: id, password };
     const data = await api('POST', '/auth/login', payload);
     if (data.twoFactorRequired) {
       showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
@@ -1397,15 +1460,6 @@ $('tfa-btn').onclick = async () => {
   finally { $('tfa-btn').disabled = false; }
 };
 $('tfa-back').onclick = () => toLogin();
-$('forgot-btn').onclick = () => { showScreen('forgot-screen'); $('forgot-email').value = $('login-id').value.includes('@') ? $('login-id').value : ''; $('forgot-msg').classList.add('hidden'); };
-$('forgot-back').onclick = () => toLogin();
-$('forgot-submit').onclick = async () => {
-  const email = $('forgot-email').value.trim(); if (!email) return;
-  $('forgot-submit').disabled = true; const msg = $('forgot-msg');
-  try { await api('POST', '/auth/password/forgot', { email }); msg.className = 'alert alert-success'; msg.textContent = 'Если аккаунт есть — письмо отправлено.'; }
-  catch (e) { msg.className = 'alert alert-info'; msg.textContent = e.status === 404 ? 'Восстановление пока не на сервере.' : (e.message || 'Ошибка'); }
-  msg.classList.remove('hidden'); $('forgot-submit').disabled = false;
-};
 function closeMenu() { /* side menu removed */ }
 function openMenu() { go('settings'); }
 $('menu-btn').onclick = () => go('settings'); if ($('overlay')) $('overlay').onclick = closeMenu; if ($('side-close')) $('side-close').onclick = closeMenu;
@@ -1416,131 +1470,157 @@ function sideItem(tab, iconHtml, label, isStub = false) {
     h('span', { html: iconHtml }), label, isStub ? h('span', { class: 'soon' }, 'скоро') : h('span', { class: 'chev' }, '›'));
 }
 if ($('logout-side')) $('logout-side').onclick = async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
+/* ===== Водяная «капля»: пружинная физика, растяжение плёнки, отрыв капель ===== */
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const waters = new WeakMap(), waterHosts = new Set();
+function getWater(host) {
+  let w = waters.get(host);
+  if (w) return w;
+  const body = h('i', { class: 'water-body' });
+  const drops = [0, 1, 2].map(() => h('i', { class: 'water-drop' }));
+  const sparks = [0, 1, 2].map(() => h('i', { class: 'ws-spark' }));
+  const pill = h('div', { class: 'ws-pill' }, h('i', { class: 'ws-arc' }), h('i', { class: 'ws-dot' }), h('i', { class: 'ws-dot2' }));
+  const goo = h('div', { class: 'water-goo' }, body, ...drops);
+  const shine = h('div', { class: 'water-shine' }, pill, ...sparks);
+  w = { host, goo, shine, body, pill, drops, sparks, l: null, r: null, vl: 0, vr: 0, tl: 0, tr: 0, dir: 1, top: 0, hgt: 40, cy: 20, arc: 8, raf: 0, t0: 0, ds: drops.map(() => ({ on: false })) };
+  waters.set(host, w); waterHosts.add(host);
+  return w;
+}
+function paintWater(w) {
+  const width = Math.max(10, w.r - w.l), nat = Math.max(10, w.tr - w.tl);
+  const sy = 1 - Math.min(.17, Math.max(0, width / nat - 1) * .22);
+  const tf = `translateX(${w.l}px) scaleY(${sy})`;
+  for (const el of [w.body, w.pill]) { el.style.transform = tf; el.style.width = width + 'px'; el.style.top = w.top + 'px'; el.style.height = w.hgt + 'px'; }
+}
+function hideDrop(w, i) { w.drops[i].style.transform = 'translate(0,0) scale(0)'; w.sparks[i].style.opacity = '0'; }
+function paintDrop(w, i, p, cx) {
+  const d = w.ds[i], el = w.drops[i], sp = w.sparks[i];
+  const e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+  const sin = Math.sin(Math.PI * p);
+  const x = d.fan != null ? cx + d.fan * sin : d.x0 + (cx - d.x0) * e;
+  const y = -d.arc * sin;
+  const sc = (d.size / 16) * (d.fan != null ? (.4 + .6 * sin) : (1 - .72 * p * p));
+  el.style.transform = `translate(${x - 8}px, ${w.cy - 8 + y}px) scale(${sc})`;
+  sp.style.transform = `translate(${x - 2 - 3 * sc}px, ${w.cy - 2 - 3 * sc + y}px) scale(${sc})`;
+  sp.style.opacity = String(Math.max(0, .95 * (1 - p * p)));
+}
+function tickWater(w, now) {
+  const dt = Math.min(.032, Math.max(.001, (now - w.t0) / 1000)); w.t0 = now;
+  // ведущий край быстрее, хвост тянется — как поверхностное натяжение воды
+  const kLead = 170, kTrail = 70, z = .82;
+  const kl = w.dir > 0 ? kTrail : kLead, kr = w.dir > 0 ? kLead : kTrail;
+  w.vl += (kl * (w.tl - w.l) - 2 * z * Math.sqrt(kl) * w.vl) * dt; w.l += w.vl * dt;
+  w.vr += (kr * (w.tr - w.r) - 2 * z * Math.sqrt(kr) * w.vr) * dt; w.r += w.vr * dt;
+  let busy = Math.abs(w.vl) > .06 || Math.abs(w.vr) > .06 || Math.abs(w.tl - w.l) > .08 || Math.abs(w.tr - w.r) > .08;
+  if (!busy) { w.l = w.tl; w.r = w.tr; w.vl = w.vr = 0; }
+  paintWater(w);
+  const cx = (w.l + w.r) / 2;
+  w.ds.forEach((d, i) => {
+    if (!d.on) return;
+    const el = now - d.t - d.delay;
+    if (el < 0) { busy = true; return; }
+    const p = el / d.dur;
+    if (p >= 1) { d.on = false; hideDrop(w, i); return; }
+    busy = true; paintDrop(w, i, p, cx);
+  });
+  w.raf = busy ? requestAnimationFrame((t) => tickWater(w, t)) : 0;
+}
+function kickWater(w) { if (!w.raf) { w.t0 = performance.now(); w.raf = requestAnimationFrame((t) => tickWater(w, t)); } }
+function spawnDrops(w, fromL, fromR, dir, dist) {
+  const n = dist > 150 ? 3 : dist > 70 ? 2 : 1, now = performance.now();
+  for (let i = 0; i < n; i++) {
+    const edge = dir > 0 ? fromL + (fromR - fromL) * .3 : fromL + (fromR - fromL) * .7;
+    Object.assign(w.ds[i], { on: true, t: now, delay: 40 + i * 90, dur: 560 + i * 120, x0: edge - dir * i * 7, fan: null, arc: w.arc * (i % 2 ? -.55 : 1), size: 16 - i * 3 });
+  }
+}
+function splashWater(w) {
+  if (w.l == null || REDUCED) return;
+  const now = performance.now();
+  w.ds.forEach((d, i) => Object.assign(d, { on: true, t: now, delay: i * 70, dur: 620 + i * 90, fan: (i - 1) * 20, arc: w.arc * (1.3 + i * .25), size: 15 - i * 2 }));
+  kickWater(w);
+}
+function waterTo(w, l, r, top, hgt, instant) {
+  w.top = top; w.hgt = hgt; w.cy = top + hgt / 2; w.arc = Math.min(12, hgt * .22);
+  const first = w.l == null;
+  const oldL = w.l, oldR = w.r;
+  w.tl = l; w.tr = r;
+  if (first || instant || REDUCED) { w.l = l; w.r = r; w.vl = w.vr = 0; paintWater(w); return; }
+  const dc = (l + r) / 2 - (oldL + oldR) / 2;
+  if (Math.abs(dc) > 1) w.dir = dc > 0 ? 1 : -1;
+  if (Math.abs(dc) >= 28) spawnDrops(w, oldL, oldR, w.dir, Math.abs(dc));
+  kickWater(w);
+}
+function syncWater(host, instant) {
+  const w = getWater(host);
+  const btn = host.querySelector('button.active');
+  if (host.offsetWidth === 0 || host.offsetParent === null && getComputedStyle(host).position !== 'fixed') { w.l = null; return; }
+  if (!btn) { w.goo.style.opacity = '0'; w.shine.style.opacity = '0'; return; }
+  w.goo.style.opacity = ''; w.shine.style.opacity = '';
+  waterTo(w, btn.offsetLeft, btn.offsetLeft + btn.offsetWidth, btn.offsetTop, btn.offsetHeight, instant);
+}
+addEventListener('resize', () => { waterHosts.forEach(hst => syncWater(hst, true)); });
+function wobbleWaters() { waterHosts.forEach(hst => splashWater(getWater(hst))); }
+
+/* Смена темы: круговая волна от места нажатия + капли на панелях */
+function changeAppearance(apply, ev) {
+  const x = ev?.clientX ?? innerWidth / 2, y = ev?.clientY ?? innerHeight / 2;
+  const R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  const done = () => setTimeout(wobbleWaters, 380);
+  if (REDUCED || !document.startViewTransition) { apply(); done(); return; }
+  const ring = h('div', { class: 'theme-ring' });
+  ring.style.left = x + 'px'; ring.style.top = y + 'px';
+  document.body.append(ring);
+  const vt = document.startViewTransition(() => { apply(); });
+  vt.ready.then(() => {
+    document.documentElement.animate(
+      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${R}px at ${x}px ${y}px)`] },
+      { duration: 1000, easing: 'cubic-bezier(.22,.7,.18,1)', pseudoElement: '::view-transition-new(root)' });
+    ring.animate([{ transform: 'translate(-50%,-50%) scale(0)', opacity: .7 }, { transform: `translate(-50%,-50%) scale(${R * 2 / 40})`, opacity: 0 }],
+      { duration: 1000, easing: 'cubic-bezier(.22,.7,.18,1)' }).onfinish = () => ring.remove();
+  }).catch(() => ring.remove());
+  vt.finished.finally(done);
+}
+
 function renderFolders() {
   const el = $('folders');
   if (!el) return;
   const tabs = state.layout.top.filter(k => SECTIONS[k] && k !== 'settings' && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s }));
   const hide = !tabs.length || ['search', 'me', 'settings', 'layout'].includes(state.tab);
   el.style.display = hide ? 'none' : 'flex';
-  const track = h('div', { class: 'folders-track' });
-  let blob = h('div', { class: 'folder-blob' });
-  track.append(blob);
-  tabs.forEach(({ k, t }) => {
-    track.append(h('button', {
-      class: 'folder' + (state.tab === k ? ' active' : ''),
-      type: 'button',
-      'data-tab': k,
-      onclick: () => go(k),
-    }, t));
-  });
-  const fromLeft = el._blobLeft;
-  const fromWidth = el._blobWidth;
-  el.replaceChildren(track);
+  let track = el._track;
+  if (!track) { track = el._track = h('div', { class: 'folders-track' }); }
+  const w = getWater(track);
+  track.replaceChildren(w.goo, w.shine, ...tabs.map(({ k, t }) => h('button', {
+    class: 'folder' + (state.tab === k ? ' active' : ''), type: 'button', 'data-tab': k, onclick: () => go(k),
+  }, t)));
+  if (track.parentNode !== el) el.replaceChildren(track);
   requestAnimationFrame(() => {
-    const activeBtn = track.querySelector('.folder.active');
-    blob.style.opacity = activeBtn ? '1' : '0';
-    if (!activeBtn) return;
-    const tr = track.getBoundingClientRect();
-    const br = activeBtn.getBoundingClientRect();
-    const toLeft = br.left - tr.left;
-    const toWidth = br.width;
-    if (fromLeft == null) {
-      blob.style.transition = 'none';
-      blob.style.left = toLeft + 'px';
-      blob.style.width = toWidth + 'px';
-    } else {
-      moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth);
-    }
-    el._blobLeft = toLeft;
-    el._blobWidth = toWidth;
-    el.scrollTo({ left: Math.max(0, toLeft - 40), behavior: 'smooth' });
+    syncWater(track);
+    const act = track.querySelector('.folder.active');
+    if (act) el.scrollTo({ left: Math.max(0, act.offsetLeft - 40), behavior: REDUCED ? 'auto' : 'smooth' });
   });
-}
-function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
-  if (!blob) return;
-  // start from previous selected position (surface tension: elongate across path)
-  const a = fromLeft != null ? fromLeft : toLeft;
-  const aw = fromWidth != null ? fromWidth : toWidth;
-  blob.style.transition = 'none';
-  blob.style.left = a + 'px';
-  blob.style.width = aw + 'px';
-  blob.style.borderRadius = '999px';
-  blob.style.transform = 'scale(1)';
-  // force reflow
-  void blob.offsetWidth;
-  const goingRight = toLeft >= a;
-  const stretchLeft = Math.min(a, toLeft);
-  const stretchRight = Math.max(a + aw, toLeft + toWidth);
-  const stretchW = stretchRight - stretchLeft;
-  blob.style.transition = 'left .38s cubic-bezier(.2,.8,.2,1), width .38s cubic-bezier(.2,.8,.2,1), border-radius .38s ease, transform .38s ease';
-  // phase 1 — pull like water film
-  blob.style.left = stretchLeft + 'px';
-  blob.style.width = stretchW + 'px';
-  blob.style.borderRadius = goingRight ? '40% 55% 55% 40% / 50% 50% 50% 50%' : '55% 40% 40% 55% / 50% 50% 50% 50%';
-  blob.style.transform = 'scaleY(0.88)';
-  clearTimeout(blob._t1); clearTimeout(blob._t2);
-  blob._t1 = setTimeout(() => {
-    // phase 2 — settle on target
-    blob.style.left = toLeft + 'px';
-    blob.style.width = toWidth + 'px';
-    blob.style.borderRadius = '999px';
-    blob.style.transform = 'scale(1)';
-  }, 200);
 }
 
 function renderBottomNav() {
   const tabs = state.layout.dock.filter(k => SECTIONS[k] && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s, icon: icons[SECTIONS[k].i] }));
   if (!tabs.some(x => x.k === 'settings')) tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
-  // search is separate orb
-
   const nav = $('bottom-nav');
-  const fromLeft = nav._blobLeft;
-  const fromWidth = nav._blobWidth;
-  let blob = nav.querySelector('.nav-blob');
-  if (!blob) blob = h('div', { class: 'nav-blob' });
-
+  const w = getWater(nav);
   const btns = tabs.map(({ k, t, icon }) => {
     const active = state.tab === k || (k === 'settings' && (['settings','me','layout'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
-    const b = h('button', {
-      class: active ? 'active' : '',
-      type: 'button',
-      title: t,
-      'data-tab': k,
-      onclick: () => go(k),
-    });
+    const b = h('button', { class: active ? 'active' : '', type: 'button', title: t, 'data-tab': k, onclick: () => go(k) });
     b.innerHTML = icon;
     return b;
   });
-  nav.replaceChildren(blob, ...btns);
+  nav.replaceChildren(w.goo, w.shine, ...btns);
   nav.style.setProperty('--n', tabs.length);
-
   const orb = $('search-orb');
   if (orb) {
     orb.innerHTML = icons.search;
     orb.classList.toggle('active', state.tab === 'search');
     orb.onclick = () => go('search');
   }
-
-  requestAnimationFrame(() => {
-    const activeBtn = nav.querySelector('button.active') || nav.querySelector('button');
-    if (!activeBtn) return;
-    const navRect = nav.getBoundingClientRect();
-    const br = activeBtn.getBoundingClientRect();
-    const pad = 4;
-    const toLeft = br.left - navRect.left;
-    const toWidth = br.width;
-    blob.style.top = pad + 'px';
-    blob.style.bottom = pad + 'px';
-    if (fromLeft == null) {
-      blob.style.transition = 'none';
-      blob.style.left = toLeft + 'px';
-      blob.style.width = toWidth + 'px';
-    } else {
-      moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth);
-    }
-    nav._blobLeft = toLeft;
-    nav._blobWidth = toWidth;
-  });
+  requestAnimationFrame(() => syncWater(nav));
 }
 function toggleFavorite(id) {
   const set = new Set(state.favorites || []);
@@ -1559,38 +1639,37 @@ function parseChoiceUnit(unit) {
   return { mode: parts[1], options: parts.slice(2).join(':').split('|').filter(Boolean) };
 }
 function go(tab) {
+  if (tab === 'mine') tab = 'all';
   if (typeof openRun !== 'undefined' && openRun._restore) { try { openRun._restore(); } catch {} openRun._restore = null; }
   if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
   // Кнопка назад в шапке
   const menuBtn = $('menu-btn');
   if (menuBtn) {
-    const rootTabs = rootSet();
-    const needBack = !rootTabs.includes(tab);
-    if (needBack) {
-      menuBtn.style.display = '';
-      menuBtn.innerHTML = icons.back;
-      menuBtn.setAttribute('aria-label', 'Назад');
-      menuBtn.onclick = () => {
-        if (tab === 'search') go(state.searchPrevTab || 'mine');
-        else if (['me','audit','notifications','settings','tpl','people'].includes(tab)) go('mine');
-        else go('mine');
-      };
-    } else {
-      menuBtn.style.display = 'none';
-    }
+  const rootTabs = ['all', 'tpl', 'people', 'settings'];
+  const needBack = !rootTabs.includes(tab);
+  if (needBack) {
+    menuBtn.style.display = '';
+    menuBtn.innerHTML = icons.back;
+    menuBtn.setAttribute('aria-label', 'Назад');
+    menuBtn.onclick = () => {
+      if (tab === 'search') go(state.searchPrevTab || 'all');
+      else if (tab === 'layout') go('settings');
+      else go('all');
+    };
+  } else {
+    menuBtn.style.display = 'none';
   }
-
-  state.tab = tab;
-  const titles = { mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
-  $('topbar-title').textContent = titles[tab] || 'Чеклисты';
-  const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && can('users.create')));
-  const lb = $('layout-btn'); if (lb) lb.style.display = tab === 'layout' ? 'none' : '';
-  renderBottomNav(); renderFolders(); renderSideMenu();
-  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
-  show(screens[tab] || renderMine);
 }
 
-$('layout-btn').innerHTML = icons.tune; $('layout-btn').onclick = () => go('layout');
+  state.tab = tab;
+  const titles = { all:'Чеклисты', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
+  $('topbar-title').textContent = titles[tab] || 'Чеклисты';
+  const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && can('users.create')));
+  renderBottomNav(); renderFolders(); renderSideMenu();
+  const screens = { all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
+  show(screens[tab] || renderAll);
+}
+
 $('plus-orb').innerHTML = icons.plus;
 const lqBackdrop = h('div', { class: 'lq-backdrop' }), lqSheet = h('div', { class: 'lq-sheet' });
 document.body.append(lqBackdrop, lqSheet);
@@ -1639,7 +1718,7 @@ function renderLayout() {
   };
   setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. «Избранное» — шаблоны со звездой.'),
     ...block('dock', 'Нижняя консоль', 'До 5 разделов, «Кабинет» всегда остаётся.', 5),
-    h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
+    h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = DEFAULT_LAYOUT(); saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
 }
 
 async function firstOk(paths) {
@@ -1661,13 +1740,12 @@ async function renderAudit() {
   const act = (r) => String(r.action || r.type || r.event || '');
   const failed = (r) => /FAIL|DENIED|ERROR/i.test(String(r.result || r.status || ''));
   rows = [...rows].sort((a, b) => dt(b) - dt(a));
-  const fails = {}; rows.forEach(r => { if (/LOGIN/i.test(act(r)) && failed(r)) { const k = r.actorEmail || r.ip || personName(r.actor); fails[k] = (fails[k] || 0) + 1; } });
-  const critical = (r) => /DELETE|ROLE|PERMISSION|EXPORT/i.test(act(r)) || (/LOGIN/i.test(act(r)) && failed(r) && (fails[r.actorEmail || r.ip || personName(r.actor)] || 0) >= 5);
+  const fails = {}; rows.forEach(r => { if (/LOGIN/i.test(act(r)) && failed(r)) { const k = r.ip || personName(r.actor); fails[k] = (fails[k] || 0) + 1; } });
+  const critical = (r) => /DELETE|ROLE|PERMISSION|EXPORT/i.test(act(r)) || (/LOGIN/i.test(act(r)) && failed(r) && (fails[r.ip || personName(r.actor)] || 0) >= 5);
   const GROUPS = { all: ['Все', () => true], crit: ['Важное', critical], auth: ['Вход', r => /LOGIN|LOGOUT|PASSWORD|2FA/i.test(act(r))], data: ['Данные', r => /TEMPLATE|CHECKLIST|RUN|ITEM|FILE|COMMENT|ASSIGN|COMPLETE|CANCEL/i.test(act(r))], people: ['Люди', r => /USER|ROLE|PERMISSION/i.test(act(r))] };
   const PERIODS = { all: ['Всё', 0], day: ['Сегодня', 1], week: ['7 дней', 7], month: ['30 дней', 30] };
   let q = '', grp = 'all', per = 'all', shown = 30;
-  const mask = (e) => e ? String(e).replace(/^(.).*(@.*)$/, '$1***$2') : '';
-  const who = (r) => personName(r.actor || r.user) || mask(r.actorEmail) || 'Система';
+  const who = (r) => personName(r.actor || r.user) || 'Система';
   const filtered = () => rows.filter(r => GROUPS[grp][1](r) && (!PERIODS[per][1] || Date.now() - dt(r) < PERIODS[per][1] * 864e5)
     && (!q || [act(r), who(r), r.entity || r.entityType, r.entityId].join(' ').toLowerCase().includes(q)));
   const input = h('input', { type: 'search', placeholder: 'Поиск по действиям и людям…' });
@@ -1815,16 +1893,24 @@ function runsScreen(d, withWho, head, emptyNode) {
   draw();
   setView(head, box);
 }
-async function renderMine() {
-  const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  runsScreen(d, false, null, emptyState('Нет задач', 'Вам пока ничего не назначили'));
-}
 async function renderAll() {
-  let q = `/checklists/runs?workspaceId=${state.wsId}&scope=all`;
-  if (state.filter === 'overdue') q += '&overdue=true';
-  if (state.filter === 'done') q += '&status=COMPLETED';
-  const d = arr(await api('GET', q));
-  runsScreen(d, true, h('div', { class: 'chips' }, chip('', 'Все'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')), emptyState('Ничего не найдено'));
+  const seeAll = can('checklists.runs.read_all');
+  const mineList = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
+  const mineIds = new Set(mineList.map(r => r.id));
+  let list = mineList;
+  if (seeAll) {
+    try {
+      const others = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
+      const byId = new Map(others.map(r => [r.id, r]));
+      mineList.forEach(r => { if (!byId.has(r.id)) byId.set(r.id, r); });
+      list = [...byId.values()];
+    } catch (e) { if (e.status === 401) throw e; }
+  }
+  const f = state.filter;
+  const isDone = (r) => r.status === 'COMPLETED';
+  const view = list.filter(r => f === 'mine' ? mineIds.has(r.id) : f === 'overdue' ? !!r.overdue : f === 'done' ? isDone(r) : true);
+  const chips = [chip('', 'Все'), chip('mine', 'Мои чеклисты'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')];
+  runsScreen(view, true, h('div', { class: 'chips' }, ...chips), emptyState(f === 'mine' ? 'Нет задач' : 'Ничего не найдено', f === 'mine' ? 'Вам пока ничего не назначили' : undefined));
 }
 function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
 async function photoURL(id) {
@@ -1951,7 +2037,7 @@ async function openRun(id) {
   const extra = h('div', { style: 'display:flex;align-items:center;gap:0;position:relative' });
   const backBtn = h('button', {
     class: 'topbar-btn muted', type: 'button', title: 'Назад',
-    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'mine') : (rootSet().includes(state.tab) ? state.tab : 'mine')),
+    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'all') : (rootSet().includes(state.tab) ? state.tab : 'all')),
   });
   backBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
 
@@ -1966,7 +2052,7 @@ async function openRun(id) {
       items.push(h('button', { type: 'button', class: 'danger', onclick: async () => {
         extra.querySelector('.menu-pop')?.remove();
         if (!confirm('Отменить этот чеклист?')) return;
-        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go('mine'); }
+        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go('all'); }
         catch (err) { toast(err.message, true); }
       } }, 'Отменить чеклист'));
     }
@@ -2015,7 +2101,7 @@ async function openRun(id) {
   const menuBtn = $('menu-btn');
   // temporary replace menu with back while in run
   const prevMenuHandler = menuBtn.onclick;
-  menuBtn.onclick = () => go(rootSet().includes(state.tab) ? state.tab : 'mine');
+  menuBtn.onclick = () => go(rootSet().includes(state.tab) ? state.tab : 'all');
   menuBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   menuBtn.setAttribute('aria-label', 'Назад');
   search.classList.add('hidden');
@@ -2062,7 +2148,7 @@ async function openRun(id) {
           const r = await api('POST', `/checklists/runs/${run.id}/complete`, Object.keys(body).length ? body : undefined);
           toast(`Сдано. Проблем: ${r?.flaggedCount ?? 0}`);
           restoreChrome();
-          go(rootSet().includes(state.tab) ? state.tab : 'mine');
+          go(rootSet().includes(state.tab) ? state.tab : 'all');
         } catch (err) { toast(err.message, true); e.target.disabled = false; }
       },
     }, 'Сдать чеклист'));
@@ -2282,7 +2368,7 @@ async function showAssign(t) {
       return h('div', {
         class: 'choice-opt' + (on ? ' on' : ''),
         onclick: () => { if (selected.has(id)) selected.delete(id); else selected.add(id); renderList(); },
-      }, (on ? '✓ ' : '') + personName(u) + (u.email ? ` (${u.email})` : ''));
+      }, (on ? '✓ ' : '') + personName(u) + (u.nickname ? ` (@${u.nickname})` : ''));
     }) : [h('div', { class: 'alert alert-error' }, 'Нет сотрудников')]));
   };
   renderList();
@@ -2418,7 +2504,7 @@ async function renderPeople() {
   const out = h('div'); const nodes = [];
   if (can('users.create')) {
     const f = {
-      email: h('input', { type: 'email', placeholder: 'email@company.com' }),
+      nick: h('input', { type: 'text', placeholder: 'nickname', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false' }),
       first: h('input', { type: 'text', placeholder: 'Имя' }),
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
       role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
@@ -2429,14 +2515,14 @@ async function renderPeople() {
       h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { manual.value = genPassword(); } }, 'Сгенерировать'));
     mode.onchange = () => { manualRow.classList.toggle('hidden', mode.value !== 'manual'); if (mode.value === 'manual' && !manual.value) manual.value = genPassword(); };
     window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
-      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Никнейм (для входа)'), f.nick, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
       h('label', {}, 'Пароль'), mode, manualRow,
       h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
-        const btn = e.currentTarget, email = f.email.value.trim(), pw = mode.value === 'manual' ? manual.value.trim() : '';
-        if (!email) return toast('Укажите email', true);
+        const btn = e.currentTarget, nickname = f.nick.value.trim().replace(/^@/, ''), pw = mode.value === 'manual' ? manual.value.trim() : '';
+        if (!NICK_RE.test(nickname)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
         if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
         btn.disabled = true;
-        const base = { email, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
+        const base = { nickname, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
         const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
         try {
           let r, last;
@@ -2447,9 +2533,9 @@ async function renderPeople() {
           if (shown) box.append(h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, shown),
             h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(shown) }, 'Копировать'),
             h('div', { class: 'small', style: 'margin-top:6px' }, 'Временный пароль: при первом входе сотрудник задаст свой'));
-          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Сотрудник может нажать «Забыли пароль?» при входе'));
+          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Создайте сотрудника с временным паролем, заданным вручную'));
           out.replaceChildren(box);
-          f.email.value = f.first.value = f.last.value = manual.value = '';
+          f.nick.value = f.first.value = f.last.value = manual.value = '';
         } catch (err) { toast(err.message || 'Не удалось создать сотрудника', true); }
         btn.disabled = false;
       } }, 'Создать'), out));
@@ -2467,7 +2553,7 @@ async function renderPeople() {
         const row = h('div', { class: 'list-row' });
         const inner = h('div', { class: 'list-row-inner' },
           h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
-          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, u.email || '')),
+          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, atNick(u))),
           showRole && h('span', { class: 'badge neutral' }, roleLabel));
         if (!isMe && canDelete) {
           const actions = h('div', { class: 'list-row-actions' }, h('button', { class: 'act-delete', type: 'button', onclick: async (e) => {
@@ -2508,7 +2594,6 @@ async function renderProfile() {
   const first = h('input', { type: 'text', value: me.firstName || '', placeholder: 'Имя' });
   const last = h('input', { type: 'text', value: me.lastName || '', placeholder: 'Фамилия' });
   const nick = h('input', { type: 'text', value: me.nickname || '', placeholder: 'Никнейм' });
-  const email = h('input', { type: 'email', value: me.email || '', placeholder: 'email@company.com' });
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
   const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
@@ -2541,7 +2626,7 @@ async function renderProfile() {
   setView(
     me.requirePasswordChange && h('div', { class: 'alert alert-info' }, 'Нужно сменить пароль.'),
     h('div', { class: 'card' },
-      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, me.email), me.nickname && h('div', { class: 'small' }, '@' + me.nickname))),
+      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, atNick(me)))),
       h('div', { class: 'gap', style: 'margin-top:14px' },
         h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: () => fileInput.click() }, 'Фото'),
         emojiBtn,
@@ -2554,25 +2639,35 @@ async function renderProfile() {
     ),
     h('h2', {}, 'Данные'),
     h('div', { class: 'card' },
-      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм'), nick, h('label', {}, 'Email'), email,
+      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм (для входа)'), nick,
       h('button', { class: 'btn btn-primary', onclick: async (e) => {
-        const body = { firstName: first.value.trim(), lastName: last.value.trim() };
-        if (nick.value.trim()) body.nickname = nick.value.trim();
-        if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
-        e.target.disabled = true;
+        const btn = e.currentTarget;
+        const nickV = nick.value.trim().replace(/^@/, '');
+        if (!NICK_RE.test(nickV)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
+        const body = { firstName: first.value.trim(), lastName: last.value.trim(), nickname: nickV };
+        btn.disabled = true;
         try {
-          try { await api('PATCH', `/users/${me.id}`, body); toast('Профиль обновлён'); }
+          let onServer = true;
+          try { await api('PATCH', '/users/me', body); }
           catch (err) {
             const msg = String(err.message || '');
-            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) {
-              Object.assign(state.me, body);
-              localStorage.setItem('profileLocal', JSON.stringify({ firstName: state.me.firstName, lastName: state.me.lastName, nickname: state.me.nickname || '' }));
-              toast('Сохранено локально (сервер пока без API)', true);
-            } else throw err;
+            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) onServer = false;
+            else throw err;
           }
-          try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; } catch { Object.assign(state.me, body); }
+          if (onServer) {
+            localStorage.removeItem('profileLocal');
+            try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; }
+            catch { Object.assign(state.me, body); }
+            toast('Профиль сохранён');
+          } else {
+            Object.assign(state.me, body);
+            localStorage.setItem('profileLocal', JSON.stringify({ id: me.id, ...body }));
+            toast('Сохранено на этом устройстве: сервер не принимает изменения профиля', true);
+          }
+          localStorage.setItem('lastNick', state.me.nickname || nickV);
           updateSideUser(); go('me');
-        } catch (err) { toast(err.message || 'Ошибка', true); e.target.disabled = false; }
+        } catch (err) { toast(err.message || 'Не удалось сохранить', true); }
+        finally { btn.disabled = false; }
       } }, 'Сохранить профиль')
     ),
     h('h2', {}, 'Пароль'),
@@ -2607,7 +2702,7 @@ function renderSettings() {
           ),
           h('div', { style: 'min-width:0' },
             h('strong', { style: 'font-size:16px' }, personName(me) || 'Профиль'),
-            h('div', { class: 'muted' }, me?.email || ''),
+            h('div', { class: 'muted' }, atNick(me)),
             h('div', { class: 'small' }, 'Открыть профиль')
           )
         ),
@@ -2624,21 +2719,21 @@ function renderSettings() {
     h('div', { class: 'card' },
       h('strong', {}, 'Тема'),
       h('div', { class: 'gap', style: 'margin-top:12px' },
-        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'light'; applyAppearance(); go('settings'); } }, 'Светлая'),
-        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'dark'; applyAppearance(); go('settings'); } }, 'Тёмная')
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.theme = 'light'; applyAppearance(); go('settings'); }, e) }, 'Светлая'),
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.theme = 'dark'; applyAppearance(); go('settings'); }, e) }, 'Тёмная')
       )
     ),
     h('div', { class: 'card' },
       h('strong', {}, 'Цвет'),
       h('div', { class: 'swatches' },
-        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: () => { state.accent = a.id; applyAppearance(); go('settings'); } }))
+        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: (e) => changeAppearance(() => { state.accent = a.id; applyAppearance(); go('settings'); }, e) }))
       )
     ),
     h('div', { class: 'card' },
       h('strong', {}, 'Контраст'),
       h('div', { class: 'gap', style: 'margin-top:12px' },
-        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'normal'; applyAppearance(); go('settings'); } }, 'Обычный'),
-        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'high'; applyAppearance(); go('settings'); } }, 'Высокий')
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.contrast = 'normal'; applyAppearance(); go('settings'); }, e) }, 'Обычный'),
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.contrast = 'high'; applyAppearance(); go('settings'); }, e) }, 'Высокий')
       )
     ),
     h('button', {
@@ -2659,7 +2754,7 @@ async function renderSearch() {
   const clearBtn = h('button', {
     class: 'topbar-btn', type: 'button',
     style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
-    onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); },
+    onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'all'); },
   });
   clearBtn.innerHTML = icons.back ? icons.back.replace('M15 18l-6-6 6-6', 'M18 6L6 18M6 6l12 12') : '×';
   // X icon
@@ -2695,7 +2790,7 @@ async function renderSearch() {
     if (can('users.read')) {
       try {
         const users = arr(await api('GET', '/users'));
-        users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query))
+        users.filter(u => (personName(u) + ' ' + (u.nickname || '')).toLowerCase().includes(query))
           .forEach(u => results.push({ type: 'user', data: u }));
       } catch {}
     }
@@ -2728,7 +2823,7 @@ async function renderSearch() {
               h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
               h('div', {},
                 h('strong', {}, personName(u)),
-                h('div', { class: 'muted' }, u.email || '')
+                h('div', { class: 'muted' }, atNick(u))
               )
             )
           )
@@ -2745,7 +2840,7 @@ async function renderSearch() {
     debounce = setTimeout(runSearch, 280);
   });
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'mine'); }
+    if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'all'); }
   });
   await runSearch();
 }
