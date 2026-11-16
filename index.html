@@ -2289,91 +2289,31 @@ function commentsBlock(run, closed, mine) {
     h('div', { class: 'gap' }, h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => inp.click() }, 'Фото (до 5)'), send), inp);
   return box;
 }
-async function loadUsers() { try { return arr(await api('GET', '/users')); } catch { return []; } }
-async function renderTemplates() {
-  let list;
-  try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
-  catch (e) { if (e.status === 400) list = arr(await api('GET', '/checklists/templates')); else throw e; }
-  const manage = can('checklists.templates.manage');
-  const favIds = new Set(state.favorites || []);
-  const sorted = [...list].sort((a, b) => (favIds.has(b.id) ? 1 : 0) - (favIds.has(a.id) ? 1 : 0));
-  let openMenuId = null;
-  const nodes = [];
-
-  if (!sorted.length) {
-    nodes.push(emptyState('Шаблонов пока нет', manage ? 'Создайте первый шаблон кнопкой +' : 'Попросите администратора добавить шаблоны'));
-  } else {
-    sorted.forEach(t => {
-      const fav = isFavorite(t.id);
-      const head = h('div', { class: 'card-head row' },
-        h('div', { style: 'min-width:0;flex:1' },
-          h('strong', { style: 'font-size:15px' }, t.title),
-          t.description && h('div', { class: 'muted', style: 'margin-top:4px' }, t.description),
-          h('div', { class: 'small', style: 'margin-top:6px' }, (t.items?.length != null || t._count?.items != null) ? pluralPunkty(t.items?.length ?? t._count?.items) : '—')
-        ),
-        h('button', {
-          class: 'star-btn', type: 'button', title: fav ? 'Убрать из избранного' : 'В избранное',
-          onclick: (e) => { e.stopPropagation(); toggleFavorite(t.id); go('tpl'); },
-        }, fav ? '★' : '☆'),
-        manage && h('button', {
-          class: 'icon-btn', type: 'button', title: 'Ещё',
-          onclick: (e) => {
-            e.stopPropagation();
-            document.querySelectorAll('.menu-pop').forEach(m => m.remove());
-            if (openMenuId === t.id) { openMenuId = null; return; }
-            openMenuId = t.id;
-            const pop = h('div', { class: 'menu-pop' },
-              can('checklists.assign') && h('button', { type: 'button', onclick: () => { openMenuId = null; push(() => showAssign(t)); } }, 'Назначить'),
-              h('button', { type: 'button', onclick: () => {
-                openMenuId = null;
-                const items = (t.items || []).map(it => {
-                  const parsed = parseChoiceUnit(it.unit);
-                  return {
-                    title: it.title || '',
-                    type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
-                    required: !!it.required,
-                    unit: it.unit || '',
-                    minValue: it.minValue ?? '',
-                    maxValue: it.maxValue ?? '',
-                    options: parsed ? parsed.options : (it.options || ['']),
-                  };
-                });
-                openBuilder({
-                  title: (t.title || '') + ' (копия)',
-                  description: t.description || '',
-                  items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
-                });
-              } }, 'Копировать'),
-              h('button', { type: 'button', class: 'danger', onclick: async () => {
-                openMenuId = null;
-                if (!confirm('Удалить шаблон «' + t.title + '»? Это действие нельзя отменить.')) return;
-                try { await api('DELETE', `/checklists/templates/${t.id}`); toast('Шаблон удалён'); go('tpl'); }
-                catch (err) { toast(err.message, true); }
-              } }, 'Удалить')
-            );
-            head.append(pop);
-          },
-        }, '⋯')
-      );
-
-      const actions = [];
-      if (can('checklists.assign') && !manage) {
-        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => push(() => showAssign(t)) }, 'Назначить'));
-      } else if (can('checklists.assign')) {
-        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => push(() => showAssign(t)) }, 'Назначить'));
-      }
-
-      nodes.push(h('div', { class: 'card' },
-        head,
-        actions.length ? h('div', { class: 'gap' }, ...actions) : null
-      ));
-    });
+async function loadUsers() {
+  if (!state.wsId) {
+    throw new Error(
+      'Не выбрано рабочее пространство. Выберите его и повторите попытку.'
+    );
   }
 
-  if (manage) {
-    nodes.push(h('button', { class: 'fab', type: 'button', title: 'Новый шаблон', onclick: () => openBuilder() }, '+'));
+  const response = await api(
+    'GET',
+    `/users?workspaceId=${encodeURIComponent(state.wsId)}&take=200`
+  );
+
+  if (!Array.isArray(response)) {
+    throw new Error(
+      'Сервер вернул неожиданный формат списка сотрудников'
+    );
   }
-  setView(...nodes);
+
+  console.log('[LOAD_USERS]', {
+    workspaceId: state.wsId,
+    count: response.length,
+    users: response,
+  });
+
+  return response;
 }
 
 async function showAssign(t) {
@@ -2840,7 +2780,23 @@ async function renderPeople() {
         if (!email) return toast('Укажите email', true);
         if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
         btn.disabled = true;
-        const base = { email, nickname, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
+        if (!state.wsId) {
+  return toast(
+    'Сначала выберите рабочее пространство',
+    true
+  );
+}
+
+btn.disabled = true;
+
+const base = {
+  email,
+  nickname,
+  firstName: f.first.value.trim(),
+  lastName: f.last.value.trim(),
+  roleCode: f.role.value,
+  workspaceId: state.wsId,
+};
         const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
         try {
           let r, last;
@@ -3108,7 +3064,7 @@ async function renderSearch() {
     } catch {}
     if (can('users.read')) {
       try {
-        const users = arr(await api('GET', '/users'));
+        const users = await loadUsers();
         users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query))
           .forEach(u => results.push({ type: 'user', data: u }));
       } catch {}
