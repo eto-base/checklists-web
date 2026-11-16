@@ -398,18 +398,19 @@ function renderNav() {
   const nav = $('bottom-nav');
   nav.innerHTML = '';
   
-  // Создаём кнопки
+  // Кнопка "Чеклисты"
   const b1 = document.createElement('button');
   b1.className = currentTab === 'all' ? 'active' : '';
   b1.innerHTML = icons.all;
   b1.onclick = () => go('all');
   
+  // Кнопка "Кабинет"
   const b2 = document.createElement('button');
   b2.className = currentTab === 'settings' ? 'active' : '';
   b2.innerHTML = icons.settings;
   b2.onclick = () => go('settings');
   
-  // Вставляем элементы воды
+  // Элементы "воды"
   const water = document.createElement('div');
   water.className = 'water-goo';
   water.innerHTML = '<div class="water-body"></div><div class="water-drop"></div>';
