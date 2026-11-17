@@ -1117,51 +1117,60 @@
   .sort-dir svg { width: 16px; height: 16px; }
   input[type="datetime-local"] { width: auto; min-width: 200px; max-width: 100%; height: 40px; min-height: 40px; padding: 6px 14px; font-size: 14px; border-radius: 999px; display: block; }
 
-  /* ===== v6: water pill — вода, капли, реакция на тему ===== */
-  :root {
-    --w1: color-mix(in srgb, var(--accent) 34%, #ffffff);
-    --w2: color-mix(in srgb, var(--accent) 74%, #ffffff);
-    --w-op: .66; --w-hi: rgba(255,255,255,.95);
+  /* ===== Liquid Glass motion ===== */
+  :root { --flow: cubic-bezier(.22, 1, .36, 1); --gel: cubic-bezier(.34, 1.4, .64, 1); }
+  @keyframes lgIn { from { opacity: 0; transform: translateY(16px) scale(.985); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lgBack { from { opacity: 0; transform: translateX(-18px) scale(.985); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lgPop { from { opacity: 0; transform: scale(.82, .7); filter: blur(6px); } 60% { transform: scale(1.03, 1.05); } to { opacity: 1; transform: none; filter: none; } }
+  @keyframes lgSkeleton { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+  #view.lg-in > * { animation: lgIn .6s var(--flow) backwards; }
+  #view.lg-back > * { animation: lgBack .55s var(--flow) backwards; }
+  #view > *:nth-child(2) { animation-delay: .04s; } #view > *:nth-child(3) { animation-delay: .08s; }
+  #view > *:nth-child(4) { animation-delay: .12s; } #view > *:nth-child(5) { animation-delay: .16s; }
+  #view > *:nth-child(6) { animation-delay: .2s; }  #view > *:nth-child(n+7) { animation-delay: .24s; }
+  .skeleton { animation: lgSkeleton 1.6s ease-in-out infinite; }
+  .card, .btn, .chip, .choice-opt, .list-row-inner, .topbar-btn, .folder, .lay-sw, .badge {
+    transition: transform .5s var(--gel), background-color .35s var(--flow), box-shadow .45s var(--flow), border-color .35s var(--flow), opacity .3s var(--flow), color .3s var(--flow);
   }
-  [data-theme="dark"] {
-    --w1: color-mix(in srgb, var(--accent) 52%, #0d131b);
-    --w2: color-mix(in srgb, var(--accent) 88%, #0d131b);
-    --w-op: .58; --w-hi: rgba(255,255,255,.6);
+  .card.click:active, .btn:active, .chip:active, .choice-opt:active, .list-row-inner:active { transform: scale(.972, .955); transition-duration: .15s; }
+  .menu-pop { transform-origin: top right; animation: lgPop .5s var(--gel) both; backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5); }
+  .toast { transition: transform .55s var(--gel), opacity .4s var(--flow); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); }
+  .topbar { backdrop-filter: blur(22px) saturate(1.5); -webkit-backdrop-filter: blur(22px) saturate(1.5); }
+  .card { backdrop-filter: blur(14px) saturate(1.3); -webkit-backdrop-filter: blur(14px) saturate(1.3); }
+  .chip.active, .choice-opt.on { box-shadow: 0 6px 22px var(--accent-glow); }
+  .lay-sw i { transition: transform .5s var(--gel), background-color .3s var(--flow); }
+  .trash-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+  .trash-btn:active { background: rgba(239,68,68,.16); color: #ef4444; }
+  .trash-btn svg { width: 19px; height: 19px; }
+  #register-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: var(--bg); }
+  .code-chip { font: 600 17px ui-monospace, Menlo, monospace; letter-spacing: .04em; user-select: all; }
+  @media (prefers-reduced-motion: reduce) { #view > *, .menu-pop, .skeleton { animation: none !important; } * { transition-duration: .01s !important; } }
+
+  /* ===== Liquid Glass: texture, rim light, iridescence ===== */
+  @keyframes lgSheen { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+  body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: .05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  .card, .menu-pop, .bottom-nav, .folders-track, .lq-sheet, .toast {
+    background-image: linear-gradient(135deg, rgba(255,255,255,.22) 0%, rgba(255,255,255,0) 38%, rgba(255,255,255,.07) 100%), radial-gradient(120% 80% at 0% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.07), inset 1px 0 0 rgba(255,255,255,.12), 0 10px 30px rgba(0,0,0,.14);
   }
-  [data-contrast="high"] { --w-op: .92; }
-  .bottom-nav, .folders-track { position: relative; }
-  .nav-blob, .folder-blob { display: none !important; }
-  .water-goo { position: absolute; inset: 0; z-index: 0; pointer-events: none; filter: url(#goo); opacity: var(--w-op); transition: opacity .5s ease; }
-  .water-shine { position: absolute; inset: 0; z-index: 0; pointer-events: none; transition: opacity .5s ease; }
-  .water-body, .water-drop, .ws-pill, .ws-spark { position: absolute; left: 0; top: 0; pointer-events: none; }
-  .water-body {
-    border-radius: 999px; will-change: transform, width;
-    background-image:
-      radial-gradient(42% 75% at 24% 28%, rgba(255,255,255,.5), transparent 72%),
-      radial-gradient(36% 62% at 76% 72%, rgba(255,255,255,.26), transparent 72%),
-      linear-gradient(165deg, var(--w2), var(--w1));
-    background-size: 220% 100%, 220% 100%, 100% 100%;
-    background-repeat: no-repeat;
-    animation: waterCaustic 6s ease-in-out infinite alternate;
-    transition: filter .5s ease;
+  .btn-primary, .chip.active, .folder-blob {
+    background-image: linear-gradient(115deg, rgba(255,255,255,.34), rgba(255,255,255,0) 35%, rgba(120,220,255,.25) 60%, rgba(255,160,230,.18) 80%, rgba(255,255,255,.28));
+    background-size: 260% 260%; animation: lgSheen 9s ease-in-out infinite;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -2px 6px rgba(255,255,255,.12), 0 8px 24px var(--accent-glow);
   }
-  .water-drop { width: 16px; height: 16px; border-radius: 50%; transform: translate(0,0) scale(0); background: linear-gradient(165deg, var(--w2), var(--w1)); will-change: transform; }
-  @keyframes waterCaustic { from { background-position: 0% 0, 100% 0, 0 0; } to { background-position: 100% 0, 0% 0, 0 0; } }
-  .ws-pill { border-radius: 999px; will-change: transform, width; box-shadow: inset 0 -5px 10px -4px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 0 0 1px color-mix(in srgb, var(--w-hi) 45%, transparent); }
-  .ws-arc { position: absolute; left: 14%; right: 14%; top: 7%; height: 38%; border-radius: 999px; background: linear-gradient(180deg, var(--w-hi), rgba(255,255,255,0)); opacity: .62; animation: wsPulse 4.2s ease-in-out infinite alternate; }
-  .ws-dot { position: absolute; left: 17%; top: 17%; width: 9px; height: 6px; border-radius: 50%; background: var(--w-hi); transform: rotate(-24deg); box-shadow: 0 0 6px var(--w-hi); }
-  .ws-dot2 { position: absolute; left: calc(17% + 12px); top: calc(17% + 5px); width: 3px; height: 3px; border-radius: 50%; background: var(--w-hi); opacity: .8; }
-  .ws-spark { width: 4px; height: 4px; border-radius: 50%; background: var(--w-hi); opacity: 0; box-shadow: 0 0 5px var(--w-hi); }
-  @keyframes wsPulse { from { opacity: .5; } to { opacity: .8; } }
-  [data-theme="dark"] .ws-arc { opacity: .42; }
-  .bottom-nav button, .folder { z-index: 1; }
-  .bottom-nav button.active, .folder.active { color: var(--text); transition: color .35s ease; }
-  .theme-ring { position: fixed; z-index: 200; width: 40px; height: 40px; border-radius: 50%; pointer-events: none; transform: translate(-50%,-50%) scale(0);
-    border: 1px solid var(--accent); box-shadow: inset 0 0 10px var(--accent-glow), 0 0 12px var(--accent-glow); }
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-  ::view-transition-new(root) { z-index: 2; }
-  ::view-transition-old(root) { z-index: 1; }
-  @media (prefers-reduced-motion: reduce) { .water-body, .ws-arc { animation: none; } }
+  .btn-secondary, .chip:not(.active), .choice-opt:not(.on) {
+    background-image: linear-gradient(160deg, rgba(255,255,255,.26), rgba(255,255,255,0) 55%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45), inset 0 -1px 0 rgba(255,255,255,.06);
+  }
+  .bottom-nav button { position: relative; }
+  .unread-dot { position: absolute; top: 5px; right: 8px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 9px; background: #ef4444; color: #fff; font: 700 10px/17px system-ui, sans-serif; text-align: center; box-shadow: 0 0 0 2px rgba(0,0,0,.25); animation: lgPop .5s var(--gel) both; }
+  .dialog { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding: 4px 2px 10px; }
+  .bubble { max-width: 82%; padding: 8px 12px; border-radius: 18px; font-size: 15px; word-break: break-word; animation: lgPop .45s var(--gel) both; }
+  .bubble .small { margin-top: 2px; opacity: .65; font-size: 11px; }
+  .bubble.me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+  .bubble.them { align-self: flex-start; background: var(--surface-2); border-bottom-left-radius: 6px; }
+  @media (prefers-reduced-motion: reduce) { .btn-primary, .chip.active, .folder-blob { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -1172,11 +1181,12 @@
       <h1>Чеклисты</h1>
       <p class="subtitle">Войдите в аккаунт</p>
       <label for="login-id">Никнейм</label>
-      <input type="text" id="login-id" placeholder="nickname" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+      <input type="text" id="login-id" placeholder="nickname" autocomplete="username" autocapitalize="none" autocorrect="off">
       <label for="password">Пароль</label>
       <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       <button class="btn btn-primary" id="login-btn">Войти</button>
-      <p class="small" style="margin-top:14px;text-align:center">Забыли пароль? Попросите администратора выдать новый.</p>
+      <button class="btn btn-ghost" id="forgot-btn" style="width:100%;margin-top:12px;justify-content:center">Забыли пароль?</button>
+      <button class="btn btn-ghost" id="reg-open" style="width:100%;margin-top:4px;justify-content:center">Регистрация по коду</button>
       <div id="login-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
@@ -1192,17 +1202,45 @@
       <div id="tfa-error" class="alert alert-error hidden" style="margin-top:16px"></div>
     </div>
   </div>
+  <div id="forgot-screen" class="hidden">
+    <div class="login-card">
+      <div class="login-logo">✉</div>
+      <h1>Восстановление</h1>
+      <p class="subtitle">Укажите email</p>
+      <label for="forgot-email">Email</label>
+      <input type="email" id="forgot-email" placeholder="you@example.com">
+      <button class="btn btn-primary" id="forgot-submit">Отправить</button>
+      <button class="btn btn-ghost" id="forgot-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
+      <div id="forgot-msg" class="hidden" style="margin-top:16px"></div>
+    </div>
+  </div>
+  <div id="register-screen" class="hidden">
+    <div class="login-card">
+      <div class="login-logo">＋</div>
+      <h1>Регистрация</h1>
+      <p class="subtitle">Код выдаёт администратор</p>
+      <label for="reg-code">Код организации</label>
+      <input type="text" id="reg-code" placeholder="COFFEE-2026" autocomplete="off" autocapitalize="characters">
+      <label for="reg-nick">Никнейм (уникальный)</label>
+      <input type="text" id="reg-nick" placeholder="nickname" autocomplete="username" autocapitalize="none">
+      <label for="reg-first">Имя</label>
+      <input type="text" id="reg-first" autocomplete="given-name">
+      <label for="reg-last">Фамилия</label>
+      <input type="text" id="reg-last" autocomplete="family-name">
+      <label for="reg-pass">Пароль (от 8 символов, буквы и цифры)</label>
+      <input type="password" id="reg-pass" autocomplete="new-password">
+      <button class="btn btn-primary" id="reg-btn">Зарегистрироваться</button>
+      <button class="btn btn-ghost" id="reg-back" style="width:100%;margin-top:12px;justify-content:center">← Назад</button>
+      <div id="reg-error" class="alert alert-error hidden" style="margin-top:16px"></div>
+    </div>
+  </div>
   <div id="app-screen" class="hidden">
     <header class="topbar">
-      <button class="topbar-btn" id="menu-btn" aria-label="Меню">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+      <button class="topbar-btn" id="menu-btn" aria-label="Назад" style="display:none"></button>
       <div class="topbar-title" id="topbar-title">Чеклисты</div>
       <div class="topbar-actions" id="topbar-actions">
         <select id="ws-select" class="ws-select hidden"></select>
-        <button class="topbar-btn muted" id="search-btn" aria-label="Поиск">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3" stroke-linecap="round"/></svg>
-        </button>
+        <div id="more-slot" style="position:relative;display:flex"></div>
       </div>
     </header>
     <div class="folders" id="folders"></div>
@@ -1216,6 +1254,7 @@
         <div class="side-profile-text">
           <div class="side-profile-name" id="side-name">—</div>
           <div class="side-profile-sub" id="side-role">Профиль</div>
+          <div class="side-profile-mail" id="side-email">—</div>
         </div>
       </div>
       <nav class="sidemenu-nav" id="sidemenu-nav"></nav>
@@ -1231,40 +1270,23 @@
   </div>
 </div>
 <div id="toast" class="toast"></div>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
-  <filter id="goo" x="-20%" y="-70%" width="140%" height="240%" color-interpolation-filters="sRGB">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="b"/>
-    <feColorMatrix in="b" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8" result="g"/>
-    <feComposite in="SourceGraphic" in2="g" operator="atop"/>
-  </filter>
-</defs></svg>
 <script type="module">
 const NGROK_URL = 'https://dullness-playpen-starlet.ngrok-free.dev';
-const onApiHost = (location.hostname === 'localhost' || location.hostname === '127.0.0.1') && location.port === '3000';
-const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : (onApiHost ? '' : 'http://localhost:3000');
+const API_BASE = location.hostname.endsWith('github.io') ? NGROK_URL : '';
 const tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 const $ = (id) => document.getElementById(id);
 let csrfToken = null;
-const DEFAULT_LAYOUT = () => ({ top: ['all','tpl','people'], dock: ['all','settings'] });
-function normLayout(l) {
-  const fix = (a) => [...new Set(a.map(k => k === 'mine' ? 'all' : k))];
-  return { top: fix(l.top).filter(k => k !== 'settings'), dock: fix(l.dock) };
-}
-function loadLayout() {
-  try { const l = JSON.parse(localStorage.getItem('layout') || 'null'); if (l && Array.isArray(l.top) && Array.isArray(l.dock)) return normLayout(l); } catch {}
-  return DEFAULT_LAYOUT();
-}
 const state = {
   me: null, workspaces: [], wsId: localStorage.getItem('wsId') || null,
-  tab: 'all', filter: '', searchQuery: '', searchPrevTab: 'all',
+  tab: 'mine', filter: '', searchQuery: '', searchPrevTab: 'mine', stack: [], cur: null, cat: 'all', dir: 'fwd',
   theme: localStorage.getItem('theme') || 'light',
   accent: localStorage.getItem('accent') || 'blue',
   contrast: localStorage.getItem('contrast') || 'normal',
   avatarEmoji: localStorage.getItem('avatarEmoji') || '',
   avatarDataUrl: localStorage.getItem('avatarDataUrl') || '',
   favorites: JSON.parse(localStorage.getItem('favorites') || '[]'),
-  layout: loadLayout(),
+  layout: (() => { try { const l = JSON.parse(localStorage.getItem('layout') || 'null'); if (l && Array.isArray(l.top) && Array.isArray(l.dock)) return l; } catch {} return { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; })(),
 };
 const EMOJIS = ['😊','😎','🙂','😉','🤗','🤔','😇','🥳','🤩','😌','🧑‍💼','👩‍💻','👨‍💻','🧑‍🔧','👮','🕵️','🦁','🐯','🐻','🦊','🐸','🐼','🦄','🐶','⭐','🔥','💼','📋','✅','🚀','💡','🎯','🏆','💪','🌟','✨','🎨','📱','⚙️','🔐'];
 const S = (d) => `<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
@@ -1282,13 +1304,15 @@ const icons = {
   back: S('<path d="M15 5l-7 7 7 7"/>'),
   bell: S('<path d="M6 16v-5a6 6 0 1112 0v5l1.5 2h-15z"/><path d="M10 21h4"/>'),
   plus: S('<path d="M12 5v14M5 12h14"/>'),
+  trash: S('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/>'),
   tune: S('<rect x="3.5" y="4" width="17" height="6" rx="2.5"/><rect x="3.5" y="14" width="10" height="6" rx="2.5"/><path d="M17.5 17h3M19 15.5v3"/>'),
   star: S('<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 17l-5.2 2.7 1-5.9-4.3-4.1 5.9-.8z"/>'),
   up: S('<path d="M6 14l6-6 6 6"/>'),
   down: S('<path d="M6 10l6 6 6-6"/>'),
 };
 const SECTIONS = {
-  all: { t: 'Чеклисты', s: 'Все', i: 'all', ok: () => true },
+  mine: { t: 'Мои задачи', s: 'Мои', i: 'list', ok: () => true },
+  all: { t: 'Все задачи', s: 'Все', i: 'all', ok: () => can('checklists.runs.read_all') },
   tpl: { t: 'Шаблоны', s: 'Шаблоны', i: 'template', ok: () => can('checklists.templates.read') },
   people: { t: 'Команда', s: 'Команда', i: 'people', ok: () => can('users.create') || can('users.read') },
   fav: { t: 'Избранное', s: 'Избранное', i: 'star', ok: () => can('checklists.templates.read') },
@@ -1296,7 +1320,7 @@ const SECTIONS = {
   audit: { t: 'Журнал аудита', s: 'Журнал', i: 'audit', ok: () => true },
   settings: { t: 'Кабинет', s: 'Кабинет', i: 'settings', ok: () => true },
 };
-const rootSet = () => [...new Set(['all', ...state.layout.top, ...state.layout.dock])].filter(k => k !== 'settings');
+const rootSet = () => [...new Set(['mine', ...state.layout.top, ...state.layout.dock])].filter(k => k !== 'settings');
 function pluralPunkty(n) {
   const x = Math.abs(Number(n)) || 0;
   const n10 = x % 10, n100 = x % 100;
@@ -1324,11 +1348,14 @@ const can = (p) => !!state.me?.permissions?.includes(p);
 const fmt = (d) => new Date(d).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' });
 const STATUS = { ASSIGNED: 'Назначен', PENDING: 'Назначен', IN_PROGRESS: 'В работе', COMPLETED: 'Завершён', CANCELLED: 'Отменён', CANCELED: 'Отменён' };
 const statusName = (s) => STATUS[s] || s || '';
-const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || '') : '';
-const atNick = (u) => u?.nickname ? '@' + u.nickname : '';
-const NICK_RE = /^[A-Za-z0-9._-]{3,32}$/;
+const personName = (u) => u ? ([u.firstName, u.lastName].filter(Boolean).join(' ') || u.nickname || u.email || '') : '';
 const initials = (u) => { const n = personName(u); if (!n) return '?'; return n.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase(); };
-function setView(...nodes) { $('view').replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType)); }
+function setView(...nodes) {
+  const v = $('view');
+  v.replaceChildren(...nodes.flat(Infinity).filter(n => n && n.nodeType));
+  v.classList.remove('lg-in', 'lg-back'); void v.offsetWidth;
+  v.classList.add(state.dir === 'back' ? 'lg-back' : 'lg-in');
+}
 function toast(msg, bad = false) {
   const t = $('toast'); t.textContent = msg; t.className = 'toast' + (bad ? ' bad' : '') + ' show';
   clearTimeout(toast._t); toast._t = setTimeout(() => { t.className = 'toast'; }, 3800);
@@ -1377,9 +1404,9 @@ function applyAppearance() {
   try { tg?.setBackgroundColor?.(state.theme === 'dark' ? '#0a0c10' : '#eef1f5'); } catch {}
 }
 applyAppearance();
-function showScreen(id) { ['login-screen','tfa-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
+function showScreen(id) { ['login-screen','tfa-screen','forgot-screen','register-screen','app-screen'].forEach(s => $(s).classList.toggle('hidden', s !== id)); }
 function toLogin(msg) {
-  csrfToken = null; state.me = null; localStorage.removeItem('token'); showScreen('login-screen');
+  csrfToken = null; state.me = null; state.stack = []; state.cur = null; localStorage.removeItem('token'); showScreen('login-screen');
   const el = $('login-error');
   if (msg) { el.textContent = msg; el.classList.remove('hidden'); } else el.classList.add('hidden');
 }
@@ -1388,18 +1415,17 @@ async function afterLogin() {
   csrfToken = state.me.csrfToken || csrfToken;
   try {
     const local = JSON.parse(localStorage.getItem('profileLocal') || 'null');
-    if (local && state.me && local.id === state.me.id) {
+    if (local && state.me) {
       if (local.firstName) state.me.firstName = local.firstName;
       if (local.lastName) state.me.lastName = local.lastName;
-      if (local.nickname) state.me.nickname = local.nickname;
+      if (local.nickname && !state.me.nickname) state.me.nickname = local.nickname;
     }
   } catch {}
   state.workspaces = arr(await api('GET', '/workspaces'));
   if (!state.workspaces.find(w => w.id === state.wsId)) state.wsId = state.workspaces[0]?.id || null;
   localStorage.setItem('wsId', state.wsId || '');
-  try { localStorage.setItem('lastNick', state.me.nickname || ''); } catch {}
   showScreen('app-screen'); updateSideUser(); renderWsSelect(); renderSideMenu(); renderBottomNav(); renderFolders();
-  go(state.me.requirePasswordChange ? 'me' : 'all');
+  go(state.me.requirePasswordChange ? 'me' : 'mine');
 }
 function updateSideUser() {
   const me = state.me; const av = $('side-avatar'); av.innerHTML = '';
@@ -1408,7 +1434,8 @@ function updateSideUser() {
   else { av.textContent = initials(me); av.style.fontSize = ''; }
   const online = document.createElement('span'); online.className = 'online'; av.append(online);
   $('side-name').textContent = personName(me) || 'Пользователь';
-  $('side-role').textContent = atNick(me) || 'Профиль';
+  $('side-role').textContent = me?.nickname ? '@' + me.nickname : 'Профиль';
+  $('side-email').textContent = '✉ ' + (me?.email || '');
 }
 function renderWsSelect() {
   const sel = $('ws-select');
@@ -1417,14 +1444,13 @@ function renderWsSelect() {
   sel.replaceChildren(...state.workspaces.map(w => h('option', { value: w.id, selected: w.id === state.wsId }, w.name || w.title || w.id)));
   sel.onchange = () => { state.wsId = sel.value; localStorage.setItem('wsId', state.wsId); go(state.tab); };
 }
-try { const ln = localStorage.getItem('lastNick'); if (ln) $('login-id').value = ln; } catch {}
 $('login-btn').onclick = async () => {
   $('login-error').classList.add('hidden');
   const id = $('login-id').value.trim(); const password = $('password').value;
   if (!id || !password) { toLogin('Заполните логин и пароль'); return; }
   $('login-btn').disabled = true;
   try {
-    const payload = id.includes('@') ? { email: id, password } : { nickname: id, password };
+    const nick = id.replace(/^@/, ''); const payload = (id.includes('@') && !id.startsWith('@')) ? { email: id, password } : { nickname: nick, password };
     const data = await api('POST', '/auth/login', payload);
     if (data.twoFactorRequired) {
       showScreen('tfa-screen'); $('tfa-code').value = ''; $('tfa-error').classList.add('hidden');
@@ -1448,9 +1474,38 @@ $('tfa-btn').onclick = async () => {
   finally { $('tfa-btn').disabled = false; }
 };
 $('tfa-back').onclick = () => toLogin();
+$('reg-open').onclick = () => { $('reg-error').classList.add('hidden'); showScreen('register-screen'); };
+$('reg-back').onclick = () => toLogin();
+$('reg-btn').onclick = async () => {
+  const err = (m) => { $('reg-error').textContent = m; $('reg-error').classList.remove('hidden'); };
+  $('reg-error').classList.add('hidden');
+  const code = $('reg-code').value.trim(), nick = $('reg-nick').value.trim().replace(/^@/, '');
+  const firstName = $('reg-first').value.trim(), lastName = $('reg-last').value.trim(), password = $('reg-pass').value;
+  if (!code) return err('Введите код организации');
+  if (!/^[A-Za-z0-9_.]{3,32}$/.test(nick)) return err('Никнейм: 3–32 символа, латиница, цифры, _ и .');
+  if (password.length < 8 || !/\d/.test(password) || !/[A-Za-zА-Яа-я]/.test(password)) return err('Пароль: от 8 символов, буквы и цифры');
+  $('reg-btn').disabled = true;
+  try {
+    await api('POST', '/auth/register', { code, inviteCode: code, nickname: nick, firstName, lastName, password });
+    $('login-id').value = nick; $('password').value = password;
+    $('reg-pass').value = '';
+    await $('login-btn').onclick();
+  } catch (e) {
+    err(e.status === 409 ? 'Этот никнейм уже занят' : e.status === 404 ? 'Регистрация пока не поддерживается сервером' : (e.message || 'Не удалось зарегистрироваться'));
+  } finally { $('reg-btn').disabled = false; }
+};
+$('forgot-btn').onclick = () => { showScreen('forgot-screen'); $('forgot-email').value = $('login-id').value.includes('@') ? $('login-id').value : ''; $('forgot-msg').classList.add('hidden'); };
+$('forgot-back').onclick = () => toLogin();
+$('forgot-submit').onclick = async () => {
+  const email = $('forgot-email').value.trim(); if (!email) return;
+  $('forgot-submit').disabled = true; const msg = $('forgot-msg');
+  try { await api('POST', '/auth/password/forgot', { email }); msg.className = 'alert alert-success'; msg.textContent = 'Если аккаунт есть — письмо отправлено.'; }
+  catch (e) { msg.className = 'alert alert-info'; msg.textContent = e.status === 404 ? 'Восстановление пока не на сервере.' : (e.message || 'Ошибка'); }
+  msg.classList.remove('hidden'); $('forgot-submit').disabled = false;
+};
 function closeMenu() { /* side menu removed */ }
 function openMenu() { go('settings'); }
-$('menu-btn').onclick = () => go('settings'); if ($('overlay')) $('overlay').onclick = closeMenu; if ($('side-close')) $('side-close').onclick = closeMenu;
+if ($('overlay')) $('overlay').onclick = closeMenu; if ($('side-close')) $('side-close').onclick = closeMenu;
 if ($('side-profile')) $('side-profile').onclick = () => go('me');
 function renderSideMenu() { /* боковая панель отключена — всё в Кабинете */ }
 function sideItem(tab, iconHtml, label, isStub = false) {
@@ -1458,157 +1513,132 @@ function sideItem(tab, iconHtml, label, isStub = false) {
     h('span', { html: iconHtml }), label, isStub ? h('span', { class: 'soon' }, 'скоро') : h('span', { class: 'chev' }, '›'));
 }
 if ($('logout-side')) $('logout-side').onclick = async () => { try { await api('POST', '/auth/logout'); } catch {} toLogin(); };
-/* ===== Водяная «капля»: пружинная физика, растяжение плёнки, отрыв капель ===== */
-const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const waters = new WeakMap(), waterHosts = new Set();
-function getWater(host) {
-  let w = waters.get(host);
-  if (w) return w;
-  const body = h('i', { class: 'water-body' });
-  const drops = [0, 1, 2].map(() => h('i', { class: 'water-drop' }));
-  const sparks = [0, 1, 2].map(() => h('i', { class: 'ws-spark' }));
-  const pill = h('div', { class: 'ws-pill' }, h('i', { class: 'ws-arc' }), h('i', { class: 'ws-dot' }), h('i', { class: 'ws-dot2' }));
-  const goo = h('div', { class: 'water-goo' }, body, ...drops);
-  const shine = h('div', { class: 'water-shine' }, pill, ...sparks);
-  w = { host, goo, shine, body, pill, drops, sparks, l: null, r: null, vl: 0, vr: 0, tl: 0, tr: 0, dir: 1, top: 0, hgt: 40, cy: 20, arc: 8, raf: 0, t0: 0, ds: drops.map(() => ({ on: false })) };
-  waters.set(host, w); waterHosts.add(host);
-  return w;
-}
-function paintWater(w) {
-  const width = Math.max(10, w.r - w.l), nat = Math.max(10, w.tr - w.tl);
-  const sy = 1 - Math.min(.17, Math.max(0, width / nat - 1) * .22);
-  const tf = `translateX(${w.l}px) scaleY(${sy})`;
-  for (const el of [w.body, w.pill]) { el.style.transform = tf; el.style.width = width + 'px'; el.style.top = w.top + 'px'; el.style.height = w.hgt + 'px'; }
-}
-function hideDrop(w, i) { w.drops[i].style.transform = 'translate(0,0) scale(0)'; w.sparks[i].style.opacity = '0'; }
-function paintDrop(w, i, p, cx) {
-  const d = w.ds[i], el = w.drops[i], sp = w.sparks[i];
-  const e = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
-  const sin = Math.sin(Math.PI * p);
-  const x = d.fan != null ? cx + d.fan * sin : d.x0 + (cx - d.x0) * e;
-  const y = -d.arc * sin;
-  const sc = (d.size / 16) * (d.fan != null ? (.4 + .6 * sin) : (1 - .72 * p * p));
-  el.style.transform = `translate(${x - 8}px, ${w.cy - 8 + y}px) scale(${sc})`;
-  sp.style.transform = `translate(${x - 2 - 3 * sc}px, ${w.cy - 2 - 3 * sc + y}px) scale(${sc})`;
-  sp.style.opacity = String(Math.max(0, .95 * (1 - p * p)));
-}
-function tickWater(w, now) {
-  const dt = Math.min(.032, Math.max(.001, (now - w.t0) / 1000)); w.t0 = now;
-  // ведущий край быстрее, хвост тянется — как поверхностное натяжение воды
-  const kLead = 170, kTrail = 70, z = .82;
-  const kl = w.dir > 0 ? kTrail : kLead, kr = w.dir > 0 ? kLead : kTrail;
-  w.vl += (kl * (w.tl - w.l) - 2 * z * Math.sqrt(kl) * w.vl) * dt; w.l += w.vl * dt;
-  w.vr += (kr * (w.tr - w.r) - 2 * z * Math.sqrt(kr) * w.vr) * dt; w.r += w.vr * dt;
-  let busy = Math.abs(w.vl) > .06 || Math.abs(w.vr) > .06 || Math.abs(w.tl - w.l) > .08 || Math.abs(w.tr - w.r) > .08;
-  if (!busy) { w.l = w.tl; w.r = w.tr; w.vl = w.vr = 0; }
-  paintWater(w);
-  const cx = (w.l + w.r) / 2;
-  w.ds.forEach((d, i) => {
-    if (!d.on) return;
-    const el = now - d.t - d.delay;
-    if (el < 0) { busy = true; return; }
-    const p = el / d.dur;
-    if (p >= 1) { d.on = false; hideDrop(w, i); return; }
-    busy = true; paintDrop(w, i, p, cx);
-  });
-  w.raf = busy ? requestAnimationFrame((t) => tickWater(w, t)) : 0;
-}
-function kickWater(w) { if (!w.raf) { w.t0 = performance.now(); w.raf = requestAnimationFrame((t) => tickWater(w, t)); } }
-function spawnDrops(w, fromL, fromR, dir, dist) {
-  const n = dist > 150 ? 3 : dist > 70 ? 2 : 1, now = performance.now();
-  for (let i = 0; i < n; i++) {
-    const edge = dir > 0 ? fromL + (fromR - fromL) * .3 : fromL + (fromR - fromL) * .7;
-    Object.assign(w.ds[i], { on: true, t: now, delay: 40 + i * 90, dur: 560 + i * 120, x0: edge - dir * i * 7, fan: null, arc: w.arc * (i % 2 ? -.55 : 1), size: 16 - i * 3 });
-  }
-}
-function splashWater(w) {
-  if (w.l == null || REDUCED) return;
-  const now = performance.now();
-  w.ds.forEach((d, i) => Object.assign(d, { on: true, t: now, delay: i * 70, dur: 620 + i * 90, fan: (i - 1) * 20, arc: w.arc * (1.3 + i * .25), size: 15 - i * 2 }));
-  kickWater(w);
-}
-function waterTo(w, l, r, top, hgt, instant) {
-  w.top = top; w.hgt = hgt; w.cy = top + hgt / 2; w.arc = Math.min(12, hgt * .22);
-  const first = w.l == null;
-  const oldL = w.l, oldR = w.r;
-  w.tl = l; w.tr = r;
-  if (first || instant || REDUCED) { w.l = l; w.r = r; w.vl = w.vr = 0; paintWater(w); return; }
-  const dc = (l + r) / 2 - (oldL + oldR) / 2;
-  if (Math.abs(dc) > 1) w.dir = dc > 0 ? 1 : -1;
-  if (Math.abs(dc) >= 28) spawnDrops(w, oldL, oldR, w.dir, Math.abs(dc));
-  kickWater(w);
-}
-function syncWater(host, instant) {
-  const w = getWater(host);
-  const btn = host.querySelector('button.active');
-  if (host.offsetWidth === 0 || host.offsetParent === null && getComputedStyle(host).position !== 'fixed') { w.l = null; return; }
-  if (!btn) { w.goo.style.opacity = '0'; w.shine.style.opacity = '0'; return; }
-  w.goo.style.opacity = ''; w.shine.style.opacity = '';
-  waterTo(w, btn.offsetLeft, btn.offsetLeft + btn.offsetWidth, btn.offsetTop, btn.offsetHeight, instant);
-}
-addEventListener('resize', () => { waterHosts.forEach(hst => syncWater(hst, true)); });
-function wobbleWaters() { waterHosts.forEach(hst => splashWater(getWater(hst))); }
-
-/* Смена темы: круговая волна от места нажатия + капли на панелях */
-function changeAppearance(apply, ev) {
-  const x = ev?.clientX ?? innerWidth / 2, y = ev?.clientY ?? innerHeight / 2;
-  const R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-  const done = () => setTimeout(wobbleWaters, 380);
-  if (REDUCED || !document.startViewTransition) { apply(); done(); return; }
-  const ring = h('div', { class: 'theme-ring' });
-  ring.style.left = x + 'px'; ring.style.top = y + 'px';
-  document.body.append(ring);
-  const vt = document.startViewTransition(() => { apply(); });
-  vt.ready.then(() => {
-    document.documentElement.animate(
-      { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${R}px at ${x}px ${y}px)`] },
-      { duration: 1000, easing: 'cubic-bezier(.22,.7,.18,1)', pseudoElement: '::view-transition-new(root)' });
-    ring.animate([{ transform: 'translate(-50%,-50%) scale(0)', opacity: .7 }, { transform: `translate(-50%,-50%) scale(${R * 2 / 40})`, opacity: 0 }],
-      { duration: 1000, easing: 'cubic-bezier(.22,.7,.18,1)' }).onfinish = () => ring.remove();
-  }).catch(() => ring.remove());
-  vt.finished.finally(done);
-}
-
 function renderFolders() {
   const el = $('folders');
   if (!el) return;
   const tabs = state.layout.top.filter(k => SECTIONS[k] && k !== 'settings' && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s }));
-  const hide = !tabs.length || ['search', 'me', 'settings', 'layout'].includes(state.tab);
-  el.style.display = hide ? 'none' : 'flex';
-  let track = el._track;
-  if (!track) { track = el._track = h('div', { class: 'folders-track' }); }
-  const w = getWater(track);
-  track.replaceChildren(w.goo, w.shine, ...tabs.map(({ k, t }) => h('button', {
-    class: 'folder' + (state.tab === k ? ' active' : ''), type: 'button', 'data-tab': k, onclick: () => go(k),
-  }, t)));
-  if (track.parentNode !== el) el.replaceChildren(track);
-  requestAnimationFrame(() => {
-    syncWater(track);
-    const act = track.querySelector('.folder.active');
-    if (act) el.scrollTo({ left: Math.max(0, act.offsetLeft - 40), behavior: REDUCED ? 'auto' : 'smooth' });
+  const hide = !tabs.length || !tabs.some(x => x.k === state.tab) || !!state.cur?.sub;
+  if (hide) { el.style.display = 'none'; return; }
+  el.style.display = 'flex';
+  const track = h('div', { class: 'folders-track' });
+  let blob = h('div', { class: 'folder-blob' });
+  track.append(blob);
+  tabs.forEach(({ k, t }) => {
+    track.append(h('button', {
+      class: 'folder' + (state.tab === k ? ' active' : ''),
+      type: 'button',
+      'data-tab': k,
+      onclick: () => go(k),
+    }, t));
   });
+  const fromLeft = el._blobLeft;
+  const fromWidth = el._blobWidth;
+  el.replaceChildren(track);
+  requestAnimationFrame(() => {
+    const activeBtn = track.querySelector('.folder.active');
+    blob.style.opacity = activeBtn ? '1' : '0';
+    if (!activeBtn) return;
+    const tr = track.getBoundingClientRect();
+    const br = activeBtn.getBoundingClientRect();
+    const toLeft = br.left - tr.left;
+    const toWidth = br.width;
+    if (fromLeft == null) {
+      blob.style.transition = 'none';
+      blob.style.left = toLeft + 'px';
+      blob.style.width = toWidth + 'px';
+    } else {
+      moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth);
+    }
+    el._blobLeft = toLeft;
+    el._blobWidth = toWidth;
+    el.scrollTo({ left: Math.max(0, toLeft - 40), behavior: 'smooth' });
+  });
+}
+function moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth) {
+  if (!blob) return;
+  // start from previous selected position (surface tension: elongate across path)
+  const a = fromLeft != null ? fromLeft : toLeft;
+  const aw = fromWidth != null ? fromWidth : toWidth;
+  blob.style.transition = 'none';
+  blob.style.left = a + 'px';
+  blob.style.width = aw + 'px';
+  blob.style.borderRadius = '999px';
+  blob.style.transform = 'scale(1)';
+  // force reflow
+  void blob.offsetWidth;
+  const goingRight = toLeft >= a;
+  const stretchLeft = Math.min(a, toLeft);
+  const stretchRight = Math.max(a + aw, toLeft + toWidth);
+  const stretchW = stretchRight - stretchLeft;
+  blob.style.transition = 'left .38s cubic-bezier(.2,.8,.2,1), width .38s cubic-bezier(.2,.8,.2,1), border-radius .38s ease, transform .38s ease';
+  // phase 1 — pull like water film
+  blob.style.left = stretchLeft + 'px';
+  blob.style.width = stretchW + 'px';
+  blob.style.borderRadius = goingRight ? '40% 55% 55% 40% / 50% 50% 50% 50%' : '55% 40% 40% 55% / 50% 50% 50% 50%';
+  blob.style.transform = 'scaleY(0.88)';
+  clearTimeout(blob._t1); clearTimeout(blob._t2);
+  blob._t1 = setTimeout(() => {
+    // phase 2 — settle on target
+    blob.style.left = toLeft + 'px';
+    blob.style.width = toWidth + 'px';
+    blob.style.borderRadius = '999px';
+    blob.style.transform = 'scale(1)';
+  }, 200);
 }
 
 function renderBottomNav() {
   const tabs = state.layout.dock.filter(k => SECTIONS[k] && SECTIONS[k].ok()).map(k => ({ k, t: SECTIONS[k].s, icon: icons[SECTIONS[k].i] }));
   if (!tabs.some(x => x.k === 'settings')) tabs.push({ k: 'settings', t: 'Кабинет', icon: icons.settings });
+  // search is separate orb
+
   const nav = $('bottom-nav');
-  const w = getWater(nav);
+  const fromLeft = nav._blobLeft;
+  const fromWidth = nav._blobWidth;
+  let blob = nav.querySelector('.nav-blob');
+  if (!blob) blob = h('div', { class: 'nav-blob' });
+
   const btns = tabs.map(({ k, t, icon }) => {
-    const active = state.tab === k || (k === 'settings' && (['settings','me','layout'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
-    const b = h('button', { class: active ? 'active' : '', type: 'button', title: t, 'data-tab': k, onclick: () => go(k) });
+    const active = state.tab === k || (k === 'settings' && (['settings','me','layout','codes'].includes(state.tab) || (['audit','notifications'].includes(state.tab) && !state.layout.dock.includes(state.tab))));
+    const b = h('button', {
+      class: active ? 'active' : '',
+      type: 'button',
+      title: t,
+      'data-tab': k,
+      onclick: () => go(k),
+    });
     b.innerHTML = icon;
     return b;
   });
-  nav.replaceChildren(w.goo, w.shine, ...btns);
+  nav.replaceChildren(blob, ...btns);
   nav.style.setProperty('--n', tabs.length);
+
   const orb = $('search-orb');
   if (orb) {
     orb.innerHTML = icons.search;
     orb.classList.toggle('active', state.tab === 'search');
     orb.onclick = () => go('search');
   }
-  requestAnimationFrame(() => syncWater(nav));
+
+  requestAnimationFrame(() => {
+    const activeBtn = nav.querySelector('button.active') || nav.querySelector('button');
+    if (!activeBtn) return;
+    const navRect = nav.getBoundingClientRect();
+    const br = activeBtn.getBoundingClientRect();
+    const pad = 4;
+    const toLeft = br.left - navRect.left;
+    const toWidth = br.width;
+    blob.style.top = pad + 'px';
+    blob.style.bottom = pad + 'px';
+    if (fromLeft == null) {
+      blob.style.transition = 'none';
+      blob.style.left = toLeft + 'px';
+      blob.style.width = toWidth + 'px';
+    } else {
+      moveWaterBlob(blob, fromLeft, fromWidth, toLeft, toWidth);
+    }
+    nav._blobLeft = toLeft;
+    nav._blobWidth = toWidth;
+  });
 }
 function toggleFavorite(id) {
   const set = new Set(state.favorites || []);
@@ -1626,36 +1656,81 @@ function parseChoiceUnit(unit) {
   if (parts.length < 3) return null;
   return { mode: parts[1], options: parts.slice(2).join(':').split('|').filter(Boolean) };
 }
-function go(tab) {
-  if (tab === 'mine') tab = 'all';
-  if (typeof openRun !== 'undefined' && openRun._restore) { try { openRun._restore(); } catch {} openRun._restore = null; }
-  if (tab === 'search' && state.tab !== 'search') state.searchPrevTab = state.tab;
-  // Кнопка назад в шапке
-  const menuBtn = $('menu-btn');
-  if (menuBtn) {
-    const rootTabs = rootSet();
-    const needBack = !rootTabs.includes(tab);
-    if (needBack) {
-      menuBtn.style.display = '';
-      menuBtn.innerHTML = icons.back;
-      menuBtn.setAttribute('aria-label', 'Назад');
-      menuBtn.onclick = () => {
-        if (tab === 'search') go(state.searchPrevTab || 'all');
-        else if (tab === 'layout') go('settings');
-        else go('all');
-      };
-    } else {
-      menuBtn.style.display = 'none';
-    }
+const TITLES = { codes:'Коды регистрации', mine:'Мои задачи', all:'Все задачи', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
+function sameView(a, b) { return !!(a && b && a.tab === b.tab && !a.sub && !b.sub); }
+function navigate(desc, opts = {}) {
+  state.dir = opts.back ? 'back' : 'fwd';
+  const prev = state.cur;
+  if (prev && !opts.replace) {
+    const top = state.stack[state.stack.length - 1];
+    if (sameView(prev, desc)) { /* обновление того же экрана — историю не трогаем */ }
+    else if (!desc.sub && prev.sub && top && sameView(top, desc)) state.stack.pop(); // вернулись в список после действия
+    else { state.stack.push(prev); if (state.stack.length > 30) state.stack.shift(); }
   }
-
+  state.cur = desc;
+  renderCur();
+}
+function go(tab, opts) { navigate({ tab }, opts); }
+function push(render, extra) { navigate({ tab: state.tab, sub: true, render, ...(extra || {}) }); }
+function goBack() {
+  const prev = state.stack.pop();
+  navigate(prev || { tab: 'mine' }, { replace: true, back: true });
+}
+function openRunNav(id) { push(() => openRun(id), { runId: id }); }
+function openUserNav(id) { push(() => openUser(id), { userId: id }); }
+function openBuilder(draft) { push(() => showBuilder(draft)); }
+function updateBack() {
+  const b = $('menu-btn'); if (!b) return;
+  const has = state.stack.length > 0;
+  b.style.display = has ? '' : 'none';
+  if (has) { b.innerHTML = icons.back; b.setAttribute('aria-label', 'Назад'); }
+  b.onclick = goBack;
+}
+function setTopMore(items) {
+  const slot = $('more-slot'); if (!slot) return;
+  slot.replaceChildren();
+  if (!items || !items.length) return;
+  const btn = h('button', { class: 'topbar-btn muted', type: 'button', title: 'Ещё', 'aria-label': 'Ещё', html: icons.more });
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    const old = slot.querySelector('.menu-pop');
+    if (old) { old.remove(); return; }
+    document.querySelectorAll('.menu-pop').forEach(m => m.remove());
+    slot.append(h('div', { class: 'menu-pop', style: 'right:0;top:44px' }, ...items.map(it => h('button', {
+      type: 'button', class: it.danger ? 'danger' : '',
+      onclick: () => { slot.querySelector('.menu-pop')?.remove(); it.run(); },
+    }, it.label))));
+  };
+  slot.append(btn);
+}
+let _unreadAt = 0;
+async function refreshUnread(force) {
+  if (!state.me || (!force && Date.now() - _unreadAt < 10000)) return;
+  _unreadAt = Date.now();
+  let n = null;
+  try { const r = await api('GET', '/messages/unread-count'); n = typeof r === 'number' ? r : (r?.count ?? r?.unread ?? null); } catch {}
+  if (n == null) { try { n = arr(await api('GET', '/notifications?limit=100')).filter(x => !(x.readAt || x.read || x.isRead)).length; } catch {} }
+  state.unread = n || 0; paintUnread();
+}
+function paintUnread() {
+  const b = document.querySelector('#bottom-nav button[data-tab="notifications"]'); if (!b) return;
+  let d = b.querySelector('.unread-dot');
+  if ((state.unread || 0) > 0) { if (!d) { d = document.createElement('span'); d.className = 'unread-dot'; b.append(d); } d.textContent = state.unread > 9 ? '9+' : state.unread; }
+  else if (d) d.remove();
+}
+setInterval(() => { if (state.me) refreshUnread(true); }, 30000);
+function renderCur() {
+  const d = state.cur, tab = d.tab;
+  const screens = { mine:renderMine, all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout, codes:renderCodes };
   state.tab = tab;
-  const titles = { all:'Чеклисты', tpl:'Шаблоны', people:'Команда', me:'Профиль', audit:'Журнал аудита', notifications:'Сообщения', settings:'Кабинет', search:'Поиск', fav:'Избранное', layout:'Панели' };
-  $('topbar-title').textContent = titles[tab] || 'Чеклисты';
-  const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && can('users.create')));
-  renderBottomNav(); renderFolders(); renderSideMenu();
-  const screens = { all:renderAll, tpl:renderTemplates, people:renderPeople, me:renderProfile, audit:renderAudit, notifications:renderNotifications, settings:renderSettings, search:renderSearch, fav:renderFav, layout:renderLayout };
-  show(screens[tab] || renderAll);
+  document.querySelectorAll('.menu-pop').forEach(m => m.remove());
+  setTopMore(null);
+  updateBack();
+  $('topbar-title').textContent = d.sub ? '' : (TITLES[tab] || 'Чеклисты');
+  const po = $('plus-orb'); if (po) po.classList.toggle('hidden', !(tab === 'people' && !d.sub && can('users.create')));
+  renderBottomNav(); renderFolders(); paintUnread(); refreshUnread();
+  try { window.scrollTo(0, 0); } catch {}
+  show(d.render || screens[tab] || renderMine);
 }
 
 $('plus-orb').innerHTML = icons.plus;
@@ -1704,9 +1779,9 @@ function renderLayout() {
       h('button', { class: 'lay-sw' + (on ? ' on' : ''), type: 'button', disabled: key === 'dock' && k === 'settings', onclick: () => toggle(k, on) }, h('i')));
     return [h('h2', {}, title), h('div', { class: 'hint' }, hint), h('div', { class: 'card' }, ...cur.map(k => row(k, true)), ...rest.map(k => row(k, false)))];
   };
-  setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. «Избранное» — шаблоны со звездой.'),
+  setView(...block('top', 'Верхняя панель', 'Включайте нужные разделы и меняйте порядок стрелками. Панель видна только внутри своих разделов — на остальных экранах её нет. Добавьте хотя бы один из них в нижнюю консоль, чтобы попадать на панель.'),
     ...block('dock', 'Нижняя консоль', 'До 5 разделов, «Кабинет» всегда остаётся.', 5),
-    h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = DEFAULT_LAYOUT(); saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
+    h('button', { class: 'btn btn-secondary', onclick: () => { state.layout = { top: ['mine','tpl','people'], dock: ['mine','all','settings'] }; saveLayout(); renderLayout(); } }, 'Сбросить по умолчанию'));
 }
 
 async function firstOk(paths) {
@@ -1728,12 +1803,13 @@ async function renderAudit() {
   const act = (r) => String(r.action || r.type || r.event || '');
   const failed = (r) => /FAIL|DENIED|ERROR/i.test(String(r.result || r.status || ''));
   rows = [...rows].sort((a, b) => dt(b) - dt(a));
-  const fails = {}; rows.forEach(r => { if (/LOGIN/i.test(act(r)) && failed(r)) { const k = r.ip || personName(r.actor); fails[k] = (fails[k] || 0) + 1; } });
-  const critical = (r) => /DELETE|ROLE|PERMISSION|EXPORT/i.test(act(r)) || (/LOGIN/i.test(act(r)) && failed(r) && (fails[r.ip || personName(r.actor)] || 0) >= 5);
+  const fails = {}; rows.forEach(r => { if (/LOGIN/i.test(act(r)) && failed(r)) { const k = r.actorEmail || r.ip || personName(r.actor); fails[k] = (fails[k] || 0) + 1; } });
+  const critical = (r) => /DELETE|ROLE|PERMISSION|EXPORT/i.test(act(r)) || (/LOGIN/i.test(act(r)) && failed(r) && (fails[r.actorEmail || r.ip || personName(r.actor)] || 0) >= 5);
   const GROUPS = { all: ['Все', () => true], crit: ['Важное', critical], auth: ['Вход', r => /LOGIN|LOGOUT|PASSWORD|2FA/i.test(act(r))], data: ['Данные', r => /TEMPLATE|CHECKLIST|RUN|ITEM|FILE|COMMENT|ASSIGN|COMPLETE|CANCEL/i.test(act(r))], people: ['Люди', r => /USER|ROLE|PERMISSION/i.test(act(r))] };
   const PERIODS = { all: ['Всё', 0], day: ['Сегодня', 1], week: ['7 дней', 7], month: ['30 дней', 30] };
   let q = '', grp = 'all', per = 'all', shown = 30;
-  const who = (r) => personName(r.actor || r.user) || 'Система';
+  const mask = (e) => e ? String(e).replace(/^(.).*(@.*)$/, '$1***$2') : '';
+  const who = (r) => personName(r.actor || r.user) || mask(r.actorEmail) || 'Система';
   const filtered = () => rows.filter(r => GROUPS[grp][1](r) && (!PERIODS[per][1] || Date.now() - dt(r) < PERIODS[per][1] * 864e5)
     && (!q || [act(r), who(r), r.entity || r.entityType, r.entityId].join(' ').toLowerCase().includes(q)));
   const input = h('input', { type: 'search', placeholder: 'Поиск по действиям и людям…' });
@@ -1794,7 +1870,7 @@ async function renderNotifications() {
       unread > 0 && h('button', { class: 'btn btn-ghost', onclick: async () => { await Promise.all(rows.filter(n => !isRead(n)).map(markRead)); draw(); } }, 'Прочитать все'));
     const list = f.length ? f.map(n => {
       const runId = n.runId || n.data?.runId || n.payload?.runId;
-      return h('div', { class: 'card click', onclick: async () => { await markRead(n); if (runId) show(() => openRun(runId)); else draw(); } },
+      return h('div', { class: 'card click', onclick: async () => { await markRead(n); if (runId) openRunNav(runId); else draw(); } },
         h('div', { class: 'row' },
           h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, n.title || n.type || 'Уведомление'),
           !isRead(n) && h('span', { class: 'badge' }, 'Новое')),
@@ -1809,10 +1885,9 @@ async function renderNotifications() {
 async function renderFav() {
   let t = []; try { t = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); } catch {}
   t = t.filter(x => isFavorite(x.id));
-  setView(t.length ? t.map(x => h('div', { class: 'card click', onclick: () => show(() => showAssign(x)) }, h('strong', {}, x.title), x.description && h('div', { class: 'muted' }, x.description)))
+  setView(t.length ? t.map(x => h('div', { class: 'card click', onclick: () => push(() => showAssign(x)) }, h('strong', {}, x.title), x.description && h('div', { class: 'muted' }, x.description)))
     : emptyState('Избранного нет', 'Отметьте шаблон звездой в разделе «Шаблоны»'));
 }
-$('search-btn').onclick = () => go('search');
 document.addEventListener('click', () => { document.querySelectorAll('.menu-pop').forEach(m => m.remove()); });
 function statusBadge(r) {
   if (r.overdue) return h('span', { class: 'badge bad' }, 'Просрочен');
@@ -1821,7 +1896,7 @@ function statusBadge(r) {
   if (r.status === 'CANCELLED' || r.status === 'CANCELED') return h('span', { class: 'badge neutral' }, 'Отменён');
   return h('span', { class: 'badge' }, statusName(r.status));
 }
-function runCard(r, withWho) {
+function runCard(r, withWho, onDeleted) {
   const title = r.title || r.template?.title || r.templateTitle || 'Чеклист';
   const who = personName(r.assignee);
   const overdue = !!r.overdue;
@@ -1833,11 +1908,12 @@ function runCard(r, withWho) {
   }
   return h('div', {
     class: 'card click' + (overdue ? ' run-row-overdue' : ''),
-    onclick: () => show(() => openRun(r.id)),
+    onclick: () => openRunNav(r.id),
   },
     h('div', { class: 'row' },
       h('strong', { style: 'font-size:15px;min-width:0;flex:1' }, title),
-      statusBadge(r)
+      statusBadge(r),
+      canDeleteRun() && h('button', { class: 'trash-btn', type: 'button', title: 'Удалить', html: icons.trash, onclick: (e) => { e.stopPropagation(); deleteRun(r, onDeleted); } })
     ),
     h('div', { class: 'row', style: 'margin-top:6px' },
       h('div', { class: 'muted' },
@@ -1875,30 +1951,41 @@ function sortBar(redraw) {
     h('button', { class: 'chip sort-dir', type: 'button', title: 'Направление', html: runSort.dir === 'asc' ? icons.up : icons.down, onclick: () => { runSort.dir = runSort.dir === 'asc' ? 'desc' : 'asc'; save(); } }),
     ...Object.entries(SORTS).map(([k, v]) => h('button', { class: 'chip' + (runSort.key === k ? ' active' : ''), type: 'button', onclick: () => { runSort.key = k; save(); } }, v)));
 }
+const CLOSED = ['COMPLETED', 'CANCELLED', 'CANCELED', 'REJECTED', 'DECLINED'];
+const RUN_CATS = [
+  ['all', 'Все', () => true],
+  ['assigned', 'Назначенные', r => ['ASSIGNED', 'PENDING'].includes(r.status)],
+  ['notdone', 'Непройденные', r => !CLOSED.includes(r.status)],
+  ['done', 'Пройденные', r => r.status === 'COMPLETED'],
+  ['rejected', 'Отклонённые', r => ['REJECTED', 'DECLINED', 'CANCELLED', 'CANCELED'].includes(r.status)],
+  ['overdue', 'Просроченные', r => !CLOSED.includes(r.status) && (!!r.overdue || (r.dueAt && new Date(r.dueAt) < new Date()))],
+];
+const canDeleteRun = () => can('checklists.assign') || can('checklists.templates.manage');
+async function deleteRun(r, after) {
+  const t = r.title || r.template?.title || r.templateTitle || 'Чеклист';
+  if (!confirm(`Удалить чеклист «${t}»? Это действие нельзя отменить.`)) return false;
+  try { await api('DELETE', `/checklists/runs/${r.id}`); toast('Чеклист удалён'); if (after) after(r); return true; }
+  catch (e) { toast(e.status === 404 || e.status === 405 ? 'Удаление чеклистов пока недоступно на сервере' : e.status === 403 ? 'Недостаточно прав' : (e.message || 'Ошибка'), true); return false; }
+}
 function runsScreen(d, withWho, head, emptyNode) {
-  const box = h('div');
-  const draw = () => { const sorted = sortRuns(d); box.replaceChildren(sortBar(draw), ...(sorted.length ? sorted.map(r => runCard(r, withWho)) : [emptyNode])); };
+  const box = h('div'), catBar = h('div', { class: 'chips sortbar' });
+  const removed = (r) => { d = d.filter(x => x.id !== r.id); draw(); };
+  const draw = () => {
+    const cat = RUN_CATS.find(c => c[0] === state.cat) || RUN_CATS[0];
+    catBar.replaceChildren(...RUN_CATS.map(([k, t, f]) => h('button', { class: 'chip' + (cat[0] === k ? ' active' : ''), type: 'button', onclick: () => { state.cat = k; draw(); } }, `${t} · ${d.filter(f).length}`)));
+    const sorted = sortRuns(d.filter(cat[2]));
+    box.replaceChildren(sortBar(draw), ...(sorted.length ? sorted.map(r => runCard(r, withWho, removed)) : [emptyNode]));
+  };
   draw();
-  setView(head, box);
+  setView(head, catBar, box);
+}
+async function renderMine() {
+  const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
+  runsScreen(d, false, null, emptyState('Нет задач', 'Вам пока ничего не назначили'));
 }
 async function renderAll() {
-  const seeAll = can('checklists.runs.read_all');
-  const mineList = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}`));
-  const mineIds = new Set(mineList.map(r => r.id));
-  let list = mineList;
-  if (seeAll) {
-    try {
-      const others = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
-      const byId = new Map(others.map(r => [r.id, r]));
-      mineList.forEach(r => { if (!byId.has(r.id)) byId.set(r.id, r); });
-      list = [...byId.values()];
-    } catch (e) { if (e.status === 401) throw e; }
-  }
-  const f = state.filter;
-  const isDone = (r) => r.status === 'COMPLETED';
-  const view = list.filter(r => f === 'mine' ? mineIds.has(r.id) : f === 'overdue' ? !!r.overdue : f === 'done' ? isDone(r) : true);
-  const chips = [chip('', 'Все'), chip('mine', 'Мои чеклисты'), chip('overdue', 'Просроченные'), chip('done', 'Выполненные')];
-  runsScreen(view, true, h('div', { class: 'chips' }, ...chips), emptyState(f === 'mine' ? 'Нет задач' : 'Ничего не найдено', f === 'mine' ? 'Вам пока ничего не назначили' : undefined));
+  const d = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`));
+  runsScreen(d, true, null, emptyState('Ничего не найдено', 'В этой категории чеклистов нет'));
 }
 function chip(k, label) { return h('button', { class: 'chip' + (state.filter === k ? ' active' : ''), onclick: () => { state.filter = k; go('all'); } }, label); }
 async function photoURL(id) {
@@ -2018,100 +2105,49 @@ async function openRun(id) {
   const title = run.title || run.template?.title || run.templateTitle || 'Чеклист';
   const templateId = run.templateId || run.template?.id;
 
-  $('topbar-title').textContent = title;
-
-  // Кнопка назад в шапке + меню ⋯ для вторичных действий
-  const actions = $('topbar-actions');
-  const extra = h('div', { style: 'display:flex;align-items:center;gap:0;position:relative' });
-  const backBtn = h('button', {
-    class: 'topbar-btn muted', type: 'button', title: 'Назад',
-    onclick: () => go(state.tab === 'search' ? (state.searchPrevTab || 'all') : (rootSet().includes(state.tab) ? state.tab : 'all')),
-  });
-  backBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-
-  const moreBtn = h('button', { class: 'topbar-btn muted', type: 'button', title: 'Ещё' });
-  moreBtn.textContent = '⋯';
-  moreBtn.onclick = (e) => {
-    e.stopPropagation();
-    const old = extra.querySelector('.menu-pop');
-    if (old) { old.remove(); return; }
-    const items = [];
-    if (!closed && can('checklists.assign')) {
-      items.push(h('button', { type: 'button', class: 'danger', onclick: async () => {
-        extra.querySelector('.menu-pop')?.remove();
-        if (!confirm('Отменить этот чеклист?')) return;
-        try { await api('POST', `/checklists/runs/${run.id}/cancel`); go('all'); }
-        catch (err) { toast(err.message, true); }
-      } }, 'Отменить чеклист'));
-    }
-    if (templateId && can('checklists.templates.manage')) {
-      items.push(h('button', { type: 'button', onclick: async () => {
-        extra.querySelector('.menu-pop')?.remove();
-        try {
-          let t = run.template;
-          if (!t || !t.items) {
-            const list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
-            t = list.find(x => x.id === templateId) || t;
-          }
-          if (!t) return toast('Шаблон не найден', true);
-          const itemsMap = (t.items || run.items || []).map(it => {
-            const parsed = parseChoiceUnit(it.unit);
-            return {
-              title: it.title || '',
-              type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
-              required: !!it.required,
-              unit: it.unit || '',
-              minValue: it.minValue ?? '',
-              maxValue: it.maxValue ?? '',
-              options: parsed ? parsed.options : ['Вариант 1', 'Вариант 2'],
-            };
-          });
-          showBuilder({
-            title: (t.title || title) + ' (копия)',
-            description: t.description || '',
-            items: itemsMap.length ? itemsMap : [{ title: '', type: 'CHECK', required: true, options: [''] }],
-          });
-        } catch (err) { toast(err.message, true); }
-      } }, 'Копировать как шаблон'));
-    }
-    if (!items.length) {
-      items.push(h('button', { type: 'button', onclick: () => extra.querySelector('.menu-pop')?.remove() }, 'Нет действий'));
-    }
-    const pop = h('div', { class: 'menu-pop', style: 'right:0;top:44px' }, ...items);
-    extra.append(pop);
-  };
-
-  // rebuild topbar right: keep search hidden on run detail, show back+more
-  const ws = $('ws-select');
-  const search = $('search-btn');
-  extra.append(moreBtn);
-  // insert back before title area via menu-btn side - put back next to menu
-  const menuBtn = $('menu-btn');
-  // temporary replace menu with back while in run
-  const prevMenuHandler = menuBtn.onclick;
-  menuBtn.onclick = () => go(rootSet().includes(state.tab) ? state.tab : 'all');
-  menuBtn.innerHTML = `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
-  menuBtn.setAttribute('aria-label', 'Назад');
-  search.classList.add('hidden');
-  const moreHost = h('div', { style: 'position:relative;display:flex' }, moreBtn);
-  // place more into topbar-actions
-  const keepWs = ws && !ws.classList.contains('hidden') ? ws : null;
-  actions.replaceChildren(...[keepWs, moreHost].filter(Boolean));
-
-  const restoreChrome = () => {
-    menuBtn.onclick = openMenu;
-    menuBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
-    menuBtn.setAttribute('aria-label', 'Меню');
-    search.classList.remove('hidden');
-    renderWsSelect();
-    // restore search button
-    const acc = $('topbar-actions');
-    if (!$('search-btn')) {
-      /* search is same node if only class hidden */
-    }
-    if (!acc.contains(search)) acc.append(search);
-    const lbt = $('layout-btn'); if (lbt && !acc.contains(lbt)) acc.prepend(lbt);
-  };
+  if (state.cur?.runId !== id) return;
+  const moreItems = [];
+  if (!closed && can('checklists.assign')) {
+    moreItems.push({ label: 'Отменить чеклист', danger: true, run: async () => {
+      if (!confirm('Отменить этот чеклист?')) return;
+      try { await api('POST', `/checklists/runs/${run.id}/cancel`); toast('Чеклист отменён'); goBack(); }
+      catch (err) { toast(err.message, true); }
+    } });
+  }
+  if (templateId && can('checklists.templates.manage')) {
+    moreItems.push({ label: 'Копировать как шаблон', run: async () => {
+      try {
+        let t = run.template;
+        if (!t || !t.items) {
+          const list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`));
+          t = list.find(x => x.id === templateId) || t;
+        }
+        if (!t) return toast('Шаблон не найден', true);
+        const itemsMap = (t.items || run.items || []).map(it => {
+          const parsed = parseChoiceUnit(it.unit);
+          return {
+            title: it.title || '',
+            type: parsed ? (parsed.mode === 'multi' ? 'MULTI' : 'CHOICE') : (it.type || 'CHECK'),
+            required: !!it.required,
+            unit: it.unit || '',
+            minValue: it.minValue ?? '',
+            maxValue: it.maxValue ?? '',
+            options: parsed ? parsed.options : ['Вариант 1', 'Вариант 2'],
+          };
+        });
+        openBuilder({
+          title: (t.title || title) + ' (копия)',
+          description: t.description || '',
+          items: itemsMap.length ? itemsMap : [{ title: '', type: 'CHECK', required: true, options: [''] }],
+        });
+      } catch (err) { toast(err.message, true); }
+    } });
+  }
+  if (canDeleteRun()) {
+    moreItems.push({ label: 'Удалить чеклист', danger: true, run: async () => { if (await deleteRun(run)) goBack(); } });
+  }
+  // «⋯» показываем только если в нём есть действия
+  setTopMore(moreItems);
 
   const commentField = h('textarea', { rows: 2, placeholder: 'Комментарий к сдаче (необязательно)' });
   const itemTotal = (run.items || []).length;
@@ -2135,8 +2171,7 @@ async function openRun(id) {
           if (c) body.comment = c;
           const r = await api('POST', `/checklists/runs/${run.id}/complete`, Object.keys(body).length ? body : undefined);
           toast(`Сдано. Проблем: ${r?.flaggedCount ?? 0}`);
-          restoreChrome();
-          go(rootSet().includes(state.tab) ? state.tab : 'all');
+          goBack();
         } catch (err) { toast(err.message, true); e.target.disabled = false; }
       },
     }, 'Сдать чеклист'));
@@ -2145,8 +2180,6 @@ async function openRun(id) {
   nodes.push(commentsBlock(run, closed, mine));
   setView(nodes);
 
-  // When leaving via go(), chrome restores on next renderBottomNav/topbar title — hook restore into go wrapper once
-  openRun._restore = restoreChrome;
 }
 
 
@@ -2256,16 +2289,7 @@ function commentsBlock(run, closed, mine) {
     h('div', { class: 'gap' }, h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => inp.click() }, 'Фото (до 5)'), send), inp);
   return box;
 }
-async function loadUsers() { 
-  try { 
-    const response = await api('GET', `/users?workspaceId=${state.wsId}`);
-    return arr(response);
-  } catch (err) { 
-    console.error('Ошибка загрузки пользователей:', err);
-    toast('Ошибка загрузки команды: ' + (err.message || 'Нет доступа'), true); 
-    return []; 
-  } 
-}
+async function loadUsers() { try { return arr(await api('GET', '/users')); } catch { return []; } }
 async function renderTemplates() {
   let list;
   try { list = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
@@ -2299,7 +2323,7 @@ async function renderTemplates() {
             if (openMenuId === t.id) { openMenuId = null; return; }
             openMenuId = t.id;
             const pop = h('div', { class: 'menu-pop' },
-              can('checklists.assign') && h('button', { type: 'button', onclick: () => { openMenuId = null; show(() => showAssign(t)); } }, 'Назначить'),
+              can('checklists.assign') && h('button', { type: 'button', onclick: () => { openMenuId = null; push(() => showAssign(t)); } }, 'Назначить'),
               h('button', { type: 'button', onclick: () => {
                 openMenuId = null;
                 const items = (t.items || []).map(it => {
@@ -2314,7 +2338,7 @@ async function renderTemplates() {
                     options: parsed ? parsed.options : (it.options || ['']),
                   };
                 });
-                showBuilder({
+                openBuilder({
                   title: (t.title || '') + ' (копия)',
                   description: t.description || '',
                   items: items.length ? items : [{ title: '', type: 'CHECK', required: true, options: [''] }],
@@ -2322,10 +2346,10 @@ async function renderTemplates() {
               } }, 'Копировать'),
               h('button', { type: 'button', class: 'danger', onclick: async () => {
                 openMenuId = null;
-                if (!confirm('Архивировать «' + t.title + '»?')) return;
-                try { await api('DELETE', `/checklists/templates/${t.id}`); go('tpl'); }
+                if (!confirm('Удалить шаблон «' + t.title + '»? Это действие нельзя отменить.')) return;
+                try { await api('DELETE', `/checklists/templates/${t.id}`); toast('Шаблон удалён'); go('tpl'); }
                 catch (err) { toast(err.message, true); }
-              } }, 'Архивировать')
+              } }, 'Удалить')
             );
             head.append(pop);
           },
@@ -2334,9 +2358,9 @@ async function renderTemplates() {
 
       const actions = [];
       if (can('checklists.assign') && !manage) {
-        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => push(() => showAssign(t)) }, 'Назначить'));
       } else if (can('checklists.assign')) {
-        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => show(() => showAssign(t)) }, 'Назначить'));
+        actions.push(h('button', { class: 'btn btn-primary btn-sm', onclick: () => push(() => showAssign(t)) }, 'Назначить'));
       }
 
       nodes.push(h('div', { class: 'card' },
@@ -2347,7 +2371,7 @@ async function renderTemplates() {
   }
 
   if (manage) {
-    nodes.push(h('button', { class: 'fab', type: 'button', title: 'Новый шаблон', onclick: () => showBuilder() }, '+'));
+    nodes.push(h('button', { class: 'fab', type: 'button', title: 'Новый шаблон', onclick: () => openBuilder() }, '+'));
   }
   setView(...nodes);
 }
@@ -2358,27 +2382,38 @@ async function showAssign(t) {
   const listBox = h('div', { class: 'stack', style: 'margin-top:8px' });
   const due = h('input', { type: 'datetime-local' });
 
+  let q = '';
+  const counter = h('div', { class: 'small', style: 'margin-top:6px' });
+  const visible = () => users.filter(u => !q || [personName(u), u.nickname, u.email].join(' ').toLowerCase().includes(q));
   const renderList = () => {
-    listBox.replaceChildren(...(users.length ? users.map(u => {
-      const id = u.id;
-      const on = selected.has(id);
-      return h('div', {
-        class: 'choice-opt' + (on ? ' on' : ''),
-        onclick: () => { if (selected.has(id)) selected.delete(id); else selected.add(id); renderList(); },
-      }, (on ? '✓ ' : '') + personName(u) + (u.nickname ? ` (@${u.nickname})` : ''));
-    }) : [h('div', { class: 'alert alert-error' }, 'Нет сотрудников')]));
+    const list = visible();
+    listBox.replaceChildren(...(list.length ? list.map(u => {
+      const on = selected.has(u.id);
+      return h('div', { class: 'choice-opt' + (on ? ' on' : ''), onclick: () => { if (selected.has(u.id)) selected.delete(u.id); else selected.add(u.id); renderList(); } },
+        (on ? '✓ ' : '') + personName(u) + (u.nickname ? ` @${u.nickname}` : (u.email ? ` (${u.email})` : '')));
+    }) : [h('div', { class: 'alert alert-error' }, users.length ? 'Никого не найдено' : 'Нет сотрудников')]));
+    counter.textContent = `Выбрано: ${selected.size} из ${users.length}`;
   };
+  const toolsBar = h('div', {},
+    h('input', { type: 'search', placeholder: 'Поиск по имени или нику', oninput: (e) => { q = e.target.value.trim().toLowerCase(); renderList(); } }),
+    h('div', { class: 'chips', style: 'margin-top:8px' },
+      h('button', { class: 'chip', type: 'button', onclick: () => { visible().forEach(u => selected.add(u.id)); renderList(); } }, 'Выбрать всех'),
+      h('button', { class: 'chip', type: 'button', onclick: () => { selected.clear(); renderList(); } }, 'Снять выбор'),
+      ...Object.entries(ROLE_RU).filter(([c]) => users.some(u => userRoleCode(u).toUpperCase() === c)).map(([c, t]) =>
+        h('button', { class: 'chip', type: 'button', onclick: () => { users.filter(u => userRoleCode(u).toUpperCase() === c).forEach(u => selected.add(u.id)); renderList(); } }, '+ ' + t))),
+    counter);
   renderList();
 
   setView(
-    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
     h('h1', {}, 'Назначить'),
     h('p', { class: 'page-desc' }, t.title),
     h('label', {}, 'Исполнители (можно несколько)'),
+    toolsBar,
     listBox,
     h('label', {}, 'Срок'), due,
     h('button', { class: 'btn btn-primary', onclick: async (e) => {
       if (!selected.size) return toast('Выберите хотя бы одного', true);
+      if (selected.size > 1 && !confirm(`Назначить «${t.title}» выбранным сотрудникам (${selected.size})?`)) return;
       e.target.disabled = true;
       let ok = 0, fail = 0;
       for (const assigneeId of selected) {
@@ -2433,7 +2468,6 @@ function showBuilder(draft) {
   });
 
   setView(
-    h('button', { class: 'btn btn-ghost back-btn', onclick: () => go('tpl') }, '← К шаблонам'),
     h('h1', {}, 'Новый шаблон'),
     h('label', {}, 'Название'), h('input', { type: 'text', value: draft.title, oninput: (e) => { draft.title = e.target.value; } }),
     h('label', {}, 'Описание'), h('input', { type: 'text', value: draft.description, oninput: (e) => { draft.description = e.target.value; } }),
@@ -2496,12 +2530,296 @@ async function copyText(t) {
   const ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;opacity:0'; document.body.append(ta); ta.select();
   try { document.execCommand('copy'); toast('Скопировано'); } catch { toast('Выделите пароль и скопируйте вручную', true); } ta.remove();
 }
+
+const ROLE_RU = { OWNER: 'Владелец', ADMIN: 'Администратор', MANAGER: 'Менеджер', MEMBER: 'Сотрудник', VIEWER: 'Наблюдатель' };
+const RANK = { OWNER: 4, ADMIN: 3, MANAGER: 2, MEMBER: 1, VIEWER: 0 };
+const userRoleCode = (u) => { const r = u.roleCode || u.role?.code || u.role?.name || u.role || u.roleName || u.roles?.[0]?.code || u.roles?.[0]?.name || ''; return typeof r === 'string' ? r : ''; };
+const roleRu = (c) => ROLE_RU[String(c || '').toUpperCase()] || c || '';
+async function updateUserRole(u, code) {
+  const tries = [
+    ['PATCH', `/users/${u.id}`, { roleCode: code }],
+    ['PATCH', `/users/${u.id}`, { roleCode: code, workspaceId: state.wsId }],
+    ['PATCH', `/users/${u.id}/role`, { roleCode: code }],
+    ['PUT', `/users/${u.id}/role`, { roleCode: code }],
+    ['POST', `/users/${u.id}/role`, { roleCode: code }],
+  ];
+  let last;
+  for (const [m, p, b] of tries) {
+    try { return await api(m, p, b); }
+    catch (e) { last = e; if (e.status === 401 || e.status === 403) throw e; }
+  }
+  throw last;
+}
+const PERMS = [
+  ['checklists.runs.read_all', 'Видеть все чеклисты'], ['checklists.templates.read', 'Видеть шаблоны'],
+  ['checklists.templates.manage', 'Управлять шаблонами'], ['checklists.assign', 'Назначать чеклисты'],
+  ['users.read', 'Видеть сотрудников'], ['users.create', 'Добавлять сотрудников'],
+  ['users.update', 'Изменять сотрудников'], ['users.delete', 'Удалять сотрудников'], ['users.manage', 'Управлять доступом'],
+];
+async function tryApi(tries) {
+  let last;
+  for (const [m, p, b] of tries) {
+    try { return await api(m, p, b); }
+    catch (e) { last = e; if (e.status === 401 || e.status === 403) throw e; }
+  }
+  throw last;
+}
+const updateUserPerms = (u, permissions) => tryApi([['PATCH', `/users/${u.id}`, { permissions }], ['PUT', `/users/${u.id}/permissions`, { permissions }], ['PATCH', `/users/${u.id}/permissions`, { permissions }]]);
+const sendMessage = (u, text) => tryApi([
+  ['POST', '/messages', { recipientId: u.id, text, workspaceId: state.wsId }],
+  ['POST', '/notifications', { userId: u.id, title: 'Сообщение от ' + (personName(state.me) || 'руководителя'), body: text }],
+]);
+async function openUser(id) {
+  const users = await loadUsers();
+  if (state.cur?.userId !== id) return;
+  const u = users.find(x => x.id === id);
+  if (!u) { setView(emptyState('Сотрудник не найден')); return; }
+  const isMe = u.id === state.me?.id;
+  const myRole = userRoleCode(state.me || {}).toUpperCase();
+  const outranks = !myRole || myRole === 'OWNER' || (RANK[myRole] ?? 0) > (RANK[userRoleCode(u).toUpperCase()] ?? 0);
+  const assignable = (c) => c !== 'OWNER' && (!myRole || myRole === 'OWNER' || (RANK[c] ?? 0) < (RANK[myRole] ?? 0));
+  const canRole = !isMe && outranks && (can('users.update') || can('users.manage') || can('users.create'));
+  const canAcc = !isMe && outranks && (can('users.manage') || can('users.update'));
+  const blocked = u.isActive === false || u.blocked === true || u.disabled === true || /BLOCK|DISABLED/i.test(String(u.status || ''));
+  const tempBox = h('div');
+  const canDel = !isMe && (can('users.delete') || can('users.manage') || can('users.update') || can('users.create'));
+  const canAssign = can('checklists.assign');
+  const role = userRoleCode(u).toUpperCase();
+
+  // права доступа
+  const canPerm = !isMe && can('users.manage');
+  const perms = new Set(Array.isArray(u.permissions) ? u.permissions : []);
+  const permBox = h('div');
+  const drawPerms = () => permBox.replaceChildren(...PERMS.map(([k, t]) => h('div', { class: 'lay-row' },
+    h('span', { class: 'lay-t' }, t),
+    h('button', { class: 'lay-sw' + (perms.has(k) ? ' on' : ''), type: 'button', onclick: () => { if (perms.has(k)) perms.delete(k); else perms.add(k); drawPerms(); } }, h('i')))));
+  drawPerms();
+  const msgField = h('textarea', { rows: 2, placeholder: 'Сообщение сотруднику…' });
+  const thread = h('div', { class: 'dialog' });
+  let msgs = [];
+  const drawThread = () => {
+    thread.replaceChildren(...(msgs.length ? msgs.map(m => h('div', { class: 'bubble ' + (((m.senderId || m.fromId || m.sender?.id) === state.me.id) ? 'me' : 'them') },
+      h('div', {}, m.text || m.body || m.message || ''), h('div', { class: 'small' }, m.createdAt ? fmt(m.createdAt) : ''))) : [h('div', { class: 'muted' }, 'Сообщений пока нет')]));
+    thread.scrollTop = thread.scrollHeight;
+  };
+  const loadThread = async () => {
+    try {
+      const r = await tryApi([['GET', `/messages?withUserId=${u.id}`], ['GET', `/messages/dialogs/${u.id}`], ['GET', `/messages/with/${u.id}`]]);
+      msgs = (Array.isArray(r) ? r : (r?.messages || arr(r))).slice().sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0));
+      drawThread();
+    } catch { if (!msgs.length) thread.replaceChildren(h('div', { class: 'small' }, 'История переписки пока недоступна на сервере')); }
+  };
+  if (!isMe) {
+    await loadThread();
+    const timer = setInterval(() => { if (state.cur?.userId !== id) clearInterval(timer); else loadThread(); }, 8000);
+  }
+
+  // полномочия
+  let newRole = ROLE_RU[role] ? role : '';
+  const roleBox = h('div', { class: 'stack', style: 'margin-top:8px' });
+  const drawRoles = () => roleBox.replaceChildren(...Object.entries(ROLE_RU).filter(([c]) => assignable(c)).map(([c, t]) => h('div', {
+    class: 'choice-opt' + (newRole === c ? ' on' : ''),
+    onclick: () => { newRole = c; drawRoles(); },
+  }, (newRole === c ? '✓ ' : '') + t)));
+  drawRoles();
+
+  // шаблоны для назначения
+  let tpls = [];
+  if (canAssign) {
+    try { tpls = arr(await api('GET', `/checklists/templates?workspaceId=${state.wsId}`)); }
+    catch { try { tpls = arr(await api('GET', '/checklists/templates')); } catch {} }
+  }
+  const picked = new Set();
+  const tplBox = h('div', { class: 'stack', style: 'margin-top:8px' });
+  const drawTpl = () => tplBox.replaceChildren(...(tpls.length ? tpls.map(t => h('div', {
+    class: 'choice-opt' + (picked.has(t.id) ? ' on' : ''),
+    onclick: () => { if (picked.has(t.id)) picked.delete(t.id); else picked.add(t.id); drawTpl(); },
+  }, (picked.has(t.id) ? '✓ ' : '') + t.title)) : [h('div', { class: 'muted' }, 'Шаблонов пока нет')]));
+  drawTpl();
+  const due = h('input', { type: 'datetime-local' });
+
+  // текущие чеклисты сотрудника
+  let runs = [];
+  if (can('checklists.runs.read_all')) {
+    try { runs = arr(await api('GET', `/checklists/runs?workspaceId=${state.wsId}&scope=all`)).filter(r => (r.assigneeId || r.assignee?.id) === u.id); } catch {}
+  }
+  if (state.cur?.userId !== id) return;
+
+  setView(
+    h('div', { class: 'card' }, h('div', { class: 'row' },
+      h('div', { class: 'avatar-lg' }, initials(u)),
+      h('div', { style: 'flex:1;min-width:0' },
+        h('strong', { style: 'font-size:17px' }, personName(u) || 'Без имени'),
+        u.email && h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis' }, u.email),
+        u.nickname && h('div', { class: 'small' }, '@' + u.nickname)),
+      blocked && h('span', { class: 'badge bad' }, 'Заблокирован'),
+      role && h('span', { class: 'badge neutral' }, roleRu(role)))),
+
+    canAssign && h('h2', {}, 'Назначить чеклист'),
+    canAssign && h('div', { class: 'card' },
+      h('label', { style: 'margin-top:0' }, 'Шаблоны (можно несколько)'), tplBox,
+      h('label', {}, 'Срок'), due,
+      h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
+        if (!picked.size) return toast('Выберите хотя бы один чеклист', true);
+        const btn = e.currentTarget; btn.disabled = true;
+        let ok = 0, fail = 0, lastErr;
+        for (const templateId of picked) {
+          const body = { templateId, assigneeId: u.id };
+          if (due.value) body.dueAt = new Date(due.value).toISOString();
+          try { await api('POST', '/checklists/runs', body); ok++; } catch (err) { fail++; lastErr = err; }
+        }
+        if (ok) { toast(`Назначено: ${ok}` + (fail ? `, ошибок: ${fail}` : '')); show(() => openUser(id)); }
+        else { toast(lastErr?.message || 'Не удалось назначить', true); btn.disabled = false; }
+      } }, 'Назначить')),
+
+    h('h2', {}, 'Полномочия'),
+    h('div', { class: 'card' },
+      canRole ? [
+        h('label', { style: 'margin-top:0' }, 'Роль'), roleBox,
+        h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
+          if (!newRole || newRole === role) return toast('Роль не изменилась');
+          const btn = e.currentTarget; btn.disabled = true;
+          try {
+            await updateUserRole(u, newRole);
+            const fresh = (await loadUsers()).find(x => x.id === u.id);
+            const got = fresh ? userRoleCode(fresh).toUpperCase() : newRole;
+            if (got && got !== newRole) { toast('Сервер принял запрос, но роль не изменилась', true); btn.disabled = false; }
+            else { toast('Полномочия обновлены'); show(() => openUser(id)); }
+          } catch (err) {
+            toast(err.status === 403 ? 'Недостаточно прав' : (err.status === 404 || err.status === 405) ? 'Смена роли пока недоступна на сервере' : (err.message || 'Ошибка'), true);
+            btn.disabled = false;
+          }
+        } }, 'Сохранить роль'),
+      ] : h('div', { class: 'muted' }, isMe ? 'Это ваш аккаунт — свою роль менять нельзя.' : 'Менять роли может только руководитель или администратор.' + (role ? ' Сейчас: ' + roleRu(role) : ''))),
+
+    canPerm && h('h2', {}, 'Права доступа'),
+    canPerm && h('div', { class: 'card' },
+      !Array.isArray(u.permissions) && h('div', { class: 'small', style: 'margin-bottom:8px' }, 'Сервер не отдал текущие права — сохранятся только отмеченные.'),
+      permBox,
+      h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
+        const btn = e.currentTarget; btn.disabled = true;
+        try { await updateUserPerms(u, [...perms]); toast('Права обновлены'); show(() => openUser(id)); }
+        catch (err) { toast(err.status === 403 ? 'Недостаточно прав' : (err.status === 404 || err.status === 405) ? 'Управление правами пока недоступно на сервере' : (err.message || 'Ошибка'), true); btn.disabled = false; }
+      } }, 'Сохранить права')),
+
+    canAcc && h('h2', {}, 'Аккаунт'),
+    canAcc && h('div', { class: 'card' },
+      h('div', { class: 'muted' }, blocked ? 'Аккаунт заблокирован: войти нельзя.' : 'Аккаунт активен.'),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-sm ' + (blocked ? 'btn-primary' : 'btn-danger'), type: 'button', onclick: async (e) => {
+          if (!blocked && !confirm(`Заблокировать «${personName(u)}»? Он не сможет войти.`)) return;
+          const btn = e.currentTarget; btn.disabled = true;
+          try {
+            await tryApi([['PATCH', `/users/${u.id}`, { isActive: blocked }], ['POST', `/users/${u.id}/${blocked ? 'unblock' : 'block'}`, {}]]);
+            const fresh = (await loadUsers()).find(x => x.id === u.id);
+            const nowBlocked = fresh && (fresh.isActive === false || fresh.blocked === true || fresh.disabled === true || /BLOCK|DISABLED/i.test(String(fresh.status || '')));
+            if (fresh && nowBlocked === blocked) { toast('Сервер принял запрос, но статус не изменился', true); btn.disabled = false; }
+            else { toast(blocked ? 'Аккаунт разблокирован' : 'Аккаунт заблокирован'); show(() => openUser(id)); }
+          } catch (err) { toast(err.status === 404 || err.status === 405 ? 'Блокировка пока недоступна на сервере' : (err.message || 'Ошибка'), true); btn.disabled = false; }
+        } }, blocked ? 'Разблокировать' : 'Заблокировать'),
+        h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: async (e) => {
+          if (!confirm(`Сбросить пароль «${personName(u)}»? Старый пароль перестанет работать.`)) return;
+          const btn = e.currentTarget; btn.disabled = true;
+          try {
+            const r = await tryApi([['POST', `/users/${u.id}/reset-password`, {}], ['POST', `/users/${u.id}/password/reset`, {}], ['POST', '/auth/password/admin-reset', { userId: u.id }]]);
+            const pw = r?.temporaryPassword || r?.tempPassword || r?.password || r?.data?.temporaryPassword;
+            tempBox.replaceChildren(h('div', { class: 'alert alert-success', style: 'margin-top:12px' },
+              h('div', {}, pw ? 'Временный пароль (при входе сотрудник задаст свой):' : 'Сброс запущен. Сотрудник получит ссылку для нового пароля.'),
+              pw && h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, pw),
+              pw && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(pw) }, 'Копировать')));
+          } catch (err) { toast(err.status === 404 || err.status === 405 ? 'Сброс пароля пока недоступен на сервере' : (err.message || 'Ошибка'), true); }
+          btn.disabled = false;
+        } }, 'Сбросить пароль')),
+      tempBox),
+
+    !isMe && h('h2', {}, 'Написать сотруднику'),
+    !isMe && h('div', { class: 'card' }, thread, msgField,
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: async (e) => {
+          const text = msgField.value.trim(); if (!text) return toast('Введите текст сообщения', true);
+          const btn = e.currentTarget; btn.disabled = true;
+          try { await sendMessage(u, text); msgField.value = ''; msgs.push({ id: 'tmp' + Date.now(), senderId: state.me.id, text, createdAt: new Date().toISOString() }); drawThread(); loadThread(); }
+          catch (err) { toast(err.status === 404 || err.status === 405 ? 'Сообщения пока недоступны на сервере' : (err.message || 'Не удалось отправить'), true); }
+          btn.disabled = false;
+        } }, 'Отправить'),
+        (u.telegramUsername || u.telegram) && h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => {
+          const link = 'https://t.me/' + String(u.telegramUsername || u.telegram).replace(/^@/, '');
+          if (tg?.openTelegramLink) tg.openTelegramLink(link); else window.open(link, '_blank');
+        } }, 'Открыть в Telegram'))),
+
+    runs.length > 0 && h('h2', {}, `Чеклисты сотрудника · ${runs.length}`),
+    runs.length > 0 && sortRuns(runs).slice(0, 10).map(r => runCard(r, false)),
+
+    canDel && h('button', { class: 'btn btn-danger', style: 'margin-top:18px', onclick: async () => {
+      if (!confirm(`Удалить «${personName(u)}»?`)) return;
+      if (await deleteUser(u)) goBack();
+    } }, 'Удалить сотрудника')
+  );
+}
+
+async function codesApi(method, suffix, body) {
+  let last;
+  for (const p of ['/org/invite-codes', '/invite-codes', '/auth/invite-codes']) {
+    try { return await api(method, p + suffix, body); }
+    catch (e) { last = e; if (e.status !== 404 && e.status !== 405) throw e; }
+  }
+  throw last;
+}
+async function renderCodes() {
+  let list;
+  try { const r = await codesApi('GET', ''); list = Array.isArray(r) ? r : (r?.codes || arr(r)); }
+  catch (e) { return loadFail(e, 'Коды регистрации', () => show(renderCodes)); }
+  const genCode = () => 'ORG-' + Math.random().toString(36).slice(2, 8).toUpperCase();
+  let editId = null;
+  const code = h('input', { type: 'text', placeholder: 'Например: COFFEE-2026', autocomplete: 'off', autocapitalize: 'characters' });
+  const roleSel = h('select', {}, ...['MEMBER', 'MANAGER', 'VIEWER'].map(c => h('option', { value: c }, ROLE_RU[c])));
+  const maxUses = h('input', { type: 'number', min: '1', placeholder: 'Без ограничения' });
+  const saveBtn = h('button', { class: 'btn btn-primary', style: 'margin-top:14px', type: 'button' }, 'Создать код');
+  const cancelEdit = h('button', { class: 'btn btn-ghost hidden', type: 'button' }, 'Отменить изменение');
+  const reset = () => { editId = null; code.value = ''; maxUses.value = ''; roleSel.value = 'MEMBER'; saveBtn.textContent = 'Создать код'; cancelEdit.classList.add('hidden'); };
+  cancelEdit.onclick = reset;
+  saveBtn.onclick = async () => {
+    const value = code.value.trim();
+    if (!/^[A-Za-z0-9_-]{4,32}$/.test(value)) return toast('Код: 4–32 символа, латиница, цифры, - и _', true);
+    const body = { code: value, roleCode: roleSel.value, maxUses: maxUses.value ? Number(maxUses.value) : null, workspaceId: state.wsId };
+    saveBtn.disabled = true;
+    try { if (editId) await codesApi('PATCH', '/' + editId, body); else await codesApi('POST', '', body); toast(editId ? 'Код изменён' : 'Код создан'); show(renderCodes); }
+    catch (e) { toast(e.status === 409 ? 'Такой код уже есть' : e.status === 404 ? 'Коды пока недоступны на сервере' : (e.message || 'Ошибка'), true); saveBtn.disabled = false; }
+  };
+  const row = (c) => {
+    const active = c.active !== false && !c.disabled;
+    return h('div', { class: 'card' },
+      h('div', { class: 'row' }, h('span', { class: 'code-chip' }, c.code),
+        h('span', { class: 'badge ' + (active ? 'ok' : 'neutral') }, active ? 'Активен' : 'Выключен')),
+      h('div', { class: 'muted', style: 'margin-top:6px' }, `${roleRu(c.roleCode || c.role || 'MEMBER')} · использован ${c.usedCount ?? c.uses ?? 0}${c.maxUses ? ' из ' + c.maxUses : ' раз'}`),
+      h('div', { class: 'gap', style: 'margin-top:12px' },
+        h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => { editId = c.id; code.value = c.code; roleSel.value = ['MEMBER', 'MANAGER', 'VIEWER'].includes(String(c.roleCode || c.role).toUpperCase()) ? String(c.roleCode || c.role).toUpperCase() : 'MEMBER'; maxUses.value = c.maxUses || ''; saveBtn.textContent = 'Сохранить изменения'; cancelEdit.classList.remove('hidden'); window.scrollTo(0, 0); } }, 'Изменить'),
+        h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: async () => { try { await codesApi('PATCH', '/' + c.id, { active: !active }); show(renderCodes); } catch (e) { toast(e.message, true); } } }, active ? 'Выключить' : 'Включить'),
+        h('button', { class: 'btn btn-danger btn-sm', type: 'button', onclick: async () => {
+          if (!confirm(`Удалить код «${c.code}»? Регистрация по нему станет невозможна.`)) return;
+          try { await codesApi('DELETE', '/' + c.id); toast('Код удалён'); show(renderCodes); } catch (e) { toast(e.message, true); }
+        } }, 'Удалить')));
+  };
+  setView(
+    h('div', { class: 'card' },
+      h('strong', {}, 'Код регистрации'),
+      h('div', { class: 'small', style: 'margin-top:4px' }, 'Многоразовый. Его можно менять и выключать. Код не даёт прав администратора — только выбранную роль.'),
+      h('label', {}, 'Код'), code,
+      h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { code.value = genCode(); } }, 'Сгенерировать'),
+      h('label', {}, 'Роль новых сотрудников'), roleSel,
+      h('label', {}, 'Сколько раз можно использовать'), maxUses,
+      saveBtn, cancelEdit),
+    h('h2', {}, 'Действующие коды'),
+    ...(list.length ? list.map(row) : [emptyState('Кодов пока нет', 'Создайте первый код выше')])
+  );
+}
 async function renderPeople() {
   const users = can('users.read') ? await loadUsers() : [];
   const out = h('div'); const nodes = [];
   if (can('users.create')) {
     const f = {
-      nick: h('input', { type: 'text', placeholder: 'nickname', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false' }),
+      nick: h('input', { type: 'text', placeholder: 'Никнейм (уникальный)', autocomplete: 'off', autocapitalize: 'none' }),
+      email: h('input', { type: 'email', placeholder: 'email@company.com' }),
       first: h('input', { type: 'text', placeholder: 'Имя' }),
       last: h('input', { type: 'text', placeholder: 'Фамилия' }),
       role: h('select', {}, h('option', { value: 'MEMBER' }, 'Исполнитель'), h('option', { value: 'MANAGER' }, 'Руководитель'), h('option', { value: 'VIEWER' }, 'Наблюдатель'), h('option', { value: 'ADMIN' }, 'Администратор')),
@@ -2512,27 +2830,30 @@ async function renderPeople() {
       h('button', { class: 'btn btn-secondary btn-sm', type: 'button', style: 'margin-top:8px', onclick: () => { manual.value = genPassword(); } }, 'Сгенерировать'));
     mode.onchange = () => { manualRow.classList.toggle('hidden', mode.value !== 'manual'); if (mode.value === 'manual' && !manual.value) manual.value = genPassword(); };
     window.__addForm = (h('div', { class: 'card', style: 'margin:0;border:none;background:transparent;box-shadow:none' },
-      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Никнейм (для входа)'), f.nick, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
+      h('strong', { style: 'font-size:18px' }, 'Новый сотрудник'), h('label', {}, 'Никнейм'), f.nick, h('label', {}, 'Email'), f.email, h('label', {}, 'Имя'), f.first, h('label', {}, 'Фамилия'), f.last, h('label', {}, 'Роль'), f.role,
       h('label', {}, 'Пароль'), mode, manualRow,
       h('button', { class: 'btn btn-primary', style: 'margin-top:14px', onclick: async (e) => {
-        const btn = e.currentTarget, nickname = f.nick.value.trim().replace(/^@/, ''), pw = mode.value === 'manual' ? manual.value.trim() : '';
-        if (!NICK_RE.test(nickname)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
+        const btn = e.currentTarget, email = f.email.value.trim(), pw = mode.value === 'manual' ? manual.value.trim() : '';
+        const nickname = f.nick.value.trim().replace(/^@/, '');
+        if (!/^[A-Za-z0-9_.]{3,32}$/.test(nickname)) return toast('Никнейм: 3–32 символа, латиница, цифры, _ и .', true);
+        if (users.some(x => String(x.nickname || '').toLowerCase() === nickname.toLowerCase())) return toast('Этот никнейм уже занят', true);
+        if (!email) return toast('Укажите email', true);
         if (mode.value === 'manual' && (pw.length < 8 || !/\d/.test(pw) || !/[A-Za-zА-Яа-я]/.test(pw))) return toast('Пароль: от 8 символов, буквы и цифры', true);
         btn.disabled = true;
-        const base = { email, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value };
+        const base = { email, nickname, firstName: f.first.value.trim(), lastName: f.last.value.trim(), roleCode: f.role.value, workspaceId: state.wsId };
         const tries = pw ? [{ ...base, temporaryPassword: pw, requirePasswordChange: true }, { ...base, password: pw, requirePasswordChange: true }, { ...base, temporaryPassword: pw }, { ...base, password: pw }] : [base];
         try {
           let r, last;
-          for (const b of tries) { try { r = await api('POST', `/users?workspaceId=${state.wsId}`, b); break; } catch (err) { last = err; if (err.status !== 400 && err.status !== 422) throw err; } }
+          for (const b of tries) { try { r = await api('POST', '/users', b); break; } catch (err) { last = err; if (err.status !== 400 && err.status !== 422) throw err; } }
           if (!r) throw last;
           const shown = pw || r?.temporaryPassword || r?.tempPassword || r?.initialPassword || r?.password || r?.data?.temporaryPassword;
           const box = h('div', { class: 'alert alert-success' }, h('div', {}, 'Сотрудник создан'));
           if (shown) box.append(h('div', { style: 'font:600 18px monospace;margin:8px 0;user-select:all;word-break:break-all' }, shown),
             h('button', { class: 'btn btn-secondary btn-sm', type: 'button', onclick: () => copyText(shown) }, 'Копировать'),
             h('div', { class: 'small', style: 'margin-top:6px' }, 'Временный пароль: при первом входе сотрудник задаст свой'));
-          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Создайте сотрудника с временным паролем, заданным вручную'));
+          else box.append(h('div', { class: 'small', style: 'margin-top:6px' }, 'Сервер не вернул пароль. Сотрудник может нажать «Забыли пароль?» при входе'));
           out.replaceChildren(box);
-          f.nick.value = f.first.value = f.last.value = manual.value = '';
+          f.email.value = f.nick.value = f.first.value = f.last.value = manual.value = '';
         } catch (err) { toast(err.message || 'Не удалось создать сотрудника', true); }
         btn.disabled = false;
       } }, 'Создать'), out));
@@ -2545,13 +2866,13 @@ async function renderPeople() {
       const closeAll = (ex) => group.querySelectorAll('.list-row.open').forEach(r => { if (r !== ex) r.classList.remove('open'); });
       users.forEach(u => {
         const isMe = u.id === state.me?.id;
-        const roleLabel = u.roleCode || u.role || u.roleName || '';
+        const roleLabel = roleRu(userRoleCode(u));
         const showRole = roleLabel && roleLabel !== '—' && roleLabel !== '-';
         const row = h('div', { class: 'list-row' });
-        const inner = h('div', { class: 'list-row-inner' },
+        const inner = h('div', { class: 'list-row-inner', style: 'cursor:pointer' },
           h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
-          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, atNick(u))),
-          showRole && h('span', { class: 'badge neutral' }, roleLabel));
+          h('div', { style: 'min-width:0;flex:1' }, h('strong', { style: 'font-size:15px;display:block' }, personName(u) || 'Без имени'), h('div', { class: 'muted', style: 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap' }, u.email || '')),
+          showRole && h('span', { class: 'badge neutral' }, roleLabel), h('span', { class: 'muted' }, '›'));
         if (!isMe && canDelete) {
           const actions = h('div', { class: 'list-row-actions' }, h('button', { class: 'act-delete', type: 'button', onclick: async (e) => {
             e.stopPropagation();
@@ -2559,12 +2880,12 @@ async function renderPeople() {
             if (await deleteUser(u)) go('people'); else row.classList.remove('open');
           } }, 'Удалить'));
           row.append(actions, inner);
-          let startX = 0, currentX = 0, dragging = false;
-          inner.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentX = startX; dragging = true; closeAll(row); }, { passive: true });
-          inner.addEventListener('touchmove', (e) => { if (!dragging) return; currentX = e.touches[0].clientX; const dx = currentX - startX; if (dx < 0) { inner.style.transition = 'none'; inner.style.transform = `translateX(${Math.max(dx, -88)}px)`; } }, { passive: true });
+          let startX = 0, currentX = 0, dragging = false, moved = false;
+          inner.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; currentX = startX; dragging = true; moved = false; closeAll(row); }, { passive: true });
+          inner.addEventListener('touchmove', (e) => { if (!dragging) return; currentX = e.touches[0].clientX; const dx = currentX - startX; if (Math.abs(dx) > 8) moved = true; if (dx < 0) { inner.style.transition = 'none'; inner.style.transform = `translateX(${Math.max(dx, -88)}px)`; } }, { passive: true });
           inner.addEventListener('touchend', () => { if (!dragging) return; dragging = false; inner.style.transition = ''; if (currentX - startX < -40) { row.classList.add('open'); inner.style.transform = ''; } else { row.classList.remove('open'); inner.style.transform = ''; } });
-          inner.addEventListener('click', () => { if (row.classList.contains('open')) row.classList.remove('open'); });
-        } else row.append(inner);
+          inner.addEventListener('click', () => { if (moved) { moved = false; return; } if (row.classList.contains('open')) row.classList.remove('open'); else openUserNav(u.id); });
+        } else { row.append(inner); inner.addEventListener('click', () => openUserNav(u.id)); }
         group.append(row);
       });
       nodes.push(group);
@@ -2591,6 +2912,7 @@ async function renderProfile() {
   const first = h('input', { type: 'text', value: me.firstName || '', placeholder: 'Имя' });
   const last = h('input', { type: 'text', value: me.lastName || '', placeholder: 'Фамилия' });
   const nick = h('input', { type: 'text', value: me.nickname || '', placeholder: 'Никнейм' });
+  const email = h('input', { type: 'email', value: me.email || '', placeholder: 'email@company.com' });
   const cur = h('input', { type: 'password', autocomplete: 'current-password' });
   const n1 = h('input', { type: 'password', autocomplete: 'new-password' });
   const n2 = h('input', { type: 'password', autocomplete: 'new-password' });
@@ -2623,7 +2945,7 @@ async function renderProfile() {
   setView(
     me.requirePasswordChange && h('div', { class: 'alert alert-info' }, 'Нужно сменить пароль.'),
     h('div', { class: 'card' },
-      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, atNick(me)))),
+      h('div', { class: 'row' }, avatarBox, h('div', { style: 'flex:1' }, h('strong', { style: 'font-size:17px' }, personName(me)), h('div', { class: 'muted' }, me.email), me.nickname && h('div', { class: 'small' }, '@' + me.nickname))),
       h('div', { class: 'gap', style: 'margin-top:14px' },
         h('button', { class: 'btn btn-primary btn-sm', type: 'button', onclick: () => fileInput.click() }, 'Фото'),
         emojiBtn,
@@ -2636,35 +2958,29 @@ async function renderProfile() {
     ),
     h('h2', {}, 'Данные'),
     h('div', { class: 'card' },
-      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм (для входа)'), nick,
+      h('label', { style: 'margin-top:0' }, 'Имя'), first, h('label', {}, 'Фамилия'), last, h('label', {}, 'Никнейм'), nick, h('label', {}, 'Email'), email,
       h('button', { class: 'btn btn-primary', onclick: async (e) => {
-        const btn = e.currentTarget;
-        const nickV = nick.value.trim().replace(/^@/, '');
-        if (!NICK_RE.test(nickV)) return toast('Никнейм: 3–32 символа, латиница, цифры, точка, _ или -', true);
-        const body = { firstName: first.value.trim(), lastName: last.value.trim(), nickname: nickV };
-        btn.disabled = true;
+        const body = { firstName: first.value.trim(), lastName: last.value.trim() };
+        if (nick.value.trim()) body.nickname = nick.value.trim().replace(/^@/, '');
+        if (body.nickname) {
+          const others = await loadUsers();
+          if (others.some(x => x.id !== me.id && String(x.nickname || '').toLowerCase() === body.nickname.toLowerCase())) return toast('Этот никнейм уже занят', true);
+        }
+        if (email.value.trim() && email.value.trim() !== me.email) body.email = email.value.trim();
+        e.target.disabled = true;
         try {
-          let onServer = true;
-          try { await api('PATCH', '/users/me', body); }
+          try { await api('PATCH', `/users/${me.id}`, body); toast('Профиль обновлён'); }
           catch (err) {
             const msg = String(err.message || '');
-            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) onServer = false;
-            else throw err;
+            if (err.status === 404 || err.status === 405 || /cannot|not allowed|method/i.test(msg)) {
+              Object.assign(state.me, body);
+              localStorage.setItem('profileLocal', JSON.stringify({ firstName: state.me.firstName, lastName: state.me.lastName, nickname: state.me.nickname || '' }));
+              toast('Сохранено локально (сервер пока без API)', true);
+            } else throw err;
           }
-          if (onServer) {
-            localStorage.removeItem('profileLocal');
-            try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; }
-            catch { Object.assign(state.me, body); }
-            toast('Профиль сохранён');
-          } else {
-            Object.assign(state.me, body);
-            localStorage.setItem('profileLocal', JSON.stringify({ id: me.id, ...body }));
-            toast('Сохранено на этом устройстве: сервер не принимает изменения профиля', true);
-          }
-          localStorage.setItem('lastNick', state.me.nickname || nickV);
+          try { state.me = await api('GET', '/auth/me'); csrfToken = state.me.csrfToken || csrfToken; } catch { Object.assign(state.me, body); }
           updateSideUser(); go('me');
-        } catch (err) { toast(err.message || 'Не удалось сохранить', true); }
-        finally { btn.disabled = false; }
+        } catch (err) { toast(err.message || 'Ошибка', true); e.target.disabled = false; }
       } }, 'Сохранить профиль')
     ),
     h('h2', {}, 'Пароль'),
@@ -2699,7 +3015,7 @@ function renderSettings() {
           ),
           h('div', { style: 'min-width:0' },
             h('strong', { style: 'font-size:16px' }, personName(me) || 'Профиль'),
-            h('div', { class: 'muted' }, atNick(me)),
+            h('div', { class: 'muted' }, me?.email || ''),
             h('div', { class: 'small' }, 'Открыть профиль')
           )
         ),
@@ -2712,25 +3028,31 @@ function renderSettings() {
           h('span', { html: icons.tune, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
           h('div', {}, h('strong', {}, 'Панели'), h('div', { class: 'small' }, 'Верхняя панель и нижняя консоль'))),
         h('span', { class: 'muted' }, '›'))),
+    (can('users.manage') || can('users.create')) && h('div', { class: 'card click', style: 'margin-top:12px', onclick: () => go('codes') },
+      h('div', { class: 'row' },
+        h('div', { style: 'display:flex;gap:12px;align-items:center' },
+          h('span', { html: icons.people, style: 'width:22px;height:22px;display:flex;color:var(--accent)' }),
+          h('div', {}, h('strong', {}, 'Коды регистрации'), h('div', { class: 'small' }, 'Вход новых сотрудников по коду'))),
+        h('span', { class: 'muted' }, '›'))),
     h('h2', {}, 'Оформление'),
     h('div', { class: 'card' },
       h('strong', {}, 'Тема'),
       h('div', { class: 'gap', style: 'margin-top:12px' },
-        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.theme = 'light'; applyAppearance(); go('settings'); }, e) }, 'Светлая'),
-        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.theme = 'dark'; applyAppearance(); go('settings'); }, e) }, 'Тёмная')
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'light' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'light'; applyAppearance(); go('settings'); } }, 'Светлая'),
+        h('button', { class: 'btn btn-sm ' + (state.theme === 'dark' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.theme = 'dark'; applyAppearance(); go('settings'); } }, 'Тёмная')
       )
     ),
     h('div', { class: 'card' },
       h('strong', {}, 'Цвет'),
       h('div', { class: 'swatches' },
-        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: (e) => changeAppearance(() => { state.accent = a.id; applyAppearance(); go('settings'); }, e) }))
+        ...accents.map(a => h('button', { class: 'swatch' + (state.accent === a.id ? ' on' : ''), type: 'button', style: `background:${a.color}`, onclick: () => { state.accent = a.id; applyAppearance(); go('settings'); } }))
       )
     ),
     h('div', { class: 'card' },
       h('strong', {}, 'Контраст'),
       h('div', { class: 'gap', style: 'margin-top:12px' },
-        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.contrast = 'normal'; applyAppearance(); go('settings'); }, e) }, 'Обычный'),
-        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: (e) => changeAppearance(() => { state.contrast = 'high'; applyAppearance(); go('settings'); }, e) }, 'Высокий')
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'normal' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'normal'; applyAppearance(); go('settings'); } }, 'Обычный'),
+        h('button', { class: 'btn btn-sm ' + (state.contrast === 'high' ? 'btn-primary' : 'btn-secondary'), onclick: () => { state.contrast = 'high'; applyAppearance(); go('settings'); } }, 'Высокий')
       )
     ),
     h('button', {
@@ -2751,7 +3073,7 @@ async function renderSearch() {
   const clearBtn = h('button', {
     class: 'topbar-btn', type: 'button',
     style: 'position:absolute;right:4px;top:50%;transform:translateY(-50%);width:36px;height:36px;color:var(--text-muted)',
-    onclick: () => { state.searchQuery = ''; go(state.searchPrevTab || 'all'); },
+    onclick: () => { state.searchQuery = ''; goBack(); },
   });
   clearBtn.innerHTML = icons.back ? icons.back.replace('M15 18l-6-6 6-6', 'M18 6L6 18M6 6l12 12') : '×';
   // X icon
@@ -2786,8 +3108,8 @@ async function renderSearch() {
     } catch {}
     if (can('users.read')) {
       try {
-        const users = arr(await api('GET', `/users?workspaceId=${state.wsId}`));
-        users.filter(u => (personName(u) + ' ' + (u.nickname || '')).toLowerCase().includes(query))
+        const users = arr(await api('GET', '/users'));
+        users.filter(u => (personName(u) + ' ' + (u.email || '')).toLowerCase().includes(query))
           .forEach(u => results.push({ type: 'user', data: u }));
       } catch {}
     }
@@ -2804,7 +3126,7 @@ async function renderSearch() {
       nodes.push(h('div', { class: 'section-label' }, 'Шаблоны'));
       tpls.forEach(({ data: t }) => {
         const cnt = t.items?.length ?? t._count?.items;
-        nodes.push(h('div', { class: 'card click', onclick: () => show(() => showAssign(t)) },
+        nodes.push(h('div', { class: 'card click', onclick: () => push(() => showAssign(t)) },
           h('strong', {}, t.title),
           t.description && h('div', { class: 'muted' }, t.description),
           cnt != null && h('div', { class: 'small', style: 'margin-top:6px' }, pluralPunkty(cnt))
@@ -2820,7 +3142,7 @@ async function renderSearch() {
               h('div', { class: 'avatar-lg', style: 'width:40px;height:40px;font-size:14px' }, initials(u)),
               h('div', {},
                 h('strong', {}, personName(u)),
-                h('div', { class: 'muted' }, atNick(u))
+                h('div', { class: 'muted' }, u.email || '')
               )
             )
           )
@@ -2837,7 +3159,7 @@ async function renderSearch() {
     debounce = setTimeout(runSearch, 280);
   });
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { state.searchQuery = ''; go(state.searchPrevTab || 'all'); }
+    if (e.key === 'Escape') { state.searchQuery = ''; goBack(); }
   });
   await runSearch();
 }
